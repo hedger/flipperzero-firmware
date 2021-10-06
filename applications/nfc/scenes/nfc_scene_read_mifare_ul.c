@@ -1,13 +1,13 @@
 #include "../nfc_i.h"
 
-#define NFC_READ_MIFARE_UL_CUSTOM_EVENT (0UL)
+#define NFC_READ_MIFARE_UL_CUSTOM_EVENT (10UL)
 
 void nfc_read_mifare_ul_worker_callback(void* context) {
     Nfc* nfc = (Nfc*)context;
     view_dispatcher_send_custom_event(nfc->view_dispatcher, NFC_READ_MIFARE_UL_CUSTOM_EVENT);
 }
 
-const void nfc_scene_read_mifare_ul_on_enter(void* context) {
+void nfc_scene_read_mifare_ul_on_enter(void* context) {
     Nfc* nfc = (Nfc*)context;
 
     // Setup view
@@ -25,7 +25,7 @@ const void nfc_scene_read_mifare_ul_on_enter(void* context) {
         nfc);
 }
 
-const bool nfc_scene_read_mifare_ul_on_event(void* context, SceneManagerEvent event) {
+bool nfc_scene_read_mifare_ul_on_event(void* context, SceneManagerEvent event) {
     Nfc* nfc = (Nfc*)context;
 
     if(event.type == SceneManagerEventTypeCustom) {
@@ -40,7 +40,7 @@ const bool nfc_scene_read_mifare_ul_on_event(void* context, SceneManagerEvent ev
     return false;
 }
 
-const void nfc_scene_read_mifare_ul_on_exit(void* context) {
+void nfc_scene_read_mifare_ul_on_exit(void* context) {
     Nfc* nfc = (Nfc*)context;
 
     // Stop worker

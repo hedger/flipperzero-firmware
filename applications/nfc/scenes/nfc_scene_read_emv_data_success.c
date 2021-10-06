@@ -1,19 +1,20 @@
 #include "../nfc_i.h"
 #include "../helpers/nfc_emv_parser.h"
 
-void nfc_scene_read_emv_data_success_widget_callback(GuiButtonType result, void* context) {
+void nfc_scene_read_emv_data_success_widget_callback(
+    GuiButtonType result,
+    InputType type,
+    void* context) {
     Nfc* nfc = (Nfc*)context;
-
-    view_dispatcher_send_custom_event(nfc->view_dispatcher, result);
+    if(type == InputTypeShort) {
+        view_dispatcher_send_custom_event(nfc->view_dispatcher, result);
+    }
 }
 
 void nfc_scene_read_emv_data_success_on_enter(void* context) {
     Nfc* nfc = (Nfc*)context;
     NfcEmvData* emv_data = &nfc->dev.dev_data.emv_data;
     NfcDeviceCommonData* nfc_data = &nfc->dev.dev_data.nfc_data;
-
-    // Clear device name
-    nfc_device_set_name(&nfc->dev, "");
 
     // Setup Custom Widget view
     // Add frame
@@ -35,20 +36,15 @@ void nfc_scene_read_emv_data_success_on_enter(void* context) {
     widget_add_string_element(
         nfc->widget, 64, 3, AlignCenter, AlignTop, FontSecondary, nfc->dev.dev_data.emv_data.name);
     // Add cad number
-    char pan_str[32];
-    snprintf(
-        pan_str,
-        sizeof(pan_str),
-        "%02X%02X %02X%02X %02X%02X %02X%02X",
-        emv_data->number[0],
-        emv_data->number[1],
-        emv_data->number[2],
-        emv_data->number[3],
-        emv_data->number[4],
-        emv_data->number[5],
-        emv_data->number[6],
-        emv_data->number[7]);
-    widget_add_string_element(nfc->widget, 64, 13, AlignCenter, AlignTop, FontSecondary, pan_str);
+    string_t pan_str;
+    string_init(pan_str);
+    for(uint8_t i = 0; i < emv_data->number_len; i += 2) {
+        string_cat_printf(pan_str, "%02X%02X ", emv_data->number[i], emv_data->number[i + 1]);
+    }
+    string_strim(pan_str);
+    widget_add_string_element(
+        nfc->widget, 64, 13, AlignCenter, AlignTop, FontSecondary, string_get_cstr(pan_str));
+    string_clear(pan_str);
     // Parse country code
     string_t country_name;
     string_init(country_name);
@@ -106,10 +102,18 @@ void nfc_scene_read_emv_data_success_on_enter(void* context) {
         widget_add_string_element(nfc->widget, 7, 32, AlignLeft, AlignTop, FontSecondary, exp_str);
     }
 
+    // Send notification
+    if(scene_manager_get_scene_state(nfc->scene_manager, NfcSceneReadEmvDataSuccess) ==
+       NFC_SEND_NOTIFICATION_TRUE) {
+        notification_message(nfc->notifications, &sequence_success);
+        scene_manager_set_scene_state(
+            nfc->scene_manager, NfcSceneReadEmvDataSuccess, NFC_SEND_NOTIFICATION_FALSE);
+    }
+
     view_dispatcher_switch_to_view(nfc->view_dispatcher, NfcViewWidget);
 }
 
-const bool nfc_scene_read_emv_data_success_on_event(void* context, SceneManagerEvent event) {
+bool nfc_scene_read_emv_data_success_on_event(void* context, SceneManagerEvent event) {
     Nfc* nfc = (Nfc*)context;
 
     if(event.type == SceneManagerEventTypeCustom) {
@@ -117,6 +121,8 @@ const bool nfc_scene_read_emv_data_success_on_event(void* context, SceneManagerE
             return scene_manager_search_and_switch_to_previous_scene(
                 nfc->scene_manager, NfcSceneReadEmvAppSuccess);
         } else if(event.event == GuiButtonTypeRight) {
+            // Clear device name
+            nfc_device_set_name(&nfc->dev, "");
             nfc->dev.format = NfcDeviceSaveFormatBankCard;
             scene_manager_next_scene(nfc->scene_manager, NfcSceneSaveName);
             return true;
@@ -128,7 +134,7 @@ const bool nfc_scene_read_emv_data_success_on_event(void* context, SceneManagerE
     return false;
 }
 
-const void nfc_scene_read_emv_data_success_on_exit(void* context) {
+void nfc_scene_read_emv_data_success_on_exit(void* context) {
     Nfc* nfc = (Nfc*)context;
 
     widget_clear(nfc->widget);

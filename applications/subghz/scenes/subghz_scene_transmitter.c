@@ -39,7 +39,7 @@ static void subghz_scene_transmitter_update_data_show(void* context) {
         } else if(subghz->txrx->preset == FuriHalSubGhzPreset2FSKAsync) {
             snprintf(preset_str, sizeof(preset_str), "FM");
         } else {
-            furi_check(0);
+            furi_crash(NULL);
         }
 
         subghz_transmitter_add_data_to_show(
@@ -55,7 +55,7 @@ static void subghz_scene_transmitter_update_data_show(void* context) {
     }
 }
 
-const void subghz_scene_transmitter_on_enter(void* context) {
+void subghz_scene_transmitter_on_enter(void* context) {
     SubGhz* subghz = context;
     subghz_transmitter_set_callback(
         subghz->subghz_transmitter, subghz_scene_transmitter_callback, subghz);
@@ -64,27 +64,29 @@ const void subghz_scene_transmitter_on_enter(void* context) {
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewTransmitter);
 }
 
-const bool subghz_scene_transmitter_on_event(void* context, SceneManagerEvent event) {
+bool subghz_scene_transmitter_on_event(void* context, SceneManagerEvent event) {
     SubGhz* subghz = context;
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubghzTransmitterEventSendStart) {
-            subghz->state_notifications = NOTIFICATION_TX_STATE;
+            subghz->state_notifications = NOTIFICATION_IDLE_STATE;
             if(subghz->txrx->txrx_state == SubGhzTxRxStateRx) {
-                subghz_rx_end(subghz->txrx->worker);
-                subghz->txrx->txrx_state = SubGhzTxRxStateIdle;
+                subghz_rx_end(subghz);
             }
-            if(subghz->txrx->txrx_state == SubGhzTxRxStateIdle) {
-                subghz_tx_start(subghz);
-                subghz_scene_transmitter_update_data_show(subghz);
-                subghz->txrx->txrx_state = SubGhzTxRxStateTx;
+            if((subghz->txrx->txrx_state == SubGhzTxRxStateIdle) ||
+               (subghz->txrx->txrx_state == SubGhzTxRxStateSleep)) {
+                if(!subghz_tx_start(subghz)) {
+                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowOnlyRx);
+                } else {
+                    subghz->state_notifications = NOTIFICATION_TX_STATE;
+                    subghz_scene_transmitter_update_data_show(subghz);
+                }
             }
             return true;
         } else if(event.event == SubghzTransmitterEventSendStop) {
             subghz->state_notifications = NOTIFICATION_IDLE_STATE;
             if(subghz->txrx->txrx_state == SubGhzTxRxStateTx) {
                 subghz_tx_stop(subghz);
-                subghz_sleep();
-                subghz->txrx->txrx_state = SubGhzTxRxStateIdle;
+                subghz_sleep(subghz);
             }
             return true;
         } else if(event.event == SubghzTransmitterEventBack) {
@@ -102,7 +104,7 @@ const bool subghz_scene_transmitter_on_event(void* context, SceneManagerEvent ev
     return false;
 }
 
-const void subghz_scene_transmitter_on_exit(void* context) {
+void subghz_scene_transmitter_on_exit(void* context) {
     SubGhz* subghz = context;
 
     subghz->state_notifications = NOTIFICATION_IDLE_STATE;

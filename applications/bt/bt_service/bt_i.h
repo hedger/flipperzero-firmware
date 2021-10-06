@@ -9,14 +9,19 @@
 #include <gui/view_port.h>
 #include <gui/view.h>
 
+#include <dialogs/dialogs.h>
+#include <power/power_service/power.h>
+
 #include "../bt_settings.h"
 
 typedef enum {
     BtMessageTypeUpdateStatusbar,
     BtMessageTypeUpdateBatteryLevel,
+    BtMessageTypePinCodeShow,
 } BtMessageType;
 
 typedef union {
+    uint32_t pin_code;
     uint8_t battery_level;
 } BtMessageData;
 
@@ -28,7 +33,9 @@ typedef struct {
 struct Bt {
     BtSettings bt_settings;
     osMessageQueueId_t message_queue;
-    osTimerId_t update_status_timer;
     Gui* gui;
     ViewPort* statusbar_view_port;
+    DialogsApp* dialogs;
+    DialogMessage* dialog_message;
+    Power* power;
 };

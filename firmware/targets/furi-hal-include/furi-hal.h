@@ -1,3 +1,8 @@
+/**
+ * @file furi-hal.h
+ * Furi HAL API
+ */
+
 #pragma once
 
 #ifdef __cplusplus
@@ -6,6 +11,7 @@ template <unsigned int N> struct STOP_EXTERNING_ME {};
 
 #include "furi-hal-boot.h"
 #include "furi-hal-clock.h"
+#include "furi-hal-crypto.h"
 #include "furi-hal-console.h"
 #include "furi-hal-os.h"
 #include "furi-hal-i2c.h"
@@ -27,6 +33,7 @@ template <unsigned int N> struct STOP_EXTERNING_ME {};
 #include "furi-hal-ibutton.h"
 #include "furi-hal-rfid.h"
 #include "furi-hal-nfc.h"
+#include "furi-hal-usb.h"
 
 /** Init furi-hal */
 void furi_hal_init();

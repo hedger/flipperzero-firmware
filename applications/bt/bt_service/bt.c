@@ -3,13 +3,6 @@
 
 #define BT_SERVICE_TAG "BT"
 
-// static void bt_update_statusbar(void* arg) {
-//     furi_assert(arg);
-//     Bt* bt = arg;
-//     BtMessage m = {.type = BtMessageTypeUpdateStatusbar};
-//     furi_check(osMessageQueuePut(bt->message_queue, &m, 0, osWaitForever) == osOK);
-// }
-
 static void bt_draw_statusbar_callback(Canvas* canvas, void* context) {
     canvas_draw_icon(canvas, 0, 0, &I_Bluetooth_5x8);
 }
@@ -22,6 +15,28 @@ static ViewPort* bt_statusbar_view_port_alloc() {
     return statusbar_view_port;
 }
 
+static void bt_pin_code_show_event_handler(Bt* bt, uint32_t pin) {
+    furi_assert(bt);
+    string_t pin_str;
+    string_init_printf(pin_str, "%06d", pin);
+    dialog_message_set_text(
+        bt->dialog_message, string_get_cstr(pin_str), 64, 32, AlignCenter, AlignCenter);
+    dialog_message_set_buttons(bt->dialog_message, "Back", NULL, NULL);
+    dialog_message_show(bt->dialogs, bt->dialog_message);
+    string_clear(pin_str);
+}
+
+static void bt_battery_level_changed_callback(const void* _event, void* context) {
+    furi_assert(_event);
+    furi_assert(context);
+
+    Bt* bt = context;
+    const PowerEvent* event = _event;
+    if(event->type == PowerEventTypeBatteryLevelChanged) {
+        bt_update_battery_level(bt, event->data.battery_level);
+    }
+}
+
 Bt* bt_alloc() {
     Bt* bt = furi_alloc(sizeof(Bt));
     // Load settings
@@ -31,54 +46,59 @@ Bt* bt_alloc() {
     // Alloc queue
     bt->message_queue = osMessageQueueNew(8, sizeof(BtMessage), NULL);
 
-    // doesn't make sense if we waiting for transition on service start
-    // bt->update_status_timer = osTimerNew(bt_update_statusbar, osTimerPeriodic, bt, NULL);
-    // osTimerStart(bt->update_status_timer, 4000);
-
     // Setup statusbar view port
     bt->statusbar_view_port = bt_statusbar_view_port_alloc();
     // Gui
     bt->gui = furi_record_open("gui");
     gui_add_view_port(bt->gui, bt->statusbar_view_port, GuiLayerStatusBarLeft);
 
-    return bt;
-}
+    // Dialogs
+    bt->dialogs = furi_record_open("dialogs");
+    bt->dialog_message = dialog_message_alloc();
 
-bool bt_update_battery_level(Bt* bt, uint8_t battery_level) {
-    BtMessage message = {
-        .type = BtMessageTypeUpdateBatteryLevel, .data.battery_level = battery_level};
-    return osMessageQueuePut(bt->message_queue, &message, 0, osWaitForever) == osOK;
+    // Power
+    bt->power = furi_record_open("power");
+    PubSub* power_pubsub = power_get_pubsub(bt->power);
+    subscribe_pubsub(power_pubsub, bt_battery_level_changed_callback, bt);
+
+    return bt;
 }
 
 int32_t bt_srv() {
     Bt* bt = bt_alloc();
     furi_record_create("bt", bt);
-    furi_hal_bt_init();
 
     if(!furi_hal_bt_wait_startup()) {
         FURI_LOG_E(BT_SERVICE_TAG, "Core2 startup failed");
     } else {
         view_port_enabled_set(bt->statusbar_view_port, true);
-        if(bt->bt_settings.enabled) {
-            bool bt_app_started = furi_hal_bt_start_app();
-            if(!bt_app_started) {
-                FURI_LOG_E(BT_SERVICE_TAG, "BT App start failed");
-            } else {
-                FURI_LOG_I(BT_SERVICE_TAG, "BT App started");
+        if(furi_hal_bt_init_app()) {
+            FURI_LOG_I(BT_SERVICE_TAG, "BLE stack started");
+            if(bt->bt_settings.enabled) {
+                furi_hal_bt_start_advertising();
+                FURI_LOG_I(BT_SERVICE_TAG, "Start advertising");
             }
+        } else {
+            FURI_LOG_E(BT_SERVICE_TAG, "BT App start failed");
         }
     }
+    // Update statusbar
+    view_port_enabled_set(bt->statusbar_view_port, furi_hal_bt_is_active());
 
     BtMessage message;
     while(1) {
         furi_check(osMessageQueueGet(bt->message_queue, &message, NULL, osWaitForever) == osOK);
         if(message.type == BtMessageTypeUpdateStatusbar) {
             // Update statusbar
-            view_port_enabled_set(bt->statusbar_view_port, furi_hal_bt_is_alive());
+            view_port_enabled_set(bt->statusbar_view_port, furi_hal_bt_is_active());
         } else if(message.type == BtMessageTypeUpdateBatteryLevel) {
-            if(furi_hal_bt_is_alive()) {
+            // Update battery level
+            if(furi_hal_bt_is_active()) {
                 battery_svc_update_level(message.data.battery_level);
             }
+        } else if(message.type == BtMessageTypePinCodeShow) {
+            // Display PIN code
+            bt_pin_code_show_event_handler(bt, message.data.pin_code);
         }
     }
     return 0;

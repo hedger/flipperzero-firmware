@@ -9,7 +9,11 @@ extern "C" {
 
 typedef struct Bt Bt;
 
-bool bt_update_battery_level(Bt* bt, uint8_t battery_level);
+void bt_update_statusbar(Bt* bt);
+
+void bt_update_battery_level(Bt* bt, uint8_t battery_level);
+
+bool bt_pin_code_show(Bt* bt, uint32_t pin_code);
 
 #ifdef __cplusplus
 }

@@ -8,10 +8,6 @@
 #include "ble.h"
 
 #define FURI_HAL_VERSION_OTP_HEADER_MAGIC 0xBABE
-#define FURI_HAL_VERSION_NAME_LENGTH 8
-#define FURI_HAL_VERSION_ARRAY_NAME_LENGTH (FURI_HAL_VERSION_NAME_LENGTH + 1)
-/** BLE symbol + "Flipper " + name */
-#define FURI_HAL_VERSION_DEVICE_NAME_LENGTH (1 + 8 + FURI_HAL_VERSION_ARRAY_NAME_LENGTH)
 #define FURI_HAL_VERSION_OTP_ADDRESS OTP_AREA_BASE
 
 /** OTP Versions enum */
@@ -163,7 +159,7 @@ void furi_hal_version_init() {
         case FuriHalVersionOtpVersion1:
             furi_hal_version_load_otp_v1();
         break;
-        default: furi_check(0);
+        default: furi_crash(NULL);
     }
     FURI_LOG_I("FuriHalVersion", "Init OK");
 }

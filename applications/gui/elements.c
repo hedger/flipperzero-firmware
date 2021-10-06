@@ -278,7 +278,7 @@ void elements_multiline_text(Canvas* canvas, uint8_t x, uint8_t y, const char* t
         canvas_draw_str(canvas, x, y, string_get_cstr(str));
         start = end + 1;
         y += font_height;
-    } while(end);
+    } while(end && y < 64);
     string_clear(str);
 }
 
@@ -325,6 +325,17 @@ void elements_slightly_rounded_box(
     uint8_t height) {
     furi_assert(canvas);
     canvas_draw_rbox(canvas, x, y, width, height, 1);
+}
+
+void elements_bubble(Canvas* canvas, uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
+    furi_assert(canvas);
+    canvas_draw_rframe(canvas, x + 4, y, width, height, 3);
+    uint8_t y_corner = y + height * 2 / 3;
+    canvas_draw_line(canvas, x, y_corner, x + 4, y_corner - 4);
+    canvas_draw_line(canvas, x, y_corner, x + 4, y_corner + 4);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_draw_line(canvas, x + 4, y_corner - 3, x + 4, y_corner + 3);
+    canvas_set_color(canvas, ColorBlack);
 }
 
 void elements_string_fit_width(Canvas* canvas, string_t string, uint8_t width) {
