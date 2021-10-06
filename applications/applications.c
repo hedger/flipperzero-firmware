@@ -36,6 +36,7 @@ extern int32_t bt_debug_app(void* p);
 
 // Plugins
 extern int32_t music_player_app(void* p);
+extern int32_t test_plugin_app(void* p);
 
 // On system start hooks declaration
 extern void bt_cli_init();
@@ -45,11 +46,11 @@ extern void lfrfid_cli_init();
 extern void nfc_cli_init();
 extern void storage_cli_init();
 extern void subghz_cli_init();
+extern void test_plugin_cli_init();
 
 // Settings
 extern int32_t notification_settings_app(void* p);
 extern int32_t storage_settings_app(void* p);
-extern int32_t bt_settings_app(void* p);
 
 const FlipperApplication FLIPPER_SERVICES[] = {
 /* Services */
@@ -190,6 +191,9 @@ const FlipperOnStartHook FLIPPER_ON_SYSTEM_START[] = {
 #ifdef SRV_STORAGE
     storage_cli_init,
 #endif
+#ifdef APP_TEST_PLUGIN
+    test_plugin_cli_init,
+#endif
 };
 
 const size_t FLIPPER_ON_SYSTEM_START_COUNT =
@@ -201,11 +205,15 @@ const FlipperApplication FLIPPER_PLUGINS[] = {
 #ifdef APP_MUSIC_PLAYER
     {.app = music_player_app, .name = "Music Player", .stack_size = 1024, .icon = &A_Plugins_14},
 #endif
+
+#ifdef APP_TEST_PLUGIN
+    {.app = test_plugin_app, .name = "Test Plugin", .stack_size = 1024, .icon = &A_Plugins_14},
+#endif
 };
 
 const size_t FLIPPER_PLUGINS_COUNT = sizeof(FLIPPER_PLUGINS) / sizeof(FlipperApplication);
 
-// Plugin menu
+// Debug menu
 const FlipperApplication FLIPPER_DEBUG_APPS[] = {
 #ifdef APP_BLINK
     {.app = blink_test_app, .name = "Blink Test", .stack_size = 1024, .icon = &A_Plugins_14},
@@ -238,10 +246,6 @@ const FlipperApplication FLIPPER_DEBUG_APPS[] = {
 #ifdef APP_LF_RFID
     {.app = lfrfid_debug_app, .name = "LF-RFID Debug", .stack_size = 1024, .icon = &A_125khz_14},
 #endif
-
-#ifdef SRV_BT
-    {.app = bt_debug_app, .name = "Bluetooth Debug", .stack_size = 1024, .icon = NULL},
-#endif
 };
 
 const size_t FLIPPER_DEBUG_APPS_COUNT = sizeof(FLIPPER_DEBUG_APPS) / sizeof(FlipperApplication);
@@ -259,10 +263,6 @@ const FlipperApplication FLIPPER_SETTINGS_APPS[] = {
 
 #ifdef SRV_STORAGE
     {.app = storage_settings_app, .name = "Storage", .stack_size = 2048, .icon = NULL},
-#endif
-
-#ifdef SRV_BT
-    {.app = bt_settings_app, .name = "Bluetooth", .stack_size = 1024, .icon = NULL},
 #endif
 };
 

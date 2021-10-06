@@ -130,7 +130,7 @@ void subghz_receiver_draw(Canvas* canvas, SubghzReceiverModel* model) {
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontSecondary);
 
-    elements_button_left(canvas, "Config");
+    elements_button_left(canvas, "Config"); 
 
     canvas_draw_str(canvas, 44, 62, string_get_cstr(model->frequency_str));
     canvas_draw_str(canvas, 79, 62, string_get_cstr(model->preset_str));

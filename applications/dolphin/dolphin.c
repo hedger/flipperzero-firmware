@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "applications.h"
 
-const Icon* idle_scenes[] = {&A_Wink_128x64, &A_WatchingTV_128x64};
+const Icon* idle_scenes[] = {&A_Default_128x64, &A_Wink_128x64, &A_WatchingTV_128x64};
 
 static void dolphin_switch_to_app(Dolphin* dolphin, const FlipperApplication* flipper_app) {
     furi_assert(dolphin);
@@ -36,12 +36,13 @@ void dolphin_scene_handler_set_scene(Dolphin* dolphin, const Icon* icon_data) {
 void dolphin_scene_handler_switch_scene(Dolphin* dolphin) {
     with_view_model(
         dolphin->idle_view_main, (DolphinViewMainModel * model) {
-            if(icon_animation_is_last_frame(model->animation)) {
+            // if(icon_animation_is_last_frame(model->animation)) {
                 if(model->animation) icon_animation_free(model->animation);
                 model->animation = icon_animation_alloc(idle_scenes[model->scene_num]);
                 icon_animation_start(model->animation);
-                model->scene_num = random() % COUNT_OF(idle_scenes);
-            }
+                // model->scene_num = random() % COUNT_OF(idle_scenes);
+                model->scene_num = 0;
+            // }
             return true;
         });
 }

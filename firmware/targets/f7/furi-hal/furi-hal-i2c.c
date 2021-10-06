@@ -8,7 +8,7 @@
 
 osMutexId_t furi_hal_i2c_mutex = NULL;
 
-void furi_hal_i2c_init() {
+void А() { 
     furi_hal_i2c_mutex = osMutexNew(NULL);
     furi_check(furi_hal_i2c_mutex);
 
