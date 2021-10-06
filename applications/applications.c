@@ -49,6 +49,8 @@ extern void nfc_cli_init();
 extern void storage_cli_init();
 extern void subghz_cli_init();
 extern void power_cli_init();
+extern void test_plugin_cli_init();
+extern void imu_cli_init();
 
 // Settings
 extern int32_t notification_settings_app(void* p);
@@ -181,6 +183,9 @@ const FlipperOnStartHook FLIPPER_ON_SYSTEM_START[] = {
 #endif
 #ifdef APP_TEST_PLUGIN
     test_plugin_cli_init,
+#endif
+#ifdef APP_IMU
+    imu_cli_init,
 #endif
 };
 

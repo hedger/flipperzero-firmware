@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 
+// Power I2C
 #define POWER_I2C_SCL_Pin LL_GPIO_PIN_9
 #define POWER_I2C_SCL_GPIO_Port GPIOA
 #define POWER_I2C_SDA_Pin LL_GPIO_PIN_10
@@ -27,6 +28,27 @@ extern "C" {
   * rise time = 0ns, fall time = 0ns
   */
 #define POWER_I2C_TIMINGS_400 0x00602173
+
+
+// External I2C
+#define EXT_I2C_SCL_Pin LL_GPIO_PIN_0
+#define EXT_I2C_SCL_GPIO_Port GPIOC
+#define EXT_I2C_SDA_Pin LL_GPIO_PIN_1
+#define EXT_I2C_SDA_GPIO_Port GPIOC
+
+#define EXT_I2C I2C3
+/** Timing register value is computed with the STM32CubeMX Tool,
+  * Standard Mode @100kHz with I2CCLK = 64 MHz,
+  * rise time = 0ns, fall time = 0ns
+  */
+#define EXT_I2C_TIMINGS_100 0x10707DBC
+
+/** Timing register value is computed with the STM32CubeMX Tool,
+  * Fast Mode @400kHz with I2CCLK = 64 MHz,
+  * rise time = 0ns, fall time = 0ns
+  */
+#define EXT_I2C_TIMINGS_400 0x00602173
+
 
 /* Input Related Constants */
 #define INPUT_DEBOUNCE_TICKS 20
