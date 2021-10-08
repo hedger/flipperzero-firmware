@@ -124,7 +124,6 @@ void lis331dlh_orientation_6D(void)
   } else {
         printf("\nDevice found!");
         tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
   }
   // /* Set full scale */
   // lis331dlh_full_scale_set(&dev_ctx, LIS331DLH_2g);
