@@ -16,7 +16,6 @@ extern "C" {
 /** Init I2C
  */
 void furi_hal_i2c_init();
-void furi_hal_i2c3_init();
 
 /** Perform I2C tx transfer
  *

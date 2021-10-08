@@ -69,6 +69,8 @@
 #include <furi-hal.h>
 #include "imu.h"
 
+// #include <stm32wbxx_hal_i2c.h>
+
 #define SENSOR_BUS EXT_I2C
 
 
@@ -111,71 +113,73 @@ void lis331dlh_orientation_6D(void)
   /* Check device ID */
   lis331dlh_device_id_get(&dev_ctx, &whoamI);
 
-    printf("%c", whoamI);
+    printf("%x", whoamI);
 
   if (whoamI != LIS331DLH_ID) {
     while (1) {
       /* manage here device not found */
-      printf("Device not found");
+      printf("\nDevice not found");
       break;
     }
   } else {
-        printf("Device found");
+        printf("\nDevice found!");
+        tx_com(tx_buffer, strlen((char const *)tx_buffer));
+        break;
   }
-  /* Set full scale */
-  lis331dlh_full_scale_set(&dev_ctx, LIS331DLH_2g);
-  /* Disable HP filter */
-  lis331dlh_hp_path_set(&dev_ctx, LIS331DLH_HP_DISABLE);
-  /* Set no duration */
-  lis331dlh_int1_dur_set(&dev_ctx, 0);
-  /* Set 6D position detection */
-  lis331dlh_int1_6d_mode_set(&dev_ctx, LIS331DLH_6D_INT1_POSITION);
-  /* Apply 6D Orientation axis threshold */
-  lis331dlh_int1_treshold_set(&dev_ctx, 33);
-  /* Set Output Data Rate */
-  lis331dlh_data_rate_set(&dev_ctx, LIS331DLH_ODR_100Hz);
+  // /* Set full scale */
+  // lis331dlh_full_scale_set(&dev_ctx, LIS331DLH_2g);
+  // /* Disable HP filter */
+  // lis331dlh_hp_path_set(&dev_ctx, LIS331DLH_HP_DISABLE);
+  // /* Set no duration */
+  // lis331dlh_int1_dur_set(&dev_ctx, 0);
+  // /* Set 6D position detection */
+  // lis331dlh_int1_6d_mode_set(&dev_ctx, LIS331DLH_6D_INT1_POSITION);
+  // /* Apply 6D Orientation axis threshold */
+  // lis331dlh_int1_treshold_set(&dev_ctx, 33);
+  // /* Set Output Data Rate */
+  // lis331dlh_data_rate_set(&dev_ctx, LIS331DLH_ODR_100Hz);
 
   /* Wait Events */
-  while (1) {
-    lis331dlh_reg_t all_source;
-    lis331dlh_int1_src_get(&dev_ctx, &all_source.int1_src);
+  // while (1) {
+  //   lis331dlh_reg_t all_source;
+  //   lis331dlh_int1_src_get(&dev_ctx, &all_source.int1_src);
 
-    /* Check 6D Orientation */
-    switch (all_source.byte & 0x3f) {
-      case 0x01:
-        sprintf((char *)tx_buffer, "6D Or. position XL\r\n");
-        tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
+  //   /* Check 6D Orientation */
+  //   switch (all_source.byte & 0x3f) {
+  //     case 0x01:
+  //       sprintf((char *)tx_buffer, "6D Or. position XL\r\n");
+  //       tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  //       break;
 
-      case 0x02:
-        sprintf((char *)tx_buffer, "6D Or. position XH\r\n");
-        tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
+  //     case 0x02:
+  //       sprintf((char *)tx_buffer, "6D Or. position XH\r\n");
+  //       tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  //       break;
 
-      case 0x04:
-        sprintf((char *)tx_buffer, "6D Or. position YL\r\n");
-        tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
+  //     case 0x04:
+  //       sprintf((char *)tx_buffer, "6D Or. position YL\r\n");
+  //       tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  //       break;
 
-      case 0x08:
-        sprintf((char *)tx_buffer, "6D Or. position YH\r\n");
-        tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
+  //     case 0x08:
+  //       sprintf((char *)tx_buffer, "6D Or. position YH\r\n");
+  //       tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  //       break;
 
-      case 0x10:
-        sprintf((char *)tx_buffer, "6D Or. position ZL\r\n");
-        tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
+  //     case 0x10:
+  //       sprintf((char *)tx_buffer, "6D Or. position ZL\r\n");
+  //       tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  //       break;
 
-      case 0x20:
-        sprintf((char *)tx_buffer, "6D Or. position ZH\r\n");
-        tx_com(tx_buffer, strlen((char const *)tx_buffer));
-        break;
+  //     case 0x20:
+  //       sprintf((char *)tx_buffer, "6D Or. position ZH\r\n");
+  //       tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  //       break;
 
-      default:
-        break;
-    }
-  }
+  //     default:
+  //       break;
+  //   }
+  // }
 }
 
 /*
@@ -188,12 +192,15 @@ void lis331dlh_orientation_6D(void)
  * @param  len       number of consecutive register to write
  *
  */
+
+
 static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
                               uint16_t len)
 {
   reg |= 0x80;
   uint8_t buffer[2] = {reg, *bufp};
-  furi_hal_i2c_tx(EXT_I2C, LIS331DLH_I2C_ADD_L, buffer, 2, 1000);
+  furi_hal_i2c_tx(EXT_I2C, LIS331DLH_I2C_ADD_L, buffer, len, 1000);
+
   return 0;
 }
 
@@ -211,24 +218,12 @@ static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
                              uint16_t len)
 {
   reg |= 0x80;
-  furi_hal_i2c_trx(EXT_I2C, LIS331DLH_I2C_ADD_L, &reg, 1, bufp, len, 1000);
+  uint8_t buffer[2] = {reg, *bufp};
+  furi_hal_i2c_rx(EXT_I2C, LIS331DLH_I2C_ADD_L, buffer, len, 1000);
+
   return 0;
 }
 
-// uint16_t bq27220_read_word(uint8_t address) {
-//     uint8_t buffer[2] = {address};
-//     uint16_t ret;
-//     with_furi_hal_i2c(
-//         uint16_t, &ret, () {
-//             if(furi_hal_i2c_trx(
-//                    POWER_I2C, BQ27220_ADDRESS, buffer, 1, buffer, 2, BQ27220_I2C_TIMEOUT)) {
-//                 return *(uint16_t*)buffer;
-//             } else {
-//                 return 0;
-//             }
-//         });
-//     return ret;
-// }
 
 
 /*
@@ -240,7 +235,6 @@ static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
  */
 static void tx_com(uint8_t *tx_buffer, uint16_t len)
 {
-    // cli_write(Cli* cli, tx_buffer, len);
     printf((char *)tx_buffer);
 }
 
@@ -252,7 +246,6 @@ static void tx_com(uint8_t *tx_buffer, uint16_t len)
  */
 static void platform_delay(uint32_t ms)
 {
-    // delay(ms);
     osDelay(ms);
 }
 
@@ -263,6 +256,6 @@ void imu_cli_init() {
 }
 
 void imu_cli_command_imu(Cli* cli, string_t args, void* context) {
-    printf("IMU start");
+    printf("IMU start\n");
     lis331dlh_orientation_6D();
 }

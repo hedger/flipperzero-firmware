@@ -8,7 +8,7 @@
 
 osMutexId_t furi_hal_i2c_mutex = NULL;
 
-void А() { 
+void furi_hal_i2c_init() {
     furi_hal_i2c_mutex = osMutexNew(NULL);
     furi_check(furi_hal_i2c_mutex);
 
@@ -43,7 +43,38 @@ void А() {
     LL_I2C_DisableGeneralCall(POWER_I2C);
     LL_I2C_EnableClockStretching(POWER_I2C);
     FURI_LOG_I("FuriHalI2C", "Init OK");
+
+    // I2C3
+    LL_RCC_SetI2CClockSource(LL_RCC_I2C3_CLKSOURCE_PCLK1);
+
+    GPIO_InitStruct.Pin = EXT_I2C_SCL_Pin | EXT_I2C_SDA_Pin;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_4;
+    LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    I2C_InitStruct.PeripheralMode = LL_I2C_MODE_I2C;
+    I2C_InitStruct.AnalogFilter = LL_I2C_ANALOGFILTER_ENABLE;
+    I2C_InitStruct.DigitalFilter = 0;
+    I2C_InitStruct.OwnAddress1 = 0;
+    I2C_InitStruct.TypeAcknowledge = LL_I2C_ACK;
+    I2C_InitStruct.OwnAddrSize = LL_I2C_OWNADDRESS1_7BIT;
+    if (furi_hal_version_get_hw_version() > 10) {
+        I2C_InitStruct.Timing = POWER_I2C_TIMINGS_400;
+    } else {
+        I2C_InitStruct.Timing = POWER_I2C_TIMINGS_100;
+    }
+    LL_I2C_Init(EXT_I2C, &I2C_InitStruct);
+    LL_I2C_EnableAutoEndMode(EXT_I2C);
+    LL_I2C_SetOwnAddress2(EXT_I2C, 0, LL_I2C_OWNADDRESS2_NOMASK);
+    LL_I2C_DisableOwnAddress2(EXT_I2C);
+    LL_I2C_DisableGeneralCall(EXT_I2C);
+    LL_I2C_EnableClockStretching(EXT_I2C);
+    FURI_LOG_I("FuriHalI2C3", "Init OK");
 }
+
 
 bool furi_hal_i2c_tx(
     I2C_TypeDef* instance,

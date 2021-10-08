@@ -97,6 +97,7 @@ void furi_hal_clock_init() {
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMAMUX1);
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C3);
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_SPI2);
 
     // AHB2

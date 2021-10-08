@@ -43,22 +43,15 @@ void furi_hal_i2c_init() {
     LL_I2C_DisableGeneralCall(POWER_I2C);
     LL_I2C_EnableClockStretching(POWER_I2C);
     FURI_LOG_I("FuriHalI2C", "Init OK");
-}
 
-void furi_hal_i2c3_init() {
-    furi_hal_i2c_mutex = osMutexNew(NULL);
-    furi_check(furi_hal_i2c_mutex);
-
-    LL_I2C_InitTypeDef I2C_InitStruct = {0};
-    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-
+    // I2C3
     LL_RCC_SetI2CClockSource(LL_RCC_I2C3_CLKSOURCE_PCLK1);
 
     GPIO_InitStruct.Pin = EXT_I2C_SCL_Pin | EXT_I2C_SDA_Pin;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_4;
     LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
