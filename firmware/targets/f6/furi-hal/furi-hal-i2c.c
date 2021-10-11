@@ -61,11 +61,7 @@ void furi_hal_i2c_init() {
     I2C_InitStruct.OwnAddress1 = 0;
     I2C_InitStruct.TypeAcknowledge = LL_I2C_ACK;
     I2C_InitStruct.OwnAddrSize = LL_I2C_OWNADDRESS1_7BIT;
-    if (furi_hal_version_get_hw_version() > 10) {
-        I2C_InitStruct.Timing = POWER_I2C_TIMINGS_400;
-    } else {
-        I2C_InitStruct.Timing = POWER_I2C_TIMINGS_100;
-    }
+    I2C_InitStruct.Timing = POWER_I2C_TIMINGS_400;
     LL_I2C_Init(EXT_I2C, &I2C_InitStruct);
     LL_I2C_EnableAutoEndMode(EXT_I2C);
     LL_I2C_SetOwnAddress2(EXT_I2C, 0, LL_I2C_OWNADDRESS2_NOMASK);
