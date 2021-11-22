@@ -35,3 +35,4 @@ CMakeLists.txt
 
 # bundle output
 dist
+/SES/firmware/Output/

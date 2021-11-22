@@ -1,0 +1,992 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="Flipper" target="8" version="2">
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_optimization_level="None" />
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_debugging_level="Level 2"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 2 balanced" />
+  <project Name="firmware">
+    <configuration
+      LIBRARY_IO_TYPE="RTT"
+      Name="Common"
+      Target="STM32WB55RGVx"
+      arm_architecture="v7EM"
+      arm_compiler_variant="gcc"
+      arm_core_type="Cortex-M4"
+      arm_endian="Little"
+      arm_fp_abi="Hard"
+      arm_fpu_type="FPv4-SP-D16"
+      arm_linker_heap_size="512"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="1024"
+      arm_linker_variant="SEGGER"
+      arm_rtl_variant="SEGGER"
+      arm_simulator_memory_simulation_parameter="ROM;0x08000000;0x01000000;RAM;0x20000000;0x00040000"
+      arm_target_debug_interface_type="ADIv5"
+      arm_target_device_name="STM32WB55xx"
+      arm_target_interface_type="SWD"
+      c_preprocessor_definitions="STM32WB55xx;__STM32WBxx_FAMILY;__STM32WB55_SUBFAMILY;ARM_MATH_CM4"
+      c_user_include_directories="$(ProjectDir)/STM32WBxx/CMSIS/Device/Include"
+      debug_register_definition_file="$(ProjectDir)/STM32WBxx_CM4_Registers.xml"
+      debug_stack_pointer_start="__stack_end__"
+      debug_target_connection="J-Link"
+      gcc_entry_point="Reset_Handler"
+      link_linker_script_file="$(ProjectDir)/STM32WBxx_Flash.icf"
+      linker_memory_map_file="$(ProjectDir)/STM32WB55RGVx_MemoryMap.xml"
+      macros="DeviceHeaderFile=../../lib/STM32CubeWB/Drivers/CMSIS/Device/Include/stm32wbxx.h;DeviceLibraryIdentifier=M4lf;DeviceSystemFile=../../firmware/targets/f7/Src/system_stm32wbxx.c;DeviceFamily=STM32WBxx;DeviceSubFamily=STM32WB55;Target=STM32WB55RGVx"
+      project_directory="firmware"
+      project_type="Executable"
+      target_reset_script="Reset();"
+      target_trace_initialize_script="EnableTrace(&quot;$(TraceInterfaceType)&quot;)" />
+    <folder Name="firmware">
+      <folder Name="targets">
+        <folder Name="f7">
+          <folder Name="src">
+            <file file_name="../../firmware/targets/f7/Src/comp.c" />
+            <file file_name="../../firmware/targets/f7/Src/freertos-openocd.c" />
+            <file file_name="../../firmware/targets/f7/Src/gpio.c" />
+            <file file_name="../../firmware/targets/f7/Src/main.c" />
+            <file file_name="../../firmware/targets/f7/Src/rtc.c" />
+            <file file_name="../../firmware/targets/f7/Src/stm32wbxx_hal_msp.c" />
+            <file file_name="../../firmware/targets/f7/Src/stm32wbxx_it.c" />
+            <file file_name="../../firmware/targets/f7/Src/system_stm32wbxx.c" />
+            <file file_name="../../firmware/targets/f7/Src/tim.c" />
+          </folder>
+          <file file_name="../../firmware/targets/f7/startup_stm32wb55xx_cm4.s" />
+          <folder Name="furi-hal">
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-bootloader.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-bt.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-clock.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-compress.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-console.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-crypto.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-delay.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-flash.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-gpio.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-i2c.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-ibutton.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-interrupt.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-irda.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-light.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-lock.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-nfc.c">
+              <configuration Name="Debug" build_exclude_from_build="No" />
+            </file>
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-os.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-power.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-pwm.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-resources.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-rfid.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-sd.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-spi.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-spi-config.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-subghz.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-task.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-uart.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-usb.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-usb-cdc.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-usb-hid.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-vcp.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-version.c" />
+            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-vibro.c" />
+          </folder>
+          <folder Name="ble-glue">
+            <file file_name="../../firmware/targets/f7/ble-glue/app_debug.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/battery_service.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/ble_app.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/ble_glue.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/dev_info_service.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/gap.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/hw_ipcc.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/hw_timerserver.c" />
+            <file file_name="../../firmware/targets/f7/ble-glue/serial_service.c" />
+          </folder>
+          <folder Name="fatfs">
+            <file file_name="../../firmware/targets/f7/fatfs/fatfs.c" />
+            <file file_name="../../firmware/targets/f7/fatfs/spi_sd_hal.c" />
+            <file file_name="../../firmware/targets/f7/fatfs/stm32_adafruit_sd.c" />
+            <file file_name="../../firmware/targets/f7/fatfs/syscall.c" />
+            <file file_name="../../firmware/targets/f7/fatfs/user_diskio.c" />
+          </folder>
+        </folder>
+      </folder>
+    </folder>
+    <configuration
+      BUILD_OPTIONS="ARM GNU"
+      LIBRARY_IO_TYPE="None"
+      Name="Debug"
+      arm_fp_abi="Hard"
+      arm_library_architecture="v7EM"
+      arm_linker_search_path="D:/Tools/arm-eabi/arm-none-eabi/lib"
+      arm_linker_variant="GNU"
+      arm_rtl_variant="SEGGER"
+      armgnu_cl_cpu="cortex-m4"
+      armgnu_cl_endian="little"
+      armgnu_cl_fpabi="hard"
+      armgnu_cl_fpu="fpv4-sp-d16"
+      asm_additional_options="-x assembler-with-cpp"
+      build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml"
+      build_quietly="Yes"
+      c_additional_options="-mthumb;--specs=nosys.specs;--specs=nano.specs;-Wno-unused-parameter;-Wno-address-of-packed-member;-fno-math-errno;-fstack-usage"
+      c_additional_options_backup="-mthumb;--specs=nosys.specs;--specs=nano.specs;-Wno-unused-parameter;-Wno-address-of-packed-member;-fno-math-errno;-fstack-usage;-fdata-sections;-ffunction-sections"
+      c_asm_additional_options="-x assembler-with-cpp"
+      c_only_additional_options="-std=gnu17"
+      c_preprocessor_definitions="STM32WB;STM32WB55xx;_GNU_SOURCE;USE_FULL_LL_DRIVER;USE_HAL_DRIVER;BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08000000;OS_OFFSET=0x00000000;HAVE_FREERTOS;PB_ENABLE_MALLOC;PB_WITHOUT_64BIT;USB_PMASIZE=0x400;GIT_COMMIT=\\&quot;43039457\\&quot;;GIT_BRANCH=\\&quot;dev\\&quot;;GIT_BRANCH_NUM=\\&quot;906\\&quot;;BUILD_DATE=\\&quot;18-11-2021\\&quot;;VERSION=\\&quot;unknown\\&quot;;TARGET=7;FURI_DEBUG;NDEBUG;LFS_CONFIG=lfs_config.h;NO_BOOTLOADER;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_IBUTTON"
+      c_user_include_directories="../../assets/compiled;../../core;../../applications;../../lib;../../lib/mlib;../../lib/u8g2;../../lib/littlefs;../../lib/ST25RFAL002;../../lib/ST25RFAL002/include;../../lib/ST25RFAL002/source/st25r3916;../../lib/nfc_protocols;../../lib/callback-connector;../../lib/app-template;../../lib/app_scene_template;../../lib/fnv1a-hash;../../lib/onewire;../../lib/cyfral;../../lib/common-api;../../lib/drivers;../../lib/file_reader;../../lib/irda/encoder_decoder;../../lib/irda/worker;../../lib/app-scened-template;../../lib/libusb_stm32/inc;../../lib/nanopb;../../lib/heatshrink;../../lib/flipper_file;../../;../../firmware/targets/furi-hal-include;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc/Legacy;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Include;../../lib/STM32CubeWB/Drivers/CMSIS/Include;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/include;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F;../../firmware/targets/f7/ble-glue;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/template;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/utilities;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci;../../firmware/targets/f7/furi-hal;../../firmware/targets/f7/Inc;../../firmware/targets/f7/fatfs"
+      clang_gnu_version="None"
+      cpp_only_additional_options="-std=gnu++17;-fno-use-cxa-atexit;-fno-threadsafe-statics"
+      external_c_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c $(COptions) $(COnlyOptions) $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
+      external_link_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; $(LinkOptions) -T &quot;$(RelLinkerScriptPath)&quot; $(Objects) -o &quot;$(RelTargetPath)&quot; -Xlinker -Map=&quot;$(RelMapPath)&quot;"
+      gcc_c_language_standard="gnu17"
+      gcc_cl_c_language="None"
+      gcc_cl_cpp_enable_exceptions="No"
+      gcc_cl_cpp_enable_rtti="No"
+      gcc_cl_cpp_language="None"
+      gcc_cl_data_sections="Yes"
+      gcc_cl_enable_debug_info="Yes"
+      gcc_cl_extra_warnings="Yes"
+      gcc_cl_function_sections="Yes"
+      gcc_cl_optimization_level="Debug"
+      gcc_cl_warnings_as_errors="No"
+      gcc_cplusplus_language_standard="gnu++17"
+      gcc_optimization_level="None"
+      gcc_wchar_size="16-Bit"
+      link_additional_options_backup="-mcpu=cortex-m4;-mfpu=fpv4-sp-d16;-mfloat-abi=hard;-mthumb;-mlittle-endian;-static;--specs=nosys.specs;--specs=nano.specs;-Wl,--wrap,_malloc_r;-Wl,--wrap,_free_r;-Wl,--wrap,_calloc_r;-Wl,--wrap,_realloc_r;-Wl,-Map=.obj/f7/firmware.map,--cref;-Wl,--gc-sections;-Wl,--undefined=uxTopUsedPriority;-u _printf_float"
+      link_include_standard_libraries="No"
+      link_linker_script_file="../../firmware/targets/f7/stm32wb55xx_flash_cm4_no_bootloader.ld"
+      link_standard_libraries_directory="D:/Tools/arm-eabi/arm-none-eabi/lib"
+      link_use_linker_script_file="Yes"
+      linker_additional_options="-mthumb;-static;--specs=nosys.specs;--specs=nano.specs;-Wl,--wrap,_malloc_r;-Wl,--wrap,_free_r;-Wl,--wrap,_calloc_r;-Wl,--wrap,_realloc_r;-Wl,-Map=.obj/f7/firmware.map,--cref;-Wl,--gc-sections;-Wl,--undefined=uxTopUsedPriority;-u _printf_float;-Wl,--start-group -lstdc++ -lsupc++ -Wl,--end-group"
+      linker_output_format="None"
+      linker_post_build_command="&quot;$(ToolChainDir)/arm-none-eabi-objcopy&quot; &quot;$(RelTargetPath)&quot; &quot;$(PostLinkOutputFilePath)&quot; -Obinary"
+      linker_post_build_command_output_file="$(OutDir)/$(ProjectName).bin"
+      use_compiler_driver="No" />
+    <folder Name="core">
+      <file file_name="../../core/flipper.c" />
+      <file file_name="../../core/furi.c" />
+      <file file_name="../../core/furi/check.c" />
+      <file file_name="../../core/furi/log.c" />
+      <file file_name="../../core/furi/memmgr.c" />
+      <file file_name="../../core/furi/memmgr_heap.c" />
+      <file file_name="../../core/furi/pubsub.c" />
+      <file file_name="../../core/furi/record.c" />
+      <file file_name="../../core/furi/stdglue.c" />
+      <file file_name="../../core/furi/thread.c" />
+      <file file_name="../../core/furi/valuemutex.c" />
+      <file file_name="../../core/furi-hal/api-interrupt-mgr.c" />
+    </folder>
+    <folder Name="applications">
+      <file file_name="../../applications/applications.c" />
+      <file file_name="../../applications/applications.h" />
+      <folder Name="gui">
+        <file file_name="../../applications/gui/canvas.c" />
+        <file file_name="../../applications/gui/elements.c" />
+        <file file_name="../../applications/gui/gui.c" />
+        <file file_name="../../applications/gui/icon.c" />
+        <file file_name="../../applications/gui/icon_animation.c" />
+        <file file_name="../../applications/gui/scene_manager.c" />
+        <file file_name="../../applications/gui/view.c" />
+        <file file_name="../../applications/gui/view_dispatcher.c" />
+        <file file_name="../../applications/gui/view_port.c" />
+        <folder Name="modules">
+          <file file_name="../../applications/gui/modules/button_menu.c" />
+          <file file_name="../../applications/gui/modules/button_panel.c" />
+          <file file_name="../../applications/gui/modules/byte_input.c" />
+          <file file_name="../../applications/gui/modules/code_input.c" />
+          <file file_name="../../applications/gui/modules/dialog.c" />
+          <file file_name="../../applications/gui/modules/dialog_ex.c" />
+          <file file_name="../../applications/gui/modules/empty_screen.c" />
+          <file file_name="../../applications/gui/modules/file_select.c" />
+          <file file_name="../../applications/gui/modules/menu.c" />
+          <file file_name="../../applications/gui/modules/popup.c" />
+          <file file_name="../../applications/gui/modules/submenu.c" />
+          <file file_name="../../applications/gui/modules/text_box.c" />
+          <file file_name="../../applications/gui/modules/text_input.c" />
+          <file file_name="../../applications/gui/modules/variable-item-list.c" />
+          <file file_name="../../applications/gui/modules/widget.c" />
+          <folder Name="widget_elements">
+            <file file_name="../../applications/gui/modules/widget_elements/widget_element_text_box.c" />
+            <file file_name="../../applications/gui/modules/widget_elements/widget_element_string_multiline.c" />
+            <file file_name="../../applications/gui/modules/widget_elements/widget_element_string.c" />
+            <file file_name="../../applications/gui/modules/widget_elements/widget_element_icon.c" />
+            <file file_name="../../applications/gui/modules/widget_elements/widget_element_frame.c" />
+            <file file_name="../../applications/gui/modules/widget_elements/widget_element_button.c" />
+          </folder>
+        </folder>
+      </folder>
+      <folder Name="gpio">
+        <file file_name="../../applications/gpio/gpio_app.c" />
+        <file file_name="../../applications/gpio/gpio_item.c" />
+        <file file_name="../../applications/gpio/usb_uart_bridge.c" />
+        <folder Name="scenes">
+          <file file_name="../../applications/gpio/scenes/gpio_scene.c" />
+          <file file_name="../../applications/gpio/scenes/gpio_scene_start.c" />
+          <file file_name="../../applications/gpio/scenes/gpio_scene_test.c" />
+          <file file_name="../../applications/gpio/scenes/gpio_scene_usb_uart.c" />
+          <file file_name="../../applications/gpio/scenes/gpio_scene_usb_uart_config.c" />
+        </folder>
+        <folder Name="views">
+          <file file_name="../../applications/gpio/views/gpio_test.c" />
+          <file file_name="../../applications/gpio/views/gpio_usb_uart.c" />
+        </folder>
+      </folder>
+      <folder Name="rpc">
+        <file file_name="../../applications/rpc/rpc.c" />
+        <file file_name="../../applications/rpc/rpc_app.c" />
+        <file file_name="../../applications/rpc/rpc_cli.c" />
+        <file file_name="../../applications/rpc/rpc_gui.c" />
+        <file file_name="../../applications/rpc/rpc_status.c" />
+        <file file_name="../../applications/rpc/rpc_storage.c" />
+      </folder>
+      <folder Name="cli">
+        <file file_name="../../applications/cli/cli.c" />
+        <file file_name="../../applications/cli/cli_commands.c" />
+      </folder>
+      <folder Name="dialogs">
+        <file file_name="../../applications/dialogs/dialogs.c" />
+        <file file_name="../../applications/dialogs/dialogs-api.c" />
+        <file file_name="../../applications/dialogs/dialogs-module-file-select.c" />
+        <file file_name="../../applications/dialogs/dialogs-module-message.c" />
+        <file file_name="../../applications/dialogs/view_holder.c" />
+      </folder>
+      <folder Name="dolphin">
+        <file file_name="../../applications/dolphin/dolphin.c" />
+        <folder Name="helpers">
+          <file file_name="../../applications/dolphin/helpers/dolphin_deed.c" />
+          <file file_name="../../applications/dolphin/helpers/dolphin_state.c" />
+        </folder>
+      </folder>
+      <folder Name="desktop">
+        <file file_name="../../applications/desktop/desktop.c" />
+        <folder Name="desktop_settings">
+          <file file_name="../../applications/desktop/desktop_settings/desktop_settings_app.c" />
+          <folder Name="scenes">
+            <file file_name="../../applications/desktop/desktop_settings/scenes/desktop_settings_scene.c" />
+            <file file_name="../../applications/desktop/desktop_settings/scenes/desktop_settings_scene_favorite.c" />
+            <file file_name="../../applications/desktop/desktop_settings/scenes/desktop_settings_scene_pincode_input.c" />
+            <file file_name="../../applications/desktop/desktop_settings/scenes/desktop_settings_scene_pincode_menu.c" />
+            <file file_name="../../applications/desktop/desktop_settings/scenes/desktop_settings_scene_start.c" />
+          </folder>
+        </folder>
+        <folder Name="helpers">
+          <file file_name="../../applications/desktop/helpers/desktop_animation.c" />
+        </folder>
+        <folder Name="scenes">
+          <file file_name="../../applications/desktop/scenes/desktop_scene.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_debug.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_first_start.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_hw_mismatch.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_lock_menu.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_locked.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_main.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_pinsetup.c" />
+        </folder>
+        <folder Name="views">
+          <file file_name="../../applications/desktop/views/desktop_debug.c" />
+          <file file_name="../../applications/desktop/views/desktop_first_start.c" />
+          <file file_name="../../applications/desktop/views/desktop_lock_menu.c" />
+          <file file_name="../../applications/desktop/views/desktop_locked.c" />
+          <file file_name="../../applications/desktop/views/desktop_main.c" />
+        </folder>
+      </folder>
+      <folder Name="input">
+        <file file_name="../../applications/input/input.c" />
+      </folder>
+      <folder Name="loader">
+        <file file_name="../../applications/loader/loader.c" />
+      </folder>
+      <folder Name="notification">
+        <file file_name="../../applications/notification/notification-app.c" />
+        <file file_name="../../applications/notification/notification-app-api.c" />
+        <file file_name="../../applications/notification/notification-messages.c" />
+        <file file_name="../../applications/notification/notification-messages-notes.c" />
+        <file file_name="../../applications/notification/notification-settings-app.c" />
+      </folder>
+      <folder Name="power">
+        <file file_name="../../applications/power/power_cli.c" />
+        <folder Name="power_service">
+          <file file_name="../../applications/power/power_service/power.c" />
+          <file file_name="../../applications/power/power_service/power_api.c" />
+          <folder Name="views">
+            <file file_name="../../applications/power/power_service/views/power_off.c" />
+          </folder>
+        </folder>
+        <folder Name="power_settings_app">
+          <file file_name="../../applications/power/power_settings_app/power_settings_app.c" />
+          <folder Name="scenes">
+            <file file_name="../../applications/power/power_settings_app/scenes/power_settings_scene.c" />
+            <file file_name="../../applications/power/power_settings_app/scenes/power_settings_scene_battery_info.c" />
+            <file file_name="../../applications/power/power_settings_app/scenes/power_settings_scene_power_off.c" />
+            <file file_name="../../applications/power/power_settings_app/scenes/power_settings_scene_reboot.c" />
+            <file file_name="../../applications/power/power_settings_app/scenes/power_settings_scene_start.c" />
+          </folder>
+          <folder Name="views">
+            <file file_name="../../applications/power/power_settings_app/views/battery_info.c" />
+          </folder>
+        </folder>
+      </folder>
+      <folder Name="power-observer">
+        <file file_name="../../applications/power-observer/power-observer.c" />
+      </folder>
+      <folder Name="storage">
+        <file file_name="../../applications/storage/filesystem-api.c" />
+        <file file_name="../../applications/storage/storage.c" />
+        <file file_name="../../applications/storage/storage-cli.c" />
+        <file file_name="../../applications/storage/storage-external-api.c" />
+        <file file_name="../../applications/storage/storage-glue.c" />
+        <file file_name="../../applications/storage/storage-processing.c" />
+        <file file_name="../../applications/storage/storage-sd-api.c" />
+        <file file_name="../../applications/storage/storage-test-app.c" />
+        <folder Name="storages">
+          <file file_name="../../applications/storage/storages/sd-notify.c" />
+          <file file_name="../../applications/storage/storages/storage-ext.c" />
+          <file file_name="../../applications/storage/storages/storage-int.c" />
+        </folder>
+      </folder>
+      <folder Name="crypto">
+        <file file_name="../../applications/crypto/crypto_cli.c" />
+      </folder>
+      <folder Name="archive">
+        <folder Name="helpers">
+          <file file_name="../../applications/archive/helpers/archive_browser.c" />
+          <file file_name="../../applications/archive/helpers/archive_favorites.c" />
+          <file file_name="../../applications/archive/helpers/archive_files.c" />
+        </folder>
+        <folder Name="scenes">
+          <file file_name="../../applications/archive/scenes/archive_scene.c" />
+          <file file_name="../../applications/archive/scenes/archive_scene_browser.c" />
+          <file file_name="../../applications/archive/scenes/archive_scene_rename.c" />
+        </folder>
+        <folder Name="views">
+          <file file_name="../../applications/archive/views/archive_browser_view.c" />
+        </folder>
+        <file file_name="../../applications/archive/archive.c" />
+      </folder>
+      <folder Name="bt">
+        <folder Name="bt_service">
+          <file file_name="../../applications/bt/bt_service/bt.c" />
+          <file file_name="../../applications/bt/bt_service/bt_keys_storage.c" />
+        </folder>
+        <configuration Name="Debug" build_exclude_from_build="No" />
+        <file file_name="../../applications/bt/bt_cli.c" />
+        <file file_name="../../applications/bt/bt_settings.c" />
+        <folder Name="bt_settings_app">
+          <file file_name="../../applications/bt/bt_settings_app/bt_settings_app.c" />
+          <folder Name="scenes">
+            <file file_name="../../applications/bt/bt_settings_app/scenes/bt_settings_scene.c" />
+            <file file_name="../../applications/bt/bt_settings_app/scenes/bt_settings_scene_start.c" />
+          </folder>
+        </folder>
+        <folder Name="bt_debug_app">
+          <folder Name="views">
+            <file file_name="../../applications/bt/bt_debug_app/views/bt_carrier_test.c" />
+            <file file_name="../../applications/bt/bt_debug_app/views/bt_packet_test.c" />
+            <file file_name="../../applications/bt/bt_debug_app/views/bt_test.c" />
+          </folder>
+          <file file_name="../../applications/bt/bt_debug_app/bt_debug_app.c" />
+        </folder>
+      </folder>
+      <folder Name="storage_settings">
+        <file file_name="../../applications/storage_settings/storage_settings.c" />
+        <folder Name="scenes">
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_benchmark.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_eject_confirm.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_ejected.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_factory_reset.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_format_confirm.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_formatting.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_internal_info.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_sd_info.c" />
+          <file file_name="../../applications/storage_settings/scenes/storage_settings_scene_start.c" />
+        </folder>
+      </folder>
+      <folder Name="about">
+        <file file_name="../../applications/about/about.c" />
+      </folder>
+      <folder Name="debug_tools">
+        <file file_name="../../applications/debug_tools/bad_usb.c" />
+        <file file_name="../../applications/debug_tools/blink_test.c" />
+        <file file_name="../../applications/debug_tools/keypad_test.c" />
+        <file file_name="../../applications/debug_tools/uart_echo.c" />
+        <file file_name="../../applications/debug_tools/usb_mouse.c" />
+        <file file_name="../../applications/debug_tools/usb_test.c" />
+        <file file_name="../../applications/debug_tools/vibro_test.c" />
+        <folder Name="display_test">
+          <file file_name="../../applications/debug_tools/display_test/display_test.c" />
+          <file file_name="../../applications/debug_tools/display_test/view_display_test.c" />
+        </folder>
+      </folder>
+      <folder Name="nfc">
+        <file file_name="../../applications/nfc/nfc.c" />
+        <file file_name="../../applications/nfc/nfc_cli.c" />
+        <file file_name="../../applications/nfc/nfc_device.c" />
+        <file file_name="../../applications/nfc/nfc_worker.c" />
+        <folder Name="helpers">
+          <file file_name="../../applications/nfc/helpers/nfc_emv_parser.c" />
+        </folder>
+        <folder Name="scenes">
+          <file file_name="../../applications/nfc/scenes/nfc_scene.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_card_menu.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_delete.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_delete_success.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_device_info.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_emulate_apdu_sequence.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_emulate_mifare_ul.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_emulate_uid.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_file_select.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_mifare_ul_menu.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_not_implemented.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_card.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_card_success.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_emv_app.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_emv_app_success.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_emv_data.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_emv_data_success.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_mifare_ul.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_read_mifare_ul_success.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_restore_original.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_run_emv_app_confirm.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_save_name.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_save_success.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_saved_menu.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_scripts_menu.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_set_atqa.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_set_sak.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_set_type.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_set_uid.c" />
+          <file file_name="../../applications/nfc/scenes/nfc_scene_start.c" />
+        </folder>
+        <folder Name="views">
+          <file file_name="../../applications/nfc/views/bank_card.c" />
+        </folder>
+      </folder>
+      <folder Name="lfrfid">
+        <file file_name="../../applications/lfrfid/lfrfid-app.cpp" />
+        <file file_name="../../applications/lfrfid/lfrfid-app-launcher.cpp" />
+        <file file_name="../../applications/lfrfid/lfrfid-cli.cpp" />
+        <folder Name="helpers">
+          <file file_name="../../applications/lfrfid/helpers/state-sequencer.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/rfid-writer.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/rfid-worker.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/rfid-timer-emulator.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/rfid-reader.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/rfid-key.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/pulse-joiner.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/osc-fsk.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/key-info.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/encoder-indala-40134.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/encoder-hid-h10301.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/encoder-emmarin.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/decoder-indala.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/decoder-hid26.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/decoder-gpio-out.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/decoder-emmarin.cpp" />
+          <file file_name="../../applications/lfrfid/helpers/decoder-analyzer.cpp" />
+          <folder Name="protocols">
+            <file file_name="../../applications/lfrfid/helpers/protocols/protocol-indala-40134.cpp" />
+            <file file_name="../../applications/lfrfid/helpers/protocols/protocol-hid-h10301.cpp" />
+            <file file_name="../../applications/lfrfid/helpers/protocols/protocol-emmarin.cpp" />
+          </folder>
+        </folder>
+        <folder Name="scene">
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-write-success.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-write.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-start.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-select-key.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-save-type.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-save-success.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-save-name.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-saved-key-menu.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-saved-info.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-save-data.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-read-success.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-readed-menu.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-read.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-emulate.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-delete-success.cpp" />
+          <file file_name="../../applications/lfrfid/scene/lfrfid-app-scene-delete-confirm.cpp" />
+        </folder>
+        <folder Name="view">
+          <file file_name="../../applications/lfrfid/view/container-vm.cpp" />
+          <folder Name="elements">
+            <file file_name="../../applications/lfrfid/view/elements/string-element.cpp" />
+            <file file_name="../../applications/lfrfid/view/elements/icon-element.cpp" />
+            <file file_name="../../applications/lfrfid/view/elements/generic-element.cpp" />
+            <file file_name="../../applications/lfrfid/view/elements/button-element.cpp" />
+          </folder>
+        </folder>
+      </folder>
+      <folder Name="lfrfid-debug">
+        <folder Name="scene">
+          <file file_name="../../applications/lfrfid-debug/scene/lfrfid-debug-app-scene-start.cpp" />
+          <file file_name="../../applications/lfrfid-debug/scene/lfrfid-debug-app-scene-tune.cpp" />
+        </folder>
+        <folder Name="view-modules">
+          <file file_name="../../applications/lfrfid-debug/view-modules/lfrfid-view-tune-vm.cpp" />
+        </folder>
+        <file file_name="../../applications/lfrfid-debug/lfrfid-debug-app.cpp" />
+        <file file_name="../../applications/lfrfid-debug/lfrfid-debug-app-launcher.cpp" />
+      </folder>
+      <folder Name="irda">
+        <folder Name="cli">
+          <file file_name="../../applications/irda/cli/irda-cli.cpp" />
+        </folder>
+        <folder Name="scene">
+          <file file_name="../../applications/irda/scene/irda-app-scene-universal-tv.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-universal-common.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-universal.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-start.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-remote-list.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-remote.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-learn-success.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-learn-enter-name.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-learn-done.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-learn.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-edit-rename-done.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-edit-rename.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-edit-key-select.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-edit-delete-done.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-edit-delete.cpp" />
+          <file file_name="../../applications/irda/scene/irda-app-scene-edit.cpp" />
+        </folder>
+        <file file_name="../../applications/irda/irda-app.cpp" />
+        <file file_name="../../applications/irda/irda-app-brute-force.cpp" />
+        <file file_name="../../applications/irda/irda-app-file-parser.cpp" />
+        <file file_name="../../applications/irda/irda-app-remote-manager.cpp" />
+        <file file_name="../../applications/irda/irda-app-signal.cpp" />
+        <file file_name="../../applications/irda/irda-app-view-manager.cpp" />
+        <file file_name="../../applications/irda/irda-runner.cpp" />
+        <folder Name="view">
+          <file file_name="../../applications/irda/view/irda-app-brut-view.c" />
+        </folder>
+      </folder>
+      <folder Name="irda_monitor">
+        <file file_name="../../applications/irda_monitor/irda_monitor.c" />
+      </folder>
+      <folder Name="ibutton">
+        <folder Name="helpers">
+          <file file_name="../../applications/ibutton/helpers/pulse-sequencer.cpp" />
+          <file file_name="../../applications/ibutton/helpers/metakom-decoder.cpp" />
+          <file file_name="../../applications/ibutton/helpers/key-writer.cpp" />
+          <file file_name="../../applications/ibutton/helpers/key-worker.cpp" />
+          <file file_name="../../applications/ibutton/helpers/key-reader.cpp" />
+          <file file_name="../../applications/ibutton/helpers/key-emulator.cpp" />
+          <file file_name="../../applications/ibutton/helpers/cyfral-decoder.cpp" />
+        </folder>
+        <folder Name="scene">
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-write-success.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-write.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-start.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-select-key.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-save-success.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-save-name.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-saved-key-menu.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-read-success.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-read-not-key-error.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-readed-key-menu.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-read-crc-error.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-read.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-info.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-emulate.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-delete-success.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-delete-confirm.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-add-value.cpp" />
+          <file file_name="../../applications/ibutton/scene/ibutton-scene-add-type.cpp" />
+        </folder>
+        <file file_name="../../applications/ibutton/ibutton.cpp" />
+        <file file_name="../../applications/ibutton/ibutton-app.cpp" />
+        <file file_name="../../applications/ibutton/ibutton-cli.cpp" />
+        <file file_name="../../applications/ibutton/ibutton-key.cpp" />
+        <file file_name="../../applications/ibutton/ibutton-view-manager.cpp" />
+      </folder>
+      <folder Name="scened-app-example">
+        <folder Name="scene">
+          <file file_name="../../applications/scened-app-example/scene/scened-app-scene-byte-input.cpp" />
+          <file file_name="../../applications/scened-app-example/scene/scened-app-scene-start.cpp" />
+        </folder>
+        <file file_name="../../applications/scened-app-example/scened-app.cpp" />
+        <file file_name="../../applications/scened-app-example/scened-app-launcher.cpp" />
+      </folder>
+      <folder Name="subghz">
+        <folder Name="helpers">
+          <file file_name="../../applications/subghz/helpers/subghz_frequency_analyzer_worker.c" />
+        </folder>
+        <folder Name="scenes">
+          <file file_name="../../applications/subghz/scenes/subghz_scene.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_delete.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_delete_success.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_frequency_analyzer.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_need_saving.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_read_raw.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_read_raw_menu.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_receiver.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_receiver_config.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_receiver_info.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_save_name.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_save_success.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_saved.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_saved_menu.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_set_type.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_show_error.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_show_only_rx.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_start.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_test.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_test_carrier.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_test_packet.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_test_static.c" />
+          <file file_name="../../applications/subghz/scenes/subghz_scene_transmitter.c" />
+        </folder>
+        <folder Name="views">
+          <file file_name="../../applications/subghz/views/subghz_frequency_analyzer.c" />
+          <file file_name="../../applications/subghz/views/subghz_read_raw.c" />
+          <file file_name="../../applications/subghz/views/subghz_receiver.c" />
+          <file file_name="../../applications/subghz/views/subghz_test_carrier.c" />
+          <file file_name="../../applications/subghz/views/subghz_test_packet.c" />
+          <file file_name="../../applications/subghz/views/subghz_test_static.c" />
+          <file file_name="../../applications/subghz/views/subghz_transmitter.c" />
+        </folder>
+        <file file_name="../../applications/subghz/subghz.c" />
+        <file file_name="../../applications/subghz/subghz_cli.c" />
+        <file file_name="../../applications/subghz/subghz_history.c" />
+        <file file_name="../../applications/subghz/subghz_i.c" />
+      </folder>
+      <folder Name="accessor">
+        <file file_name="../../applications/accessor/accessor.cpp" />
+        <file file_name="../../applications/accessor/accessor-app.cpp" />
+        <file file_name="../../applications/accessor/accessor-view-manager.cpp" />
+        <folder Name="helpers">
+          <file file_name="../../applications/accessor/helpers/wiegand.cpp" />
+        </folder>
+        <folder Name="scene">
+          <file file_name="../../applications/accessor/scene/accessor-scene-start.cpp" />
+        </folder>
+      </folder>
+      <folder Name="music-player">
+        <file file_name="../../applications/music-player/music-player.c" />
+      </folder>
+    </folder>
+    <folder Name="lib">
+      <folder Name="STM32CubeWB">
+        <folder Name="Drivers">
+          <folder Name="STM32WBxx_HAL_Driver">
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_comp.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cortex.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cryp.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_exti.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_gpio.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_i2c.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_lptim.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pcd.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pcd_ex.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pwr.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pwr_ex.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rcc.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rtc.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rtc_ex.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_tim.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_tim_ex.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_adc.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_dma.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_gpio.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_i2c.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_lptim.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_lpuart.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_rcc.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_spi.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_tim.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_usart.c" />
+            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_utils.c" />
+          </folder>
+        </folder>
+        <folder Name="Middlewares">
+          <folder Name="Third_Party">
+            <folder Name="FreeRTOS">
+              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c" />
+              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/list.c" />
+              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/queue.c" />
+              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c" />
+              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/tasks.c" />
+              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/timers.c" />
+              <folder Name="CMSIS_RTOS_V2">
+                <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c" />
+              </folder>
+              <folder Name="portable">
+                <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" />
+              </folder>
+            </folder>
+          </folder>
+          <folder Name="ST">
+            <folder Name="STM32_WPAN">
+              <folder Name="interface">
+                <folder Name="patterns">
+                  <folder Name="ble_thread">
+                    <folder Name="shci">
+                      <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci/shci.c" />
+                    </folder>
+                    <folder Name="tl">
+                      <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/hci_tl.c" />
+                      <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/hci_tl_if.c" />
+                      <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c" />
+                      <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl_if.c" />
+                      <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c" />
+                    </folder>
+                  </folder>
+                </folder>
+              </folder>
+              <folder Name="utilities">
+                <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/utilities/dbg_trace.c" />
+                <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/utilities/otp.c" />
+                <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/utilities/stm_list.c" />
+              </folder>
+              <folder Name="ble">
+                <folder Name="svc">
+                  <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/svc/Src/svc_ctl.c" />
+                </folder>
+                <folder Name="core">
+                  <folder Name="template">
+                    <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/template/osal.c" />
+                  </folder>
+                  <folder Name="auto">
+                    <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_gap_aci.c" />
+                    <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_gatt_aci.c" />
+                    <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_hal_aci.c" />
+                    <file file_name="../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_hci_le.c" />
+                  </folder>
+                </folder>
+              </folder>
+            </folder>
+          </folder>
+        </folder>
+      </folder>
+      <folder Name="toolbox">
+        <file file_name="../../lib/toolbox/args.c" />
+        <file file_name="../../lib/toolbox/hex.c" />
+        <file file_name="../../lib/toolbox/manchester-decoder.c" />
+        <file file_name="../../lib/toolbox/manchester-encoder.c" />
+        <file file_name="../../lib/toolbox/md5.c" />
+        <file file_name="../../lib/toolbox/path.c" />
+        <file file_name="../../lib/toolbox/random_name.c" />
+        <file file_name="../../lib/toolbox/saved_struct.c" />
+        <file file_name="../../lib/toolbox/version.c" />
+      </folder>
+      <folder Name="libusb_stm32">
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32wb55_devfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l476_otgfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l433_devfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l100_devfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l052_devfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f446_otghs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f446_otgfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f429_otghs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f429_otgfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f105_otgfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f103_devfs.c" />
+        <file file_name="../../lib/libusb_stm32/src/usbd_core.c" />
+      </folder>
+      <folder Name="nanopb">
+        <file file_name="../../lib/nanopb/pb_common.c" />
+        <file file_name="../../lib/nanopb/pb_decode.c" />
+        <file file_name="../../lib/nanopb/pb_encode.c" />
+      </folder>
+      <folder Name="fatfs">
+        <file file_name="../../lib/fatfs/diskio.c" />
+        <file file_name="../../lib/fatfs/ff.c" />
+        <file file_name="../../lib/fatfs/ff_gen_drv.c" />
+        <folder Name="option">
+          <file file_name="../../lib/fatfs/option/unicode.c" />
+        </folder>
+      </folder>
+      <folder Name="heatshrink">
+        <file file_name="../../lib/heatshrink/heatshrink_decoder.c" />
+        <file file_name="../../lib/heatshrink/heatshrink_encoder.c" />
+      </folder>
+      <folder Name="drivers">
+        <file file_name="../../lib/drivers/lp5562.c" />
+        <file file_name="../../lib/drivers/bq25896.c" />
+        <file file_name="../../lib/drivers/bq27220.c" />
+        <file file_name="../../lib/drivers/cc1101.c" />
+      </folder>
+      <folder Name="u8g2">
+        <file file_name="../../lib/u8g2/u8g2_bitmap.c" />
+        <file file_name="../../lib/u8g2/u8g2_box.c" />
+        <file file_name="../../lib/u8g2/u8g2_buffer.c" />
+        <file file_name="../../lib/u8g2/u8g2_circle.c" />
+        <file file_name="../../lib/u8g2/u8g2_d_memory.c" />
+        <file file_name="../../lib/u8g2/u8g2_font.c" />
+        <file file_name="../../lib/u8g2/u8g2_fonts.c" />
+        <file file_name="../../lib/u8g2/u8g2_glue.c" />
+        <file file_name="../../lib/u8g2/u8g2_hvline.c" />
+        <file file_name="../../lib/u8g2/u8g2_intersection.c" />
+        <file file_name="../../lib/u8g2/u8g2_line.c" />
+        <file file_name="../../lib/u8g2/u8g2_ll_hvline.c" />
+        <file file_name="../../lib/u8g2/u8g2_setup.c" />
+        <file file_name="../../lib/u8g2/u8x8_8x8.c" />
+        <file file_name="../../lib/u8g2/u8x8_byte.c" />
+        <file file_name="../../lib/u8g2/u8x8_cad.c" />
+        <file file_name="../../lib/u8g2/u8x8_display.c" />
+        <file file_name="../../lib/u8g2/u8x8_gpio.c" />
+        <file file_name="../../lib/u8g2/u8x8_setup.c" />
+      </folder>
+      <folder Name="app-scened-template">
+        <file file_name="../../lib/app-scened-template/file-worker.c" />
+        <file file_name="../../lib/app-scened-template/file-worker-cpp.cpp" />
+        <file file_name="../../lib/app-scened-template/text-store.cpp" />
+        <folder Name="view-modules">
+          <file file_name="../../lib/app-scened-template/view-modules/byte-input-vm.cpp" />
+          <file file_name="../../lib/app-scened-template/view-modules/dialog-ex-vm.cpp" />
+          <file file_name="../../lib/app-scened-template/view-modules/popup-vm.cpp" />
+          <file file_name="../../lib/app-scened-template/view-modules/submenu-vm.cpp" />
+          <file file_name="../../lib/app-scened-template/view-modules/text-input-vm.cpp" />
+        </folder>
+      </folder>
+      <folder Name="littlefs">
+        <file file_name="../../lib/littlefs/lfs.c" />
+        <file file_name="../../lib/littlefs/lfs_util.c" />
+      </folder>
+      <folder Name="ST25RFAL002">
+        <file file_name="../../lib/ST25RFAL002/platform.c" />
+        <file file_name="../../lib/ST25RFAL002/timer.c" />
+        <folder Name="source">
+          <file file_name="../../lib/ST25RFAL002/source/custom_analog_config.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_analogConfig.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_crc.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_dpo.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_iso15693_2.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_isoDep.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_nfc.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_nfca.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcb.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcDep.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcf.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcv.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_st25tb.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_st25xv.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_t1t.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_t2t.c" />
+          <file file_name="../../lib/ST25RFAL002/source/rfal_t4t.c" />
+          <folder Name="st25r3916">
+            <file file_name="../../lib/ST25RFAL002/source/st25r3916/rfal_rfst25r3916.c" />
+            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916.c" />
+            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_aat.c" />
+            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_com.c" />
+            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_irq.c" />
+            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_led.c" />
+          </folder>
+        </folder>
+      </folder>
+      <folder Name="flipper_file">
+        <file file_name="../../lib/flipper_file/file_helper.c" />
+        <file file_name="../../lib/flipper_file/flipper_file.c" />
+        <file file_name="../../lib/flipper_file/flipper_file_float.c" />
+        <file file_name="../../lib/flipper_file/flipper_file_helper.c" />
+        <file file_name="../../lib/flipper_file/flipper_file_hex.c" />
+        <file file_name="../../lib/flipper_file/flipper_file_int32.c" />
+        <file file_name="../../lib/flipper_file/flipper_file_string.c" />
+        <file file_name="../../lib/flipper_file/flipper_file_uint32.c" />
+      </folder>
+      <folder Name="nfc_protocols">
+        <file file_name="../../lib/nfc_protocols/emv_decoder.c" />
+        <file file_name="../../lib/nfc_protocols/mifare_ultralight.c" />
+      </folder>
+      <folder Name="irda">
+        <folder Name="encoder_decoder">
+          <file file_name="../../lib/irda/encoder_decoder/irda.c" />
+          <folder Name="common">
+            <file file_name="../../lib/irda/encoder_decoder/common/irda_common_decoder.c" />
+            <file file_name="../../lib/irda/encoder_decoder/common/irda_common_encoder.c" />
+            <file file_name="../../lib/irda/encoder_decoder/common/irda_common_protocol_defs.c" />
+          </folder>
+          <folder Name="nec">
+            <file file_name="../../lib/irda/encoder_decoder/nec/irda_decoder_nec.c" />
+            <file file_name="../../lib/irda/encoder_decoder/nec/irda_encoder_nec.c" />
+            <file file_name="../../lib/irda/encoder_decoder/nec/irda_nec_spec.c" />
+          </folder>
+          <folder Name="rc5">
+            <file file_name="../../lib/irda/encoder_decoder/rc5/irda_decoder_rc5.c" />
+            <file file_name="../../lib/irda/encoder_decoder/rc5/irda_encoder_rc5.c" />
+            <file file_name="../../lib/irda/encoder_decoder/rc5/irda_rc5_spec.c" />
+          </folder>
+          <folder Name="sirc">
+            <file file_name="../../lib/irda/encoder_decoder/sirc/irda_decoder_sirc.c" />
+            <file file_name="../../lib/irda/encoder_decoder/sirc/irda_encoder_sirc.c" />
+            <file file_name="../../lib/irda/encoder_decoder/sirc/irda_sirc_spec.c" />
+          </folder>
+          <folder Name="samsung">
+            <file file_name="../../lib/irda/encoder_decoder/samsung/irda_decoder_samsung.c" />
+            <file file_name="../../lib/irda/encoder_decoder/samsung/irda_encoder_samsung.c" />
+            <file file_name="../../lib/irda/encoder_decoder/samsung/irda_samsung_spec.c" />
+          </folder>
+          <folder Name="rc6">
+            <file file_name="../../lib/irda/encoder_decoder/rc6/irda_decoder_rc6.c" />
+            <file file_name="../../lib/irda/encoder_decoder/rc6/irda_encoder_rc6.c" />
+            <file file_name="../../lib/irda/encoder_decoder/rc6/irda_rc6_spec.c" />
+          </folder>
+        </folder>
+        <folder Name="worker">
+          <file file_name="../../lib/irda/worker/irda_transmit.c" />
+          <file file_name="../../lib/irda/worker/irda_worker.c" />
+        </folder>
+      </folder>
+      <folder Name="onewire">
+        <file file_name="../../lib/onewire/blanks_writer.cpp" />
+        <file file_name="../../lib/onewire/maxim_crc.cpp" />
+        <file file_name="../../lib/onewire/one_wire_device.cpp" />
+        <file file_name="../../lib/onewire/one_wire_device_ds_1990.cpp" />
+        <file file_name="../../lib/onewire/one_wire_master.cpp" />
+        <file file_name="../../lib/onewire/one_wire_slave.cpp" />
+        <file file_name="../../lib/onewire/one_wire_timings.cpp" />
+      </folder>
+      <folder Name="subghz">
+        <file file_name="../../lib/subghz/subghz_file_encoder_worker.c" />
+        <file file_name="../../lib/subghz/subghz_keystore.c" />
+        <file file_name="../../lib/subghz/subghz_parser.c" />
+        <file file_name="../../lib/subghz/subghz_worker.c" />
+        <folder Name="protocols">
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_came.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_came_atomo.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_came_twee.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_cfm.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_common.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_faac_slh.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_gate_tx.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_hormann.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_ido.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_keeloq.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_keeloq_common.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_kia.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_nero_radio.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_nero_sketch.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_nice_flo.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_nice_flor_s.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_princeton.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_raw.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_scher_khan.c" />
+          <file file_name="../../lib/subghz/protocols/subghz_protocol_star_line.c" />
+        </folder>
+      </folder>
+    </folder>
+    <folder Name="assets">
+      <folder Name="compiled">
+        <file file_name="../../assets/compiled/application.pb.c" />
+        <file file_name="../../assets/compiled/assets_icons.c" />
+        <file file_name="../../assets/compiled/flipper.pb.c" />
+        <file file_name="../../assets/compiled/gui.pb.c" />
+        <file file_name="../../assets/compiled/input.pb.c" />
+        <file file_name="../../assets/compiled/screen.pb.c" />
+        <file file_name="../../assets/compiled/status.pb.c" />
+        <file file_name="../../assets/compiled/storage.pb.c" />
+      </folder>
+    </folder>
+  </project>
+</solution>
