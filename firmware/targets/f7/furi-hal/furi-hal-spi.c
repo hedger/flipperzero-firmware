@@ -24,6 +24,14 @@ static void furi_hal_spi_bus_init(const FuriHalSpiBus* bus) {
     hal_gpio_init_ex(bus->clk, GpioModeAltFunctionPushPull, GpioPullNo, GpioSpeedVeryHigh, bus->alt_fn);
 }
 
+static void furl_hal_spi_bus_deinit(const FuriHalSpiBus* bus) {
+    furi_assert(bus);
+
+    hal_gpio_init(bus->miso, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
+    hal_gpio_init(bus->mosi, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
+    hal_gpio_init(bus->clk, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
+}
+
 static void furi_hal_spi_device_cs_init(const FuriHalSpiDevice* device) {
     furi_assert(device);
 
@@ -156,6 +164,7 @@ static const FuriHalSpiDevice* furi_hal_spi_device_preconfigure_bus(FuriHalSpiDe
 
     // device requires alternate bus configuration - and has delayed CS init
     if (device->main_bus_config != NULL) {
+        furl_hal_spi_bus_deinit(device->main_bus_config);
         furi_hal_spi_bus_init(device->bus);
         furi_hal_spi_device_cs_init(device);
     }
@@ -185,6 +194,7 @@ const FuriHalSpiDevice* furi_hal_spi_custom_device_get(const LL_SPI_InitTypeDef*
 void furi_hal_spi_device_return(const FuriHalSpiDevice* device) {
     if (device->main_bus_config != NULL) {
         // restore original bus configuration
+        furl_hal_spi_bus_deinit(device->bus);
         furi_hal_spi_bus_init(device->main_bus_config);
     }
     furi_hal_spi_bus_unlock(device->bus);
