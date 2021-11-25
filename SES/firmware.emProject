@@ -365,6 +365,8 @@
           <file file_name="../../applications/archive/scenes/archive_scene.c" />
           <file file_name="../../applications/archive/scenes/archive_scene_browser.c" />
           <file file_name="../../applications/archive/scenes/archive_scene_rename.c" />
+          <file file_name="../../applications/archive/scenes/archive_scene.h" />
+          <file file_name="../../applications/archive/scenes/archive_scene_config.h" />
         </folder>
         <folder Name="views">
           <file file_name="../../applications/archive/views/archive_browser_view.c" />
@@ -673,6 +675,17 @@
       </folder>
       <folder Name="music-player">
         <file file_name="../../applications/music-player/music-player.c" />
+      </folder>
+      <folder Name="flash_manager">
+        <file file_name="../../applications/flash_manager/flash_manager.h" />
+        <file file_name="../../applications/flash_manager/flash_manager_app.cpp" />
+        <file file_name="../../applications/flash_manager/flash_manager_launcher.cpp" />
+        <folder Name="scene">
+          <file file_name="../../applications/flash_manager/scene/flash_manager_byte_input.cpp" />
+          <file file_name="../../applications/flash_manager/scene/flash_manager_scene_byte_input.h" />
+          <file file_name="../../applications/flash_manager/scene/flash_manager_scene_start.cpp" />
+          <file file_name="../../applications/flash_manager/scene/flash_manager_scene_start.h" />
+        </folder>
       </folder>
     </folder>
     <folder Name="lib">
