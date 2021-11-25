@@ -203,7 +203,9 @@ const FlipperApplication FLIPPER_PLUGINS[] = {
 
 #ifdef APP_MUSIC_PLAYER
     {.app = music_player_app, .name = "Music Player", .stack_size = 1024, .icon = &A_Plugins_14},
-    {.app = flash_manager_app, .name = "SPI Manager", .stack_size = 1024, .icon = &A_Plugins_14},
+#endif
+#ifdef PLUGIN_FLASH_MANAGER
+    {.app = flash_manager_app, .name = "Flash Manager", .stack_size = 1024, .icon = &A_Plugins_14},
 #endif
 };
 
