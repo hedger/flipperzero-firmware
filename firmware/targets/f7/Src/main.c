@@ -4,6 +4,8 @@
 #include <furi-hal.h>
 #include <flipper.h>
 
+#include "cmsis_os2.h"
+
 #define TAG "Main"
 
 int main(void) {

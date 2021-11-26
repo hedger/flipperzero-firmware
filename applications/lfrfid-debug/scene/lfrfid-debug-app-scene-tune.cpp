@@ -1,5 +1,7 @@
 #include "lfrfid-debug-app-scene-tune.h"
 
+#include "furi-hal-rfid.h"
+
 void LfRfidDebugAppSceneTune::on_enter(LfRfidDebugApp* app, bool need_restore) {
     app->view_controller.switch_to<LfRfidViewTuneVM>();
 

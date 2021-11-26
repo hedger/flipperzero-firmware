@@ -8,6 +8,8 @@
 #include <storage/storage-sd-api.h>
 #include <power/power_service/power.h>
 
+#include "furi-hal-bootloader.h"
+
 #define MAX_NAME_LENGTH 255
 
 static void storage_cli_print_usage() {

@@ -143,6 +143,7 @@ void lfrfid_cli_emulate(Cli* cli, string_t args) {
 }
 
 void lfrfid_cli(Cli* cli, string_t args, void* context) {
+    (void)context;
     string_t cmd;
     string_init(cmd);
 

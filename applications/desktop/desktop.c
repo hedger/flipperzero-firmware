@@ -13,6 +13,8 @@
 #include <power/power_service/power.h>
 #include "helpers/desktop_animation.h"
 
+#include "furi-hal-usb.h"
+
 static void desktop_lock_icon_callback(Canvas* canvas, void* context) {
     furi_assert(canvas);
     canvas_draw_icon(canvas, 0, 0, &I_Lock_8x8);

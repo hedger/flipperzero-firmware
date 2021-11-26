@@ -2,6 +2,8 @@
 #include "battery_service.h"
 #include "bt_keys_storage.h"
 
+#include "furi-hal-bt.h"
+
 #define TAG "BtSrv"
 
 #define BT_RPC_EVENT_BUFF_SENT (1UL << 0)

@@ -3,6 +3,8 @@
 #include <rpc/rpc.h>
 #include <furi-hal.h>
 
+#include "furi-hal-vcp.h"
+
 typedef struct {
     Cli* cli;
     bool session_close_request;

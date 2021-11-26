@@ -5,6 +5,9 @@
 #include "notification-messages.h"
 #include "notification-app.h"
 
+#include "furi-hal-vibro.h"
+#include "furi-hal-pwm.h"
+
 #define TAG "NotificationSrv"
 
 static const uint8_t minimal_delay = 100;

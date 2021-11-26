@@ -2,6 +2,8 @@
 #include "../gpio_app_i.h"
 #include "furi-hal.h"
 
+#include "furi-hal-uart.h"
+
 typedef enum {
     UsbUartLineIndexVcp,
     UsbUartLineIndexBaudrate,

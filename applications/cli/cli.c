@@ -4,6 +4,9 @@
 #include <furi-hal-version.h>
 #include <loader/loader.h>
 
+#include "furi-hal-vcp.h"
+#include "furi-hal-power.h"
+
 Cli* cli_alloc() {
     Cli* cli = furi_alloc(sizeof(Cli));
 

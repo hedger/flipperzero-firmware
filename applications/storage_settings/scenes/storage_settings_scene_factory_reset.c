@@ -2,6 +2,8 @@
 #include <power/power_service/power.h>
 #include <furi-hal.h>
 
+#include "furi-hal-bootloader.h"
+
 #define STORAGE_SETTINGS_SCENE_FACTORY_RESET_CONFIRM_COUNT 5
 
 static void

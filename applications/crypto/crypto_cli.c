@@ -4,6 +4,8 @@
 #include <lib/toolbox/args.h>
 #include <cli/cli.h>
 
+#include "furi-hal-crypto.h"
+
 void crypto_cli_print_usage() {
     printf("Usage:\r\n");
     printf("crypto <cmd> <args>\r\n");

@@ -1,6 +1,8 @@
 #include "loader/loader.h"
 #include "loader_i.h"
 
+#include "furi-hal-power.h"
+
 #define TAG "LoaderSrv"
 
 #define LOADER_THREAD_FLAG_SHOW_MENU (1 << 0)

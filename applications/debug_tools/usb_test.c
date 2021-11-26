@@ -6,6 +6,8 @@
 #include <gui/gui.h>
 #include <cmsis_os.h>
 
+#include "furi-hal-usb.h"
+
 typedef struct {
     Gui* gui;
     ViewDispatcher* view_dispatcher;

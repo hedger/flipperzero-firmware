@@ -6,6 +6,8 @@
 #include <gui/view_port.h>
 #include <gui/view.h>
 
+#include "furi-hal-power.h"
+
 #define POWER_OFF_TIMEOUT 90
 #define POWER_BATTERY_WELL_LEVEL 99
 

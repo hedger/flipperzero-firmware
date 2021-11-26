@@ -10,6 +10,9 @@
 
 #include <furi-hal.h>
 
+#include "furi-hal-power.h"
+#include "ble_glue.h"
+
 #define TAG "BtGap"
 
 #define FAST_ADV_TIMEOUT 30000

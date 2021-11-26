@@ -4,6 +4,8 @@
 #include <stm32wbxx_ll_cortex.h>
 #include <tim.h>
 
+#include "furi-hal-rfid.h"
+
 extern COMP_HandleTypeDef hcomp1;
 
 /**

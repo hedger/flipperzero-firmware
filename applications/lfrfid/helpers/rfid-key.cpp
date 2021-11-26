@@ -36,7 +36,7 @@ const char* RfidKey::get_type_text() {
     return lfrfid_key_get_type_string(type);
 }
 
-const uint8_t RfidKey::get_type_data_count() {
+uint8_t RfidKey::get_type_data_count() {
     return lfrfid_key_get_type_data_count(type);
 }
 

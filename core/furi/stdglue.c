@@ -8,6 +8,8 @@
 #include <furi-hal.h>
 #include <m-dict.h>
 
+#include "furi-hal-console.h"
+
 DICT_DEF2(
     FuriStdglueCallbackDict,
     uint32_t,

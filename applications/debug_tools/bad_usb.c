@@ -6,6 +6,8 @@
 #include <furi-hal-usb-hid.h>
 #include <storage/storage.h>
 
+#include "furi-hal-usb.h"
+
 #define TAG "BadUsb"
 #define WORKER_TAG TAG "Worker"
 

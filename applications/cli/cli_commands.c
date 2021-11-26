@@ -7,6 +7,9 @@
 #include <notification/notification-messages.h>
 #include <shci.h>
 
+#include "furi-hal-bt.h"
+#include "furi-hal-crypto.h"
+
 #define ENCLAVE_SIGNATURE_KEY_SLOTS 10
 #define ENCLAVE_SIGNATURE_SIZE 16
 
@@ -164,7 +167,6 @@ void cli_command_device_info(Cli* cli, string_t args, void* context) {
 }
 
 void cli_command_help(Cli* cli, string_t args, void* context) {
-    (void)args;
     printf("Commands we have:");
 
     // Command count

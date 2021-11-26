@@ -4,6 +4,8 @@
 #include "protocols/protocol-hid-h10301.h"
 #include "protocols/protocol-indala-40134.h"
 
+#include "furi-hal-rfid.h"
+
 extern COMP_HandleTypeDef hcomp1;
 
 /**

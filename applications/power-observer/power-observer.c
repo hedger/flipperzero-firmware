@@ -2,6 +2,8 @@
 #include <furi-hal.h>
 #include <notification/notification-messages.h>
 
+#include "furi-hal-power.h"
+
 const NotificationMessage message_green_110 = {
     .type = NotificationMessageTypeLedGreen,
     .data.led.value = 110,

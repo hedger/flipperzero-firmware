@@ -2,6 +2,8 @@
 #include <lfs.h>
 #include <furi-hal.h>
 
+#include "furi-hal-bootloader.h"
+
 #define TAG "StorageInt"
 #define STORAGE_PATH "/int"
 

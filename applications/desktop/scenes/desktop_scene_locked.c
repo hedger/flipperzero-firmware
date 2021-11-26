@@ -4,6 +4,8 @@
 #include "desktop/views/desktop_main.h"
 #include <furi-hal-lock.h>
 
+#include "furi-hal-usb.h"
+
 void desktop_scene_locked_callback(DesktopLockedEvent event, void* context) {
     Desktop* desktop = (Desktop*)context;
     view_dispatcher_send_custom_event(desktop->view_dispatcher, event);

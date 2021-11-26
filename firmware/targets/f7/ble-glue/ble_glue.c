@@ -10,6 +10,8 @@
 #include "app_debug.h"
 #include <furi-hal.h>
 
+#include "furi-hal-power.h"
+
 #define TAG "Core2"
 
 #define POOL_SIZE (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))

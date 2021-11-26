@@ -19,6 +19,8 @@
 #include <toolbox/path.h>
 #include <flipper_file/flipper_file.h>
 
+#include "furi-hal-power.h"
+
 const char* LfRfidApp::app_folder = "/any/lfrfid";
 const char* LfRfidApp::app_extension = ".rfid";
 const char* LfRfidApp::app_filetype = "Flipper RFID key";

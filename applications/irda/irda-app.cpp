@@ -222,7 +222,7 @@ void IrdaApp::notify_sent_just_learnt() {
         NULL,
     };
 
-    notification_message_block(notification, &sequence);
+    notification_message_block(notification, (const NotificationSequence*) &sequence);
 }
 
 void IrdaApp::notify_click() {
@@ -230,10 +230,10 @@ void IrdaApp::notify_click() {
         &message_click,
         &message_delay_1,
         &message_sound_off,
-        NULL,
+        NULL
     };
 
-    notification_message_block(notification, &sequence);
+    notification_message_block(notification, (const NotificationSequence*) &sequence);
 }
 
 void IrdaApp::notify_click_and_green_blink() {
@@ -245,10 +245,10 @@ void IrdaApp::notify_click_and_green_blink() {
         &message_delay_10,
         &message_green_0,
         &message_do_not_reset,
-        NULL,
+        NULL
     };
 
-    notification_message_block(notification, &sequence);
+    notification_message_block(notification, (const NotificationSequence*) &sequence);
 }
 
 void IrdaApp::notify_blink_green() {
@@ -260,7 +260,7 @@ void IrdaApp::notify_blink_green() {
         NULL,
     };
 
-    notification_message(notification, &sequence);
+    notification_message(notification, (const NotificationSequence*) &sequence);
 }
 
 void IrdaApp::notify_green_on() {

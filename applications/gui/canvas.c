@@ -6,6 +6,9 @@
 #include <furi-hal.h>
 #include <u8g2_glue.h>
 
+#include "furi-hal-power.h"
+#include "furi-hal-compress.h"
+
 const CanvasFontParameters canvas_font_params[FontTotalNumber] = {
     [FontPrimary] = {.leading_default = 12, .leading_min = 11, .height = 8, .descender = 2},
     [FontSecondary] = {.leading_default = 11, .leading_min = 9, .height = 7, .descender = 2},
