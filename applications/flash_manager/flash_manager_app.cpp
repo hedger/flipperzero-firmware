@@ -9,9 +9,12 @@ FlashManager::FlashManager()
 }
 
 FlashManager::~FlashManager() {
+    FURI_LOG_I(TAG, "stopped");
 }
 
 void FlashManager::run() {
+    FURI_LOG_I(TAG, "starting");
+
     scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());
     scene_controller.add_scene(SceneType::ByteInputScene, new FlashManagerSceneByteInput());
 

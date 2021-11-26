@@ -681,10 +681,10 @@
         <file file_name="../../applications/flash_manager/flash_manager_app.cpp" />
         <file file_name="../../applications/flash_manager/flash_manager_launcher.cpp" />
         <folder Name="scene">
-          <file file_name="../../applications/flash_manager/scene/flash_manager_byte_input.cpp" />
           <file file_name="../../applications/flash_manager/scene/flash_manager_scene_byte_input.h" />
           <file file_name="../../applications/flash_manager/scene/flash_manager_scene_start.cpp" />
           <file file_name="../../applications/flash_manager/scene/flash_manager_scene_start.h" />
+          <file file_name="../../applications/flash_manager/scene/flash_manager_scene_byte_input.cpp" />
         </folder>
       </folder>
     </folder>

@@ -42,6 +42,7 @@ extern int32_t vibro_test_app(void* p);
 
 // Plugins
 extern int32_t music_player_app(void* p);
+extern int32_t snake_game_app(void* p);
 extern int32_t flash_manager_app(void* p);
 
 // On system start hooks declaration
@@ -204,6 +205,11 @@ const FlipperApplication FLIPPER_PLUGINS[] = {
 #ifdef APP_MUSIC_PLAYER
     {.app = music_player_app, .name = "Music Player", .stack_size = 1024, .icon = &A_Plugins_14},
 #endif
+
+#ifdef APP_SNAKE_GAME
+    {.app = snake_game_app, .name = "Snake Game", .stack_size = 1024, .icon = &A_Plugins_14},
+#endif
+
 #ifdef PLUGIN_FLASH_MANAGER
     {.app = flash_manager_app, .name = "Flash Manager", .stack_size = 1024, .icon = &A_Plugins_14},
 #endif

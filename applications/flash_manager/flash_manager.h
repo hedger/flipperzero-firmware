@@ -13,6 +13,8 @@
 
 #include <notification/notification-messages.h>
 
+#define TAG "FlashManager"
+
 class FlashManager {
 public:
     enum class EventType : uint8_t {

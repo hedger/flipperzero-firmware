@@ -2,13 +2,21 @@
 
 typedef enum {
     SubmenuByteInput,
+    SubmenuFileBrowser,
+    SubmenuChipID,
+    SubmenuOpRead,
+    SubmenuOpWrite
 } SubmenuIndex;
 
 void FlashManagerSceneStart::on_enter(FlashManager* app, bool need_restore) {
     auto submenu = app->view_controller.get<SubmenuVM>();
     auto callback = cbc::obtain_connector(this, &FlashManagerSceneStart::submenu_callback);
 
-    submenu->add_item("Byte Input", SubmenuByteInput, callback, app);
+    //submenu->add_item("Byte Input", SubmenuByteInput, callback, app);
+    submenu->add_item("Dump browser", SubmenuFileBrowser, callback, app);
+    submenu->add_item("Chip info", SubmenuChipID, callback, app);
+    submenu->add_item("Read", SubmenuOpRead, callback, app);
+    submenu->add_item("Write", SubmenuOpWrite, callback, app);
 
     if(need_restore) {
         submenu->set_selected_item(submenu_item_selected);
