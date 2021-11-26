@@ -2,6 +2,8 @@
 #include <furi.h>
 #include <furi-hal.h>
 
+#include <memory>
+
 #include <generic-scene.hpp>
 #include <scene-controller.hpp>
 #include <view-controller.hpp>
@@ -14,6 +16,8 @@
 #include <notification/notification-messages.h>
 
 #define TAG "FlashManager"
+
+class FlashManagerWorker;
 
 class FlashManager {
 public:
@@ -44,6 +48,8 @@ public:
 
     ~FlashManager();
     FlashManager();
+
+    std::unique_ptr<FlashManagerWorker> worker;
 
     void run();
 };

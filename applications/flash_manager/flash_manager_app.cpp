@@ -1,4 +1,5 @@
 #include "flash_manager.h"
+#include "flash_manager_worker.h"
 #include "scene/flash_manager_scene_start.h"
 #include "scene/flash_manager_scene_byte_input.h"
 
@@ -19,5 +20,10 @@ void FlashManager::run() {
     scene_controller.add_scene(SceneType::ByteInputScene, new FlashManagerSceneByteInput());
 
     notification_message(notification, &sequence_blink_green_10);
+
+    worker = std::make_unique<FlashManagerWorker>();
+    worker->start();
+    
     scene_controller.process(100);
+    worker->stop();
 }
