@@ -58,7 +58,7 @@ bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const si
   
   FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
 
-  osDelay(200);
+  osDelay(10);
   // TODO: implement
   memset(p_data, 0xCD, data_len);
 

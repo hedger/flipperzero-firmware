@@ -13,10 +13,10 @@ void FlashManagerSceneStart::on_enter(FlashManager* app, bool need_restore) {
     auto callback = cbc::obtain_connector(this, &FlashManagerSceneStart::submenu_callback);
 
     //submenu->add_item("Byte Input", SubmenuByteInput, callback, app);
-    submenu->add_item("Dump browser", SubmenuFileBrowser, callback, app);
-    submenu->add_item("Chip info", SubmenuChipID, callback, app);
-    submenu->add_item("Read", SubmenuOpRead, callback, app);
-    submenu->add_item("Write", SubmenuOpWrite, callback, app);
+    //submenu->add_item("Dump browser", SubmenuFileBrowser, callback, app);
+    submenu->add_item("Detect SPI chip", SubmenuChipID, callback, app);
+    //submenu->add_item("Read", SubmenuOpRead, callback, app);
+    //submenu->add_item("Write", SubmenuOpWrite, callback, app);
 
     if(need_restore) {
         submenu->set_selected_item(submenu_item_selected);
@@ -32,6 +32,9 @@ bool FlashManagerSceneStart::on_event(FlashManager* app, FlashManager::Event* ev
         switch(event->payload.menu_index) {
         case SubmenuByteInput:
             app->scene_controller.switch_to_next_scene(FlashManager::SceneType::ByteInputScene);
+            break;
+        case SubmenuChipID:
+            app->scene_controller.switch_to_next_scene(FlashManager::SceneType::ChipIDScene);
             break;
         }
         consumed = true;

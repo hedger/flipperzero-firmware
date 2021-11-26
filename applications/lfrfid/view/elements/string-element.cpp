@@ -34,3 +34,9 @@ void StringElement::set_text(
     font = _font;
     unlock_model(true);
 }
+
+void StringElement::update_text(const char* _text) {
+    lock_model();
+    text = _text;
+    unlock_model(true);
+}

@@ -15,6 +15,7 @@ public:
         Align horizontal = AlignLeft,
         Align vertical = AlignTop,
         Font font = FontPrimary);
+     void update_text(const char* text);
 
 private:
     const char* text = NULL;

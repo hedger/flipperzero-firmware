@@ -2,12 +2,13 @@
 #include "spi/spi_api.h"
 #include <furi.h>
 
+#undef TAG
 #define TAG "FlashWorker"
 
 static int32_t flash_manager_worker_thread(void *context);
 
-WorkerTask::WorkerTask() : WorkerTask(WorkerOperation::Unknown, 0, nullptr, 0) {
-}
+//WorkerTask::WorkerTask() : WorkerTask(WorkerOperation::Unknown, 0, nullptr, 0) {
+//}
 
 WorkerTask::WorkerTask(WorkerOperation _operation, size_t _offset, uint8_t* _data, size_t _size) 
   : offset(_offset), data(_data), size(_size), operation(_operation), progress(0), success(false) {
@@ -87,7 +88,15 @@ static int32_t flash_manager_worker_thread(void *context) {
 
       switch (pTask->operation) {
           case WorkerOperation::ChipId:
+            furi_assert(pTask->size == sizeof(SpiFlashInfo_t));
+            furi_assert(pTask->data);
+
             pTask->success = pToolkit->detect_flash();
+            if (pTask->success) {
+                //memcpy(pToolkit->get_info(), pTask->data, pTask->size);
+                *(reinterpret_cast<SpiFlashInfo_t*>(pTask->data)) = *pToolkit->get_info();
+            }
+            
             // TODO: implement
             break;
 
@@ -133,6 +142,7 @@ static int32_t flash_manager_worker_thread(void *context) {
       }
 
       pTask->progress = WorkerTask::COMPLETE;
+      instance->active_task = nullptr;
       FURI_LOG_I(TAG, "task done");
     }
 

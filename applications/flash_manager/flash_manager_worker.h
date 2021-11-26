@@ -24,14 +24,14 @@ struct WorkerTask {
     static const uint8_t COMPLETE = 100;
 
     const size_t offset;
-    const uint8_t* data;
+    uint8_t* const data;
     const size_t size;
 
     const WorkerOperation operation;
     volatile uint8_t progress;
     bool success;
 
-    WorkerTask();
+    //WorkerTask();
     WorkerTask(WorkerOperation _operation, size_t _offset = 0, uint8_t* _data = 0, size_t _size = 0);
     //void clear();
 

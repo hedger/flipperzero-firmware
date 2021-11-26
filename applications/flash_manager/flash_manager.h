@@ -11,7 +11,9 @@
 #include <text-store.h>
 
 #include <view-modules/submenu-vm.h>
+#include <view-modules/text-input-vm.h>
 #include <view-modules/byte-input-vm.h>
+#include "../lfrfid/view/container-vm.h"
 
 #include <storage/storage.h>
 #include <dialogs/dialogs.h>
@@ -25,13 +27,18 @@ class FlashManager {
 public:
     enum class EventType : uint8_t {
         GENERIC_EVENT_ENUM_VALUES,
+        Next,
         MenuSelected,
         ByteEditResult,
+        OpReadChip
     };
 
     enum class SceneType : uint8_t {
         GENERIC_SCENE_ENUM_VALUES,
         ByteInputScene,
+        ChipIDScene,
+        ReadImgFileNameInputScene,
+        ReadImgProcessScene,
     };
 
     class Event {
@@ -45,7 +52,7 @@ public:
 
     SceneController<GenericScene<FlashManager>, FlashManager> scene_controller;
     TextStore text_store;
-    ViewController<FlashManager, SubmenuVM, ByteInputVM> view_controller;
+    ViewController<FlashManager, SubmenuVM, ByteInputVM, TextInputVM, ContainerVM> view_controller;
 
     RecordController<NotificationApp> notification;
     RecordController<Storage> storage;
