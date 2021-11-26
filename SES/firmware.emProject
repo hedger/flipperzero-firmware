@@ -289,6 +289,7 @@
           <file file_name="../../applications/desktop/scenes/desktop_scene_locked.c" />
           <file file_name="../../applications/desktop/scenes/desktop_scene_main.c" />
           <file file_name="../../applications/desktop/scenes/desktop_scene_pinsetup.c" />
+          <file file_name="../../applications/desktop/scenes/desktop_scene_levelup.c" />
         </folder>
         <folder Name="views">
           <file file_name="../../applications/desktop/views/desktop_debug.c" />
@@ -630,7 +631,6 @@
           <file file_name="../../applications/subghz/scenes/subghz_scene_frequency_analyzer.c" />
           <file file_name="../../applications/subghz/scenes/subghz_scene_need_saving.c" />
           <file file_name="../../applications/subghz/scenes/subghz_scene_read_raw.c" />
-          <file file_name="../../applications/subghz/scenes/subghz_scene_read_raw_menu.c" />
           <file file_name="../../applications/subghz/scenes/subghz_scene_receiver.c" />
           <file file_name="../../applications/subghz/scenes/subghz_scene_receiver_config.c" />
           <file file_name="../../applications/subghz/scenes/subghz_scene_receiver_info.c" />
@@ -686,6 +686,9 @@
           <file file_name="../../applications/flash_manager/scene/flash_manager_scene_start.h" />
           <file file_name="../../applications/flash_manager/scene/flash_manager_scene_byte_input.cpp" />
         </folder>
+      </folder>
+      <folder Name="snake-game">
+        <file file_name="../../applications/snake-game/snake-game.c" />
       </folder>
     </folder>
     <folder Name="lib">
@@ -997,8 +1000,6 @@
         <file file_name="../../assets/compiled/assets_icons.c" />
         <file file_name="../../assets/compiled/flipper.pb.c" />
         <file file_name="../../assets/compiled/gui.pb.c" />
-        <file file_name="../../assets/compiled/input.pb.c" />
-        <file file_name="../../assets/compiled/screen.pb.c" />
         <file file_name="../../assets/compiled/status.pb.c" />
         <file file_name="../../assets/compiled/storage.pb.c" />
       </folder>
