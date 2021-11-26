@@ -51,5 +51,5 @@ public:
 
     std::unique_ptr<FlashManagerWorker> worker;
 
-    void run();
+    int32_t run();
 };

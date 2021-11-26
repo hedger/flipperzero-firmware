@@ -1,12 +1,15 @@
 #include "flash_manager_worker.h"
+#include "spi/spi_api.h"
 
 #define TAG "FlashWorker"
 
 
 static int32_t flash_manager_worker_thread(void* context);
 
-FlashManagerWorker::FlashManagerWorker() : worker_running(true) {
+FlashManagerWorker::FlashManagerWorker() 
+      : worker_running(true), toolkit(std::make_unique<SpiToolkit>()) {
     FURI_LOG_I(TAG, "ctor()");
+
     thread = furi_thread_alloc();
     furi_thread_set_name(thread, "FlashManagerWorker");
     furi_thread_set_stack_size(thread, 1024);

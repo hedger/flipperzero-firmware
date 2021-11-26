@@ -13,7 +13,7 @@ FlashManager::~FlashManager() {
     FURI_LOG_I(TAG, "stopped");
 }
 
-void FlashManager::run() {
+int32_t FlashManager::run() {
     FURI_LOG_I(TAG, "starting");
 
     scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());
@@ -26,4 +26,6 @@ void FlashManager::run() {
     
     scene_controller.process(100);
     worker->stop();
+
+    return 0;
 }
