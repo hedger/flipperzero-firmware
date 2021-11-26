@@ -53,7 +53,7 @@ public:
 
     int get_task_progress();
 
-    bool is_busy();
+    inline bool is_busy() const;
 
     std::unique_ptr<SpiToolkit> toolkit;
 

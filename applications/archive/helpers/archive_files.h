@@ -9,6 +9,7 @@ typedef enum {
     ArchiveFileTypeSubGhz,
     ArchiveFileTypeLFRFID,
     ArchiveFileTypeIrda,
+    ArchiveFileTypeFlash,
     ArchiveFileTypeFolder,
     ArchiveFileTypeUnknown,
     AppIdTotal,

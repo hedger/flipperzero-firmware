@@ -11,6 +11,7 @@ static const char* tab_default_paths[] = {
     [ArchiveTabSubGhz] = "/any/subghz/saved",
     [ArchiveTabLFRFID] = "/any/lfrfid",
     [ArchiveTabIrda] = "/any/irda",
+    [ArchiveTabFlash] = "/any/flash", // TODO: use static from app class
     [ArchiveTabBrowser] = "/any",
 };
 
@@ -20,6 +21,7 @@ static const char* known_ext[] = {
     [ArchiveFileTypeSubGhz] = ".sub",
     [ArchiveFileTypeLFRFID] = ".rfid",
     [ArchiveFileTypeIrda] = ".ir",
+    [ArchiveFileTypeFlash] = ".bin",
 };
 
 static inline const char* get_tab_ext(ArchiveTabEnum tab) {
@@ -34,6 +36,8 @@ static inline const char* get_tab_ext(ArchiveTabEnum tab) {
         return known_ext[ArchiveFileTypeLFRFID];
     case ArchiveTabIrda:
         return known_ext[ArchiveFileTypeIrda];
+    case ArchiveTabFlash:
+        return known_ext[ArchiveFileTypeFlash];
     default:
         return "*";
     }

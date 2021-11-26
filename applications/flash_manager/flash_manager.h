@@ -13,6 +13,8 @@
 #include <view-modules/submenu-vm.h>
 #include <view-modules/byte-input-vm.h>
 
+#include <storage/storage.h>
+#include <dialogs/dialogs.h>
 #include <notification/notification-messages.h>
 
 #define TAG "FlashManager"
@@ -44,12 +46,24 @@ public:
     SceneController<GenericScene<FlashManager>, FlashManager> scene_controller;
     TextStore text_store;
     ViewController<FlashManager, SubmenuVM, ByteInputVM> view_controller;
+
     RecordController<NotificationApp> notification;
+    RecordController<Storage> storage;
+    RecordController<DialogsApp> dialogs;
 
     ~FlashManager();
     FlashManager();
 
     std::unique_ptr<FlashManagerWorker> worker;
 
-    int32_t run();
+    int32_t run(const char* args);
+
+
+    static const uint8_t file_name_size = 100;
+    char file_name[file_name_size];
+
+    static const char* app_folder;
+    static const char* app_extension;
+    static const char* app_filetype;
+    void make_app_folder();
 };

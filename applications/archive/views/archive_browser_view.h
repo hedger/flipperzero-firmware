@@ -23,6 +23,7 @@ typedef enum {
     ArchiveTabNFC,
     ArchiveTabIrda,
     ArchiveTabIButton,
+    ArchiveTabFlash,
     ArchiveTabBrowser,
     ArchiveTabTotal,
 } ArchiveTabEnum;

@@ -51,12 +51,16 @@ bool FlashManagerWorker::enqueue_task(WorkerTask* task) {
     furi_assert(task);
     furi_assert(task->operation > WorkerOperation::None);
 
-    if (active_task != nullptr && !active_task->completed()) {
+    if (is_busy()) {
         return false;
     }
 
     active_task = task;
     return true;
+}
+
+bool FlashManagerWorker::is_busy() const {
+    return (active_task != nullptr && !active_task->completed());
 }
 
 /** Worker thread

@@ -10,6 +10,7 @@ static const char* ArchiveTabNames[] = {
     [ArchiveTabSubGhz] = "Sub-GHz",
     [ArchiveTabLFRFID] = "RFID LF",
     [ArchiveTabIrda] = "Infrared",
+    [ArchiveTabFlash] = "Dumps",
     [ArchiveTabBrowser] = "Browser"};
 
 static const Icon* ArchiveItemIcons[] = {
@@ -19,6 +20,7 @@ static const Icon* ArchiveItemIcons[] = {
     [ArchiveFileTypeLFRFID] = &I_125_10px,
     [ArchiveFileTypeIrda] = &I_ir_10px,
     [ArchiveFileTypeFolder] = &I_dir_10px,
+    [ArchiveFileTypeFlash] = &I_unknown_10px,
     [ArchiveFileTypeUnknown] = &I_unknown_10px,
 };
 

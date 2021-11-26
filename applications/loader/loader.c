@@ -81,6 +81,15 @@ LoaderStatus loader_start(Loader* instance, const char* name, const char* args) 
     }
 
     if(!flipper_app) {
+        for(size_t i = 0; i < FLIPPER_PLUGINS_COUNT; i++) {
+            if(strcmp(FLIPPER_PLUGINS[i].name, name) == 0) {
+                flipper_app = &FLIPPER_PLUGINS[i];
+                break;
+            }
+        }
+    }
+
+    if(!flipper_app) {
         FURI_LOG_E(TAG, "Can't find application with name %s", name);
         return LoaderStatusErrorUnknownApp;
     }

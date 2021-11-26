@@ -10,6 +10,7 @@ static const char* flipper_app_name[] = {
     [ArchiveFileTypeSubGhz] = "Sub-GHz",
     [ArchiveFileTypeLFRFID] = "125 kHz RFID",
     [ArchiveFileTypeIrda] = "Infrared",
+    [ArchiveFileTypeFlash] = "Flash Manager",
 };
 
 static void archive_run_in_app(
