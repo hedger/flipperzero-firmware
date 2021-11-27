@@ -112,7 +112,7 @@ static int32_t flash_manager_worker_thread(void *context) {
                 if (offs + block_size > final_offs) {
                     block_size = final_offs - offs;
                 }
-                if (!pToolkit->write_block(offs, pTask->data + offs, block_size)) {
+                if (!pToolkit->read_block(offs, const_cast<uint8_t*>(pTask->data + offs), block_size)) {
                     pTask->success = false;
                     break;
                 }
@@ -128,7 +128,7 @@ static int32_t flash_manager_worker_thread(void *context) {
                 if (offs + block_size > final_offs) {
                     block_size = final_offs - offs;
                 }
-                if (!pToolkit->read_block(offs, const_cast<uint8_t*>(pTask->data + offs), block_size)) {
+                if (!pToolkit->write_block(offs, pTask->data + offs, block_size)) {
                     pTask->success = false;
                     break;
                 }
