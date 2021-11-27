@@ -106,7 +106,6 @@ void FlashManagerSceneReadDump::tick() {
         }
         progress = bytes_read * 100 / flash->size;
     } else {
-        // TODO: update intermediate progress
         progress = (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / flash->size;
     }
 

@@ -1,4 +1,7 @@
 #pragma once
+
+#include "flash_manager_file_tools.h"
+
 #include <furi.h>
 #include <furi-hal.h>
 
@@ -55,8 +58,8 @@ public:
     ViewController<FlashManager, SubmenuVM, ByteInputVM, TextInputVM, ContainerVM> view_controller;
 
     RecordController<NotificationApp> notification;
-    RecordController<Storage> storage;
-    RecordController<DialogsApp> dialogs;
+    //RecordController<Storage> storage;
+    //RecordController<DialogsApp> dialogs;
 
     ~FlashManager();
     FlashManager();
@@ -69,8 +72,5 @@ public:
     static const uint8_t file_name_size = 100;
     char file_name[file_name_size];
 
-    static const char* app_folder;
-    static const char* app_extension;
-    static const char* app_filetype;
-    void make_app_folder();
+    FlashManagerFileTools file_tools;
 };
