@@ -56,10 +56,11 @@ bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const si
   furi_assert(p_data);
   furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
   
-  FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
+  //FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
 
   osDelay(10);
   // TODO: implement
+  FURI_LOG_I(TAG, "memset @ %x len %x", p_data, data_len);
   memset(p_data, 0xCD, data_len);
 
   return true;

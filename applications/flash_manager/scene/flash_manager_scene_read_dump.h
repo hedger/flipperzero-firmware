@@ -21,7 +21,7 @@ private:
 
     //void result_callback(void* context);
     void back_callback(void* context);
-    void read_chip_callback(void* context);
+    void done_callback(void* context);
 
     StringElement* status_line;
 

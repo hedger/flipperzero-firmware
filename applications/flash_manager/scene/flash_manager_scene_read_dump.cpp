@@ -6,7 +6,6 @@
 
 #include "../flash_manager_worker.h"
 
-
 void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     this->app = app;
 
@@ -21,7 +20,8 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
 
     auto button = container->add<ButtonElement>();
     button->set_type(ButtonElement::Type::Left, "Back");
-    button->set_callback(app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::back_callback));
+    button->set_callback(
+        app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::back_callback));
 
     auto line_1 = container->add<StringElement>();
     auto line_2 = container->add<StringElement>();
@@ -42,10 +42,10 @@ bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event*
     //    consumed = true;
     //}
 
-    if (event->type == FlashManager::EventType::Tick) {
+    if(event->type == FlashManager::EventType::Tick) {
         tick();
-    } else if (event->type == FlashManager::EventType::OpReadChip) {
-        app->scene_controller.switch_to_next_scene(FlashManager::SceneType::ReadImgFileNameInputScene);
+    } else if(event->type == FlashManager::EventType::Next) {
+        app->scene_controller.switch_to_next_scene(FlashManager::SceneType::Start);
     }
 
     return consumed;
@@ -64,15 +64,23 @@ void FlashManagerSceneReadDump::tick() {
     const SpiFlashInfo_t* flash = app->worker->toolkit->get_info();
     furi_assert(flash && flash->valid);
 
-    if (!reader_task) {
+    if(!reader_task) {
         enqueue_next_block();
     }
 
-    if (reader_task->completed()) {
-        if (reader_task->success) {
+    if(bytes_read >= flash->size) {
+        ContainerVM* container = app->view_controller;
+        auto button = container->add<ButtonElement>();
+        button->set_type(ButtonElement::Type::Right, "Done");
+        button->set_callback(
+            app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
+    }
+
+    if(reader_task->completed()) {
+        if(reader_task->success) {
             // TODO: write 'read_buffer' to file
             bytes_read += reader_task->size;
-            if (bytes_read < flash->size) {
+            if(bytes_read < flash->size) {
                 enqueue_next_block();
             }
         }
@@ -92,8 +100,8 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
     // TODO: fix tail
     size_t block_size = DUMP_READ_BLOCK_BYTES;
 
-    reader_task = std::make_unique<WorkerTask>(WorkerOperation::BlockRead, bytes_read, 
-      read_buffer.get(), block_size);
+    reader_task = std::make_unique<WorkerTask>(
+        WorkerOperation::BlockRead, bytes_read, read_buffer.get(), block_size);
 
     // TODO: check result
     FURI_LOG_I(TAG, "enqueue_next_block: adding");
@@ -106,7 +114,8 @@ void FlashManagerSceneReadDump::process_found_chip() {
     ContainerVM* container = app->view_controller;
     auto button = container->add<ButtonElement>();
     button->set_type(ButtonElement::Type::Right, "Read");
-    button->set_callback(app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::read_chip_callback));
+    button->set_callback(
+        app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
 }
 
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
@@ -115,14 +124,13 @@ void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     read_buffer.reset();
 }
 
-void FlashManagerSceneReadDump::read_chip_callback(void* context) {
+void FlashManagerSceneReadDump::done_callback(void* context) {
     FlashManager* app = static_cast<FlashManager*>(context);
     FlashManager::Event event;
 
-    event.type = FlashManager::EventType::OpReadChip;
+    event.type = FlashManager::EventType::Next;
     app->view_controller.send_event(&event);
 }
-
 
 void FlashManagerSceneReadDump::back_callback(void* context) {
     FlashManager* app = static_cast<FlashManager*>(context);

@@ -1,27 +1,31 @@
 #include "flash_manager_worker.h"
 #include "spi/spi_api.h"
+#include "spi/task_executor.h"
 #include <furi.h>
 
 #undef TAG
 #define TAG "FlashWorker"
 
-static int32_t flash_manager_worker_thread(void *context);
+static int32_t flash_manager_worker_thread(void* context);
 
-//WorkerTask::WorkerTask() : WorkerTask(WorkerOperation::Unknown, 0, nullptr, 0) {
-//}
-
-WorkerTask::WorkerTask(WorkerOperation _operation, size_t _offset, uint8_t* _data, size_t _size) 
-  : offset(_offset), data(_data), size(_size), operation(_operation), progress(0), success(false) {
+WorkerTask::WorkerTask(WorkerOperation _operation, size_t _offset, uint8_t* _data, size_t _size)
+    : offset(_offset)
+    , data(_data)
+    , size(_size)
+    , operation(_operation)
+    , progress(0)
+    , success(false) {
 }
 
 FlashManagerWorker::FlashManagerWorker()
-    : toolkit(std::make_unique<SpiToolkit>()),
-      worker_running(false), task_progress(0) {
-
+    : toolkit(std::make_unique<SpiToolkit>())
+    , task_executor(std::make_unique<TaskExecutor>(toolkit.get())) {
     FURI_LOG_I(TAG, "ctor()");
 
-    
+    init_mutex(&tasks_mutex, &tasks, sizeof(tasks));
+    tasks_semaphore = osSemaphoreNew(1, 0, nullptr);
 
+    FURI_LOG_I(TAG, "spawning thread()");
     thread = furi_thread_alloc();
     furi_thread_set_name(thread, "FlashManagerWorker");
     furi_thread_set_stack_size(thread, 1024);
@@ -37,6 +41,7 @@ void FlashManagerWorker::start() {
 void FlashManagerWorker::stop() {
     FURI_LOG_I(TAG, "worker stop flag set");
     worker_running = false;
+    osSemaphoreRelease(tasks_semaphore);
 
     furi_thread_join(thread);
     FURI_LOG_I(TAG, "join() done");
@@ -45,23 +50,35 @@ void FlashManagerWorker::stop() {
 FlashManagerWorker::~FlashManagerWorker() {
     furi_assert(thread);
     furi_thread_free(thread);
+    delete_mutex(&tasks_mutex);
+    osSemaphoreDelete(tasks_semaphore);
     FURI_LOG_I(TAG, "dtor() done");
 }
 
 bool FlashManagerWorker::enqueue_task(WorkerTask* task) {
+    FURI_LOG_I(TAG, "posting task");
     furi_assert(task);
     furi_assert(task->operation > WorkerOperation::None);
 
-    if (is_busy()) {
-        return false;
-    }
+    FURI_LOG_I(
+        TAG,
+        "op: task=%x, code=%d, offs=%x, size=%x, data=%x",
+        task,
+        task->operation,
+        task->offset,
+        task->size,
+        task->data);
 
-    active_task = task;
+    with_value_mutex_cpp(&tasks_mutex, [&](void*) { tasks.push(task); });
+
+    osSemaphoreRelease(tasks_semaphore);
+
+    FURI_LOG_I(TAG, "task posted");
     return true;
 }
 
 bool FlashManagerWorker::is_busy() const {
-    return (active_task != nullptr && !active_task->completed());
+    return !tasks.empty();
 }
 
 /** Worker thread
@@ -69,81 +86,40 @@ bool FlashManagerWorker::is_busy() const {
  * @param context
  * @return exit code
  */
-static int32_t flash_manager_worker_thread(void *context) {
+static int32_t flash_manager_worker_thread(void* context) {
     FlashManagerWorker* instance = static_cast<FlashManagerWorker*>(context);
-    SpiToolkit* pToolkit = instance->toolkit.get();
+    // SpiToolkit *pToolkit = instance->toolkit.get();
 
-    while (instance->worker_running) {
-      WorkerTask* pTask = instance->active_task;
-  
-      if ((pTask == nullptr) || pTask->operation <= WorkerOperation::None) {
-          osDelay(2000);
-          FURI_LOG_I(TAG, "worker is alive and has nothing to do");
-          continue;
-      }
+    auto& tasks = instance->tasks;
 
-      FURI_LOG_I(TAG, "running operation %d", pTask->operation);
-      pTask->progress = 0;
-      const size_t final_offs = pTask->offset + pTask->size;
+    while(instance->worker_running) {
+        if(tasks.empty()) {
+            FURI_LOG_I(TAG, "awaiting tasks");
 
-      switch (pTask->operation) {
-          case WorkerOperation::ChipId:
-            furi_assert(pTask->size == sizeof(SpiFlashInfo_t));
-            furi_assert(pTask->data);
+            osSemaphoreAcquire(instance->tasks_semaphore, osWaitForever);
+            FURI_LOG_I(TAG, "worker is released");
 
-            pTask->success = pToolkit->detect_flash();
-            if (pTask->success) {
-                //memcpy(pToolkit->get_info(), pTask->data, pTask->size);
-                *(reinterpret_cast<SpiFlashInfo_t*>(pTask->data)) = *pToolkit->get_info();
+            if(tasks.empty()) {
+                FURI_LOG_I(TAG, "worker is released with no tasks!");
+                if(instance->worker_running) {
+                    FURI_LOG_E(TAG, "THIS IS A BUG");
+                }
+                continue;
             }
-            
-            // TODO: implement
-            break;
+            osDelay(100);
+        }
 
-          case WorkerOperation::ChipErase:
-            // TODO: implement
-            pTask->success = pToolkit->chip_erase();
-            break;
+        WorkerTask* pTask = nullptr;
 
-          case WorkerOperation::BlockRead:
-            // TODO: implement read in 256-byte blocks
-            for (size_t offs = pTask->offset; offs < final_offs; offs += SpiToolkit::SPI_MAX_BLOCK_SIZE) {
-                size_t block_size = SpiToolkit::SPI_MAX_BLOCK_SIZE;
-                if (offs + block_size > final_offs) {
-                    block_size = final_offs - offs;
-                }
-                if (!pToolkit->read_block(offs, const_cast<uint8_t*>(pTask->data + offs), block_size)) {
-                    pTask->success = false;
-                    break;
-                }
-                pTask->progress = (offs - pTask->offset) / pTask->size;
-            }
-            pTask->success = true;
-            break;
+        with_value_mutex_cpp(&instance->tasks_mutex, [&](void*) {
+            pTask = tasks.front();
+            tasks.pop();
+        });
 
-          case WorkerOperation::BlockWrite:
-            // TODO: implement write in 256-byte blocks
-            for (size_t offs = pTask->offset; offs < final_offs; offs += SpiToolkit::SPI_MAX_BLOCK_SIZE) {
-                size_t block_size = SpiToolkit::SPI_MAX_BLOCK_SIZE;
-                if (offs + block_size > final_offs) {
-                    block_size = final_offs - offs;
-                }
-                if (!pToolkit->write_block(offs, pTask->data + offs, block_size)) {
-                    pTask->success = false;
-                    break;
-                }
-                pTask->progress = (offs - pTask->offset) / pTask->size;
-            }
-            pTask->success = true;
-            break;
+        instance->task_executor->run(pTask);
 
-          default:
-            FURI_LOG_W(TAG, "unhandled operation!");
-      }
-
-      pTask->progress = WorkerTask::COMPLETE;
-      instance->active_task = nullptr;
-      FURI_LOG_I(TAG, "task done");
+        // instance->active_task = nullptr;
+        FURI_LOG_I(TAG, "task done");
     }
 
     FURI_LOG_I(TAG, "worker is done");

@@ -35,15 +35,16 @@ int32_t FlashManager::run(const char* args) {
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());
         //scene_controller.add_scene(SceneType::ByteInputScene, new FlashManagerSceneByteInput());
         scene_controller.add_scene(SceneType::ChipIDScene, new FlashManagerSceneChipID());
-        scene_controller.add_scene(SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
-        scene_controller.add_scene(SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
+        scene_controller.add_scene(
+            SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
+        scene_controller.add_scene(
+            SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
         scene_controller.process(100);
     }
 
     worker->stop();
     return 0;
 }
-
 
 const char* FlashManager::app_folder = "/any/flash";
 const char* FlashManager::app_extension = ".bin";
