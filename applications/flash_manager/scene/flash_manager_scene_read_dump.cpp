@@ -16,9 +16,6 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     read_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
 
     ContainerVM* container = app->view_controller;
-    //auto callback = cbc::obtain_connector(this, &FlashManagerSceneReadDump::result_callback);
-
-    container->add<StringElement>();
 
     auto button = container->add<ButtonElement>();
     button->set_type(ButtonElement::Type::Left, "Back");
@@ -42,19 +39,17 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
 bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event* event) {
     bool consumed = false;
 
-    //if(event->type == FlashManager::EventType::ByteEditResult) {
-    //    app->scene_controller.switch_to_previous_scene();
-    //    consumed = true;
-    //}
-
-    if(event->type == FlashManager::EventType::Tick) {
+    switch(event->type) {
+    case FlashManager::EventType::Tick:
         tick();
-    } else if(event->type == FlashManager::EventType::Next) {
+        break;
+    case FlashManager::EventType::Next:
+    case FlashManager::EventType::Back:
         app->scene_controller.search_and_switch_to_previous_scene(
             {FlashManager::SceneType::Start});
-    } else if(event->type == FlashManager::EventType::Back) {
-        app->scene_controller.search_and_switch_to_previous_scene(
-            {FlashManager::SceneType::Start});
+        break;
+    default:
+        break;
     }
 
     return consumed;
@@ -75,15 +70,6 @@ void FlashManagerSceneReadDump::finish_read() {
 }
 
 void FlashManagerSceneReadDump::tick() {
-    //if (chip_id_task->completed()) {
-    //    if (chip_id_task->success && flash_info.valid) {
-    //        string_printf(chip_id, "Read failed :(");
-    //    } else {
-    //        string_printf(chip_id, "Read failed :(");
-    //    }
-    //} else {
-    //    string_printf(chip_id, "detecting...");
-    //}
     const SpiFlashInfo_t* flash = app->worker->toolkit->get_info();
     furi_assert(flash && flash->valid);
 
@@ -112,12 +98,10 @@ void FlashManagerSceneReadDump::tick() {
         }
         progress = bytes_read * 100 / flash->size;
     } else {
-        progress = (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / flash->size;
+        progress =
+            (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / flash->size;
     }
 
-    //FURI_LOG_I(TAG, "progress: %d of %d", bytes_read, flash->size);
-
-    
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
 }
@@ -152,17 +136,11 @@ void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
 }
 
 void FlashManagerSceneReadDump::done_callback(void* context) {
-    FlashManager* app = static_cast<FlashManager*>(context);
-    FlashManager::Event event;
-
-    event.type = FlashManager::EventType::Next;
+    FlashManager::Event event{.type = FlashManager::EventType::Next};
     app->view_controller.send_event(&event);
 }
 
 void FlashManagerSceneReadDump::back_callback(void* context) {
-    FlashManager* app = static_cast<FlashManager*>(context);
-    FlashManager::Event event;
-
-    event.type = FlashManager::EventType::Back;
+    FlashManager::Event event{.type = FlashManager::EventType::Back};
     app->view_controller.send_event(&event);
 }

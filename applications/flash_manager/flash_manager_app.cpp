@@ -1,7 +1,6 @@
 #include "flash_manager.h"
 #include "flash_manager_worker.h"
 #include "scene/flash_manager_scene_start.h"
-#include "scene/flash_manager_scene_byte_input.h"
 #include "scene/flash_manager_scene_chip_id.h"
 #include "scene/flash_manager_scene_read_input_name.h"
 #include "scene/flash_manager_scene_read_dump.h"

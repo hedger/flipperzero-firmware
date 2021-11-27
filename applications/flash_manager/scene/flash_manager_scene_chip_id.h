@@ -12,9 +12,11 @@ public:
     void on_exit(FlashManager* app) final;
 
 private:
-    void process_found_chip(FlashManager* app);
+    FlashManager* app;
+    void process_found_chip();
 
     //void result_callback(void* context);
+    void tick();
     void back_callback(void* context);
     void read_chip_callback(void* context);
 

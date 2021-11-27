@@ -2,9 +2,8 @@
 
 #include <lib/toolbox/random_name.h>
 
-
-
 void FlashManagerSceneReadDumpInputFilename::on_enter(FlashManager* app, bool need_restore) {
+    // TODO: fix 
     const char* key_name = ""; //app->worker.key.get_name();
 
     bool key_name_empty = !strcmp(key_name, "");
@@ -17,17 +16,14 @@ void FlashManagerSceneReadDumpInputFilename::on_enter(FlashManager* app, bool ne
     auto text_input = app->view_controller.get<TextInputVM>();
     text_input->set_header_text("Name the dump file");
 
-    text_input->set_result_callback(
-        save_callback,
-        app,
-        app->text_store.text,
-        32,
-        key_name_empty);
+    text_input->set_result_callback(save_callback, app, app->text_store.text, 32, key_name_empty);
 
     app->view_controller.switch_to<TextInputVM>();
 }
 
-bool FlashManagerSceneReadDumpInputFilename::on_event(FlashManager* app, FlashManager::Event* event) {
+bool FlashManagerSceneReadDumpInputFilename::on_event(
+    FlashManager* app,
+    FlashManager::Event* event) {
     bool consumed = false;
 
     if(event->type == FlashManager::EventType::Next) {
@@ -56,8 +52,6 @@ void FlashManagerSceneReadDumpInputFilename::on_exit(FlashManager* app) {
 
 void FlashManagerSceneReadDumpInputFilename::save_callback(void* context) {
     FlashManager* app = static_cast<FlashManager*>(context);
-    FlashManager::Event event;
-
-    event.type = FlashManager::EventType::Next;
+    FlashManager::Event event{.type = FlashManager::EventType::Next};
     app->view_controller.send_event(&event);
 }
