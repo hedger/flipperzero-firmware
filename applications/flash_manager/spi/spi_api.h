@@ -1,4 +1,4 @@
-#pragma  once
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -7,6 +7,12 @@ struct SpiFlashInfo_t {
     bool valid;
     size_t size;
     int32_t vendor_id;
+    uint8_t type_id;
+    uint8_t capacity_id;
+    const char* name;
+    uint16_t write_mode;
+    uint32_t erase_gran;
+    uint8_t erase_gran_cmd;
 };
 
 class SpiToolkit {
@@ -17,7 +23,7 @@ public:
     ~SpiToolkit();
 
     // Disconnect pins (set to Analog state)
-    void disconnect( );
+    void disconnect();
 
     // on success, updates last_info for get_info()
     bool detect_flash();
