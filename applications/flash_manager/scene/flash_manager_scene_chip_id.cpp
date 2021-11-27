@@ -59,9 +59,13 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
     case FlashManager::EventType::Tick:
         tick();
         break;
-    case FlashManager::EventType::Next:
+    case FlashManager::EventType::OpReadChip:
         app->scene_controller.switch_to_next_scene(
             FlashManager::SceneType::ReadImgFileNameInputScene);
+        break;
+    case FlashManager::EventType::OpWriteChip:
+        app->scene_controller.switch_to_scene(
+            FlashManager::SceneType::WriteImgProcessScene);
         break;
     default:
         break;
@@ -71,13 +75,26 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
 }
 
 void FlashManagerSceneChipID::process_found_chip() {
+    // TODO: better format, vendor name, ...
     string_printf(chip_id, "VID %x: %x b", flash_info.vendor_id, flash_info.size);
 
     ContainerVM* container = app->view_controller;
     auto button = container->add<ButtonElement>();
-    button->set_type(ButtonElement::Type::Right, "Read");
-    button->set_callback(
-        app, cbc::obtain_connector(this, &FlashManagerSceneChipID::read_chip_callback));
+
+    const char* next_operation = "Read";
+    ButtonElementCallback callback;
+
+    // we have a file name in text store -> next OP is write
+    // TODO: warn on size mismatch
+    if (strlen(app->text_store.text)) {
+        next_operation = "Write";
+        callback = cbc::obtain_connector(this, &FlashManagerSceneChipID::write_chip_callback);
+    } else {
+        callback = cbc::obtain_connector(this, &FlashManagerSceneChipID::read_chip_callback);
+    }
+
+    button->set_type(ButtonElement::Type::Right, next_operation);
+    button->set_callback(app, callback);
 }
 
 void FlashManagerSceneChipID::on_exit(FlashManager* app) {
@@ -86,7 +103,12 @@ void FlashManagerSceneChipID::on_exit(FlashManager* app) {
 }
 
 void FlashManagerSceneChipID::read_chip_callback(void* context) {
-    FlashManager::Event event{.type = FlashManager::EventType::Next};
+    FlashManager::Event event{.type = FlashManager::EventType::OpReadChip};
+    app->view_controller.send_event(&event);
+}
+
+void FlashManagerSceneChipID::write_chip_callback(void* context) {
+    FlashManager::Event event{.type = FlashManager::EventType::OpWriteChip};
     app->view_controller.send_event(&event);
 }
 

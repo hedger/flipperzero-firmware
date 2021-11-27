@@ -19,6 +19,7 @@ private:
     void tick();
     void back_callback(void* context);
     void read_chip_callback(void* context);
+    void write_chip_callback(void* context);
 
     StringElement* status_line;
 

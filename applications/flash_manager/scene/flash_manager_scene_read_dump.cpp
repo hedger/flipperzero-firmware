@@ -30,7 +30,7 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     line_2->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
     status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
 
-    // TODO: error check
+    // TODO: error check, empty check
     app->file_tools.open_dump_file_write(app->text_store.text);
 
     app->view_controller.switch_to<ContainerVM>();
@@ -119,19 +119,10 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
     return app->worker->enqueue_task(reader_task.get());
 }
 
-void FlashManagerSceneReadDump::process_found_chip() {
-    //string_printf(status_text, "VID %x: %x b", flash_info.vendor_id, flash_info.size);
-
-    ContainerVM* container = app->view_controller;
-    auto button = container->add<ButtonElement>();
-    button->set_type(ButtonElement::Type::Right, "Read");
-    button->set_callback(
-        app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
-}
-
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     app->view_controller.get<ContainerVM>()->clean();
     string_clear(status_text);
+    app->text_store.set("");
     read_buffer.reset();
 }
 

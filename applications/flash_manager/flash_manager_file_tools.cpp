@@ -32,9 +32,12 @@ bool FlashManagerFileTools::is_dump_file_exist(const char* filename, bool* exist
     return file_worker.is_file_exist(full_path.c_str(), exist);
 }
 
- std::string FlashManagerFileTools::make_full_name(const std::string& name) const {
-     return std::string("") + dump_directory + "/" + name + dump_extension;
- }
+std::string FlashManagerFileTools::make_full_name(const std::string& name) const {
+    if (!name.empty() && (name[0] == '/')) { // assume it's absolute path -> no processing needed
+        return name;
+    }
+    return std::string("") + dump_directory + "/" + name + dump_extension;
+}
 
 bool FlashManagerFileTools::rename_dump_file(const char* filename, const char* newname) {
     std::string old_filename = make_full_name(filename);

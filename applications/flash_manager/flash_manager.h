@@ -32,8 +32,8 @@ public:
         GENERIC_EVENT_ENUM_VALUES,
         Next,
         MenuSelected,
-        ByteEditResult,
-        OpReadChip
+        OpReadChip,
+        OpWriteChip
     };
 
     enum class SceneType : uint8_t {
@@ -42,6 +42,7 @@ public:
         ChipIDScene,
         ReadImgFileNameInputScene,
         ReadImgProcessScene,
+        WriteImgProcessScene
     };
 
     class Event {

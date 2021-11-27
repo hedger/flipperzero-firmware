@@ -5,7 +5,7 @@
 class StringElement;
 class WorkerTask;
 
-class FlashManagerSceneReadDump : public GenericScene<FlashManager> {
+class FlashManagerSceneWriteDump : public GenericScene<FlashManager> {
     static const size_t DUMP_READ_BLOCK_BYTES = 4 * 1024;
 public:
     void on_enter(FlashManager* app, bool need_restore) final;
@@ -15,7 +15,7 @@ public:
 private:
     FlashManager* app;
 
-    void finish_read();
+    void finish_write();
     void tick();
     bool enqueue_next_block();
 
@@ -23,11 +23,12 @@ private:
     void back_callback(void* context);
     void done_callback(void* context);
 
+    StringElement* header_line;
     StringElement* status_line;
 
-    bool read_completed = false;
+    bool write_completed = false;
     string_t status_text;
-    size_t bytes_read;
-    std::unique_ptr<WorkerTask> reader_task;
-    std::unique_ptr<uint8_t[]> read_buffer;
+    size_t bytes_written;
+    std::unique_ptr<WorkerTask> writer_task;
+    std::unique_ptr<uint8_t[]> write_buffer;
 };
