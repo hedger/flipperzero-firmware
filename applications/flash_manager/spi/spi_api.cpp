@@ -99,7 +99,7 @@ bool SpiToolkit::detect_flash() {
     if ( last_info.valid )
     {
         last_info.vendor_id = 0x13371337;
-        last_info.size = 0x100000;
+        last_info.size = 0x10000;
     }
     else
     {

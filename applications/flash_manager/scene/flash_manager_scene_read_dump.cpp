@@ -10,6 +10,8 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     this->app = app;
 
     bytes_read = 0;
+    read_completed = false;
+
     string_init(status_text);
     read_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
 
@@ -45,10 +47,26 @@ bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event*
     if(event->type == FlashManager::EventType::Tick) {
         tick();
     } else if(event->type == FlashManager::EventType::Next) {
-        app->scene_controller.switch_to_next_scene(FlashManager::SceneType::Start);
+        app->scene_controller.search_and_switch_to_previous_scene(
+            {FlashManager::SceneType::Start});
+    } else if(event->type == FlashManager::EventType::Back) {
+        app->scene_controller.search_and_switch_to_previous_scene(
+            {FlashManager::SceneType::Start});
     }
 
     return consumed;
+}
+
+void FlashManagerSceneReadDump::finish_read() {
+    if(!read_completed) {
+        read_completed = true;
+
+        ContainerVM* container = app->view_controller;
+        auto button = container->add<ButtonElement>();
+        button->set_type(ButtonElement::Type::Right, "Done");
+        button->set_callback(
+            app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
+    }
 }
 
 void FlashManagerSceneReadDump::tick() {
@@ -69,12 +87,14 @@ void FlashManagerSceneReadDump::tick() {
     }
 
     if(bytes_read >= flash->size) {
-        ContainerVM* container = app->view_controller;
-        auto button = container->add<ButtonElement>();
-        button->set_type(ButtonElement::Type::Right, "Done");
-        button->set_callback(
-            app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
+        finish_read();
     }
+
+    if(read_completed) {
+        return;
+    }
+
+    uint32_t progress = 0;
 
     if(reader_task->completed()) {
         if(reader_task->success) {
@@ -84,13 +104,15 @@ void FlashManagerSceneReadDump::tick() {
                 enqueue_next_block();
             }
         }
+        progress = bytes_read * 100 / flash->size;
     } else {
         // TODO: update intermediate progress
+        progress = (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / flash->size;
     }
 
     //FURI_LOG_I(TAG, "progress: %d of %d", bytes_read, flash->size);
 
-    uint32_t progress = bytes_read * 100 / flash->size;
+    
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
 }

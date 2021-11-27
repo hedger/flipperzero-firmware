@@ -15,6 +15,7 @@ public:
 private:
     FlashManager* app;
 
+    void finish_read();
     void process_found_chip();
     void tick();
     bool enqueue_next_block();
@@ -25,6 +26,7 @@ private:
 
     StringElement* status_line;
 
+    bool read_completed = false;
     string_t status_text;
     size_t bytes_read;
     std::unique_ptr<WorkerTask> reader_task;

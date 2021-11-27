@@ -20,6 +20,7 @@ private:
 
     StringElement* status_line;
 
+    bool chip_detected;
     string_t chip_id;
     SpiFlashInfo_t flash_info;
     size_t chip_size;

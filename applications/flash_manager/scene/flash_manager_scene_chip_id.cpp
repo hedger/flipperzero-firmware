@@ -8,6 +8,7 @@
 
 
 void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
+    chip_detected = false;
     string_init(chip_id);
 
     ContainerVM* container = app->view_controller;
@@ -46,7 +47,11 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
     if (event->type == FlashManager::EventType::Tick) {
         if (chip_id_task->completed()) {
             if (chip_id_task->success && flash_info.valid) {
-                process_found_chip(app);
+                if (!chip_detected) {
+                    chip_detected = true;
+                    process_found_chip(app);
+                }
+                
             } else {
                 string_printf(chip_id, "NOTHING FOUND");
             }
