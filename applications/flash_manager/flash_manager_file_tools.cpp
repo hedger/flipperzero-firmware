@@ -54,3 +54,7 @@ bool FlashManagerFileTools::close() {
 bool FlashManagerFileTools::check_errors() {
     return file_worker.check_errors();
 }
+
+uint32_t FlashManagerFileTools::get_size() {
+    return file_worker.get_size();
+}

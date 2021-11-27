@@ -437,3 +437,8 @@ bool file_worker_is_file_exist(FileWorker* file_worker, const char* filename, bo
 
     return file_worker_check_common_errors(file_worker);
 }
+
+bool file_worker_get_size(FileWorker* file_worker, uint64_t* size) {
+    *size = storage_file_size(file_worker->file);
+    return true;
+}

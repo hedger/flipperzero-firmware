@@ -184,6 +184,13 @@ public:
      */
     bool check_errors();
 
+    /**
+     * @brief Get file size
+     *
+     * @return file size
+     */
+    uint32_t get_size();
+
 private:
     FileWorker* file_worker;
 };

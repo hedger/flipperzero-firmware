@@ -15,6 +15,7 @@ public:
     bool remove_dump_file(const char* name);
     bool close();
     bool check_errors();
+    uint32_t get_size();
 
     // std::unique_ptr<IrdaAppFileParser::IrdaFileSignal> read_signal();
     // bool save_signal(const IrdaAppSignal& signal, const char* name);

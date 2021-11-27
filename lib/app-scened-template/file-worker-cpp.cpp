@@ -87,3 +87,8 @@ bool FileWorkerCpp::check_errors() {
     return file_worker_check_errors(file_worker);
 }
 
+uint32_t FileWorkerCpp::get_size() {
+    uint64_t size;
+    file_worker_get_size(file_worker, &size);
+    return static_cast<uint32_t>(size);
+}

@@ -244,6 +244,15 @@ bool file_worker_rename(FileWorker* file_worker, const char* old_path, const cha
  */
 bool file_worker_check_errors(FileWorker* file_worker);
 
+/**
+ * @brief Get file size
+ *
+ * @param file_worker FileWorker instance
+ * @param size
+ * @return true on success
+ */
+bool file_worker_get_size(FileWorker* file_worker, uint64_t* size);
+
 #ifdef __cplusplus
 }
 #endif
