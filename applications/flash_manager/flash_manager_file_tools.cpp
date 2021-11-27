@@ -58,3 +58,11 @@ bool FlashManagerFileTools::check_errors() {
 uint32_t FlashManagerFileTools::get_size() {
     return file_worker.get_size();
 }
+
+bool FlashManagerFileTools::write_buffer(const uint8_t* data, size_t length) {
+    return file_worker.write(data, length);
+}
+
+bool FlashManagerFileTools::read_buffer(uint8_t* data, size_t max_length) {
+    return file_worker.read(data, max_length);
+}

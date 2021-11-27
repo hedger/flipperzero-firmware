@@ -33,6 +33,9 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     line_2->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
     status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
 
+    // TODO: error check
+    app->file_tools.open_dump_file_write(app->text_store.text);
+
     app->view_controller.switch_to<ContainerVM>();
 }
 
@@ -60,6 +63,8 @@ bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event*
 void FlashManagerSceneReadDump::finish_read() {
     if(!read_completed) {
         read_completed = true;
+
+        app->file_tools.close();
 
         ContainerVM* container = app->view_controller;
         auto button = container->add<ButtonElement>();
@@ -99,6 +104,7 @@ void FlashManagerSceneReadDump::tick() {
     if(reader_task->completed()) {
         if(reader_task->success) {
             // TODO: write 'read_buffer' to file
+            app->file_tools.write_buffer(reader_task->data, reader_task->size);
             bytes_read += reader_task->size;
             if(bytes_read < flash->size) {
                 enqueue_next_block();
