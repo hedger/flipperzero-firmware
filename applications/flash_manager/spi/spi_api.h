@@ -14,6 +14,9 @@ public:
     SpiToolkit();
     static const size_t SPI_MAX_BLOCK_SIZE = 256;
 
+    // Disconnect pins (set to Analog state)
+    void disconnect( );
+
     // on success, updates last_info for get_info()
     bool detect_flash();
 

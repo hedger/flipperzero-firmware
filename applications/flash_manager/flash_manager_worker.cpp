@@ -141,6 +141,8 @@ static int32_t flash_manager_worker_thread(void *context) {
             FURI_LOG_W(TAG, "unhandled operation!");
       }
 
+      pToolkit->disconnect( );
+
       pTask->progress = WorkerTask::COMPLETE;
       instance->active_task = nullptr;
       FURI_LOG_I(TAG, "task done");
