@@ -55,7 +55,7 @@ static inline void* acquire_mutex_block(ValueMutex* valuemutex) {
     {                                                \
         void* p = acquire_mutex_block(value_mutex);  \
         furi_check(p);                               \
-        ({ void* __fn1__ function_body __fn1__; })();  \
+        ({ void* __fn__ function_body __fn__; })();  \
         release_mutex(value_mutex, p);               \
     }
 
@@ -63,7 +63,7 @@ static inline void* acquire_mutex_block(ValueMutex* valuemutex) {
     {                                                \
         void* p = acquire_mutex_block(value_mutex);  \
         furi_check(p);                            \
-        auto __fn__ = lambda; __fn__(p); \
+        lambda(p); \
         release_mutex(value_mutex, p);               \
     }
 

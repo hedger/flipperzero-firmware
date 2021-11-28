@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 
-
 const VendorName_t VendorNames[] = {
     {"Cypress", SpiChipVendor_CYPRESS},
     {"Fujitsu", SpiChipVendor_FUJITSU},

@@ -245,23 +245,41 @@ bool SpiToolkit::detect_flash() {
         hal_gpio_init(&SPI_MOSI, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
         hal_gpio_init(&SPI_MISO, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
     }
+#ifdef FLASHMGR_MOCK
+    else {
+        last_info.name = "W25QMOCK";
+        last_info.size = 256 * 1024L;
+        last_info.write_mode = CHIP_WM_PAGE_256B;
+        last_info.erase_gran = 4096;
+        last_info.erase_gran_cmd = 0x20;
+        last_info.valid = true;
+    }
+#endif // FLASHMGR_MOCK
     return last_info.valid;
 }
 
 bool SpiToolkit::chip_erase() {
     FURI_LOG_I(TAG, "Erasing chip");
 
+#ifdef FLASHMGR_MOCK
     osDelay(4000);
     // TODO: chip_erase
     return true;
+#else // FLASHMGR_MOCK
+    return false;
+#endif // FLASHMGR_MOCK
 }
 
 bool SpiToolkit::sector_erase(uint16_t n_sector) {
     FURI_LOG_I(TAG, "Erasing sector %d", n_sector);
 
+#ifdef FLASHMGR_MOCK
     osDelay(1000);
     // TODO: sector_erase
     return true;
+#else // FLASHMGR_MOCK
+    return false;
+#endif // FLASHMGR_MOCK
 }
 
 bool SpiToolkit::write_block(
@@ -274,9 +292,13 @@ bool SpiToolkit::write_block(
 
     FURI_LOG_I(TAG, "Writing %d bytes @ %x", data_len, offset);
 
+#ifdef FLASHMGR_MOCK
     osDelay(100);
     // TODO: write_block
     return true;
+#else // FLASHMGR_MOCK
+    return false;
+#endif// FLASHMGR_MOCK
 }
 
 bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const size_t data_len) {
@@ -285,12 +307,16 @@ bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const si
 
     FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
 
+#ifdef FLASHMGR_MOCK
     osDelay(10);
     // TODO: read_block
     //FURI_LOG_I(TAG, "memset @ %x len %x", p_data, data_len);
     memset(p_data, 0xCD, data_len);
 
     return true;
+#else // FLASHMGR_MOCK
+    return false;
+#endif // FLASHMGR_MOCK
 }
 
 SpiFlashInfo_t const* SpiToolkit::get_info() const {
