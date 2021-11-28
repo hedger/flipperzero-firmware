@@ -39,7 +39,13 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
 
 void FlashManagerSceneChipID::tick() {
     if(chip_id_task->completed()) {
-        FURI_LOG_I(TAG, "id task completed: succ %d, valid %d, id %d", chip_id_task->success, flash_info.valid, chip_id_task->success && flash_info.vendor_id);
+        FURI_LOG_I(
+            TAG,
+            "id task completed: succ %d, valid %d, id %d",
+            chip_id_task->success,
+            flash_info.valid,
+            flash_info.vendor_id);
+
         if(chip_id_task->success && flash_info.valid) {
             if(!chip_detected) {
                 chip_detected = true;
@@ -89,8 +95,8 @@ void FlashManagerSceneChipID::process_found_chip() {
     string_printf(chip_extra, "VID %x: %x b", flash_info.vendor_id, flash_info.size);
     FURI_LOG_I(TAG, "extra: '%s'", string_get_cstr(chip_extra));
 
-    detail_line->update_text(string_get_cstr(chip_extra));
-    
+    detail_line->update_text(string_get_cstr(chip_id));
+
     ContainerVM* container = app->view_controller;
     auto button = container->add<ButtonElement>();
 

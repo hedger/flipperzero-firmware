@@ -176,6 +176,17 @@ static bool read_sfdp() {
 }
 
 bool SpiToolkit::detect_flash() {
+#ifdef FLASHMGR_MOCK
+        last_info.vendor_id = SpiChipVendor_WINBOND;
+        last_info.name = "W25QMOCK";
+        last_info.size = 256 * 1024L;
+        last_info.write_mode = CHIP_WM_PAGE_256B;
+        last_info.erase_gran = 4096;
+        last_info.erase_gran_cmd = 0x20;
+        last_info.valid = true;
+
+        return true;
+#endif // FLASHMGR_MOCK
     last_info.valid = false;
 
     for(;;) {
@@ -240,17 +251,6 @@ bool SpiToolkit::detect_flash() {
         hal_gpio_init(&SPI_MOSI, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
         hal_gpio_init(&SPI_MISO, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
     }
-#ifdef FLASHMGR_MOCK
-    {
-        last_info.vendor_id = SpiChipVendor_WINBOND;
-        last_info.name = "W25QMOCK";
-        last_info.size = 256 * 1024L;
-        last_info.write_mode = CHIP_WM_PAGE_256B;
-        last_info.erase_gran = 4096;
-        last_info.erase_gran_cmd = 0x20;
-        last_info.valid = true;
-    }
-#endif // FLASHMGR_MOCK
     return last_info.valid;
 }
 
