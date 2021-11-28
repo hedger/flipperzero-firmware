@@ -6,7 +6,7 @@
 struct SpiFlashInfo_t {
     bool valid;
     size_t size;
-    int32_t vendor_id;
+    uint8_t vendor_id;
     uint8_t type_id;
     uint8_t capacity_id;
     const char* name;

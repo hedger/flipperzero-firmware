@@ -180,3 +180,21 @@ const ChipInfo_t ChipInfos[] = {
      4096,
      0x20},
     {NULL, 0, 0, 0, 0}};
+
+const char* spi_vendor_get_name(const uint8_t code) {
+    for(const VendorName_t* vendor = VendorNames; vendor->name != NULL; ++vendor) {
+        if(vendor->id == code) {
+            return vendor->name;
+        }
+    }
+    return "UNKNOWN";
+}
+
+const ChipInfo_t* spi_chip_get_details(const uint8_t vid, const uint8_t tid, const uint8_t capid) {
+    for (const ChipInfo_t* chip = ChipInfos; chip->name != NULL; ++chip) {
+        if(chip->vendor_id == vid && chip->type_id == tid && chip->capacity_id == capid) {
+            return chip;
+        }
+    }
+    return NULL;
+}

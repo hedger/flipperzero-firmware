@@ -21,10 +21,12 @@ private:
     void read_chip_callback(void* context);
     void write_chip_callback(void* context);
 
+    StringElement* header_line;
+    StringElement* detail_line;
     StringElement* status_line;
 
     bool chip_detected;
-    string_t chip_id;
+    string_t chip_id, chip_extra;
     SpiFlashInfo_t flash_info;
     size_t chip_size;
 

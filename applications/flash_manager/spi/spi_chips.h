@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     SpiChipCommand_JEDEC_ID = 0x9f,
 } SpiChipCommand;
@@ -52,3 +56,10 @@ typedef struct {
 
 extern const VendorName_t VendorNames[];
 extern const ChipInfo_t ChipInfos[];
+
+const char* spi_vendor_get_name(const uint8_t code);
+const ChipInfo_t* spi_chip_get_details(const uint8_t vid, const uint8_t tid, const uint8_t capid);
+
+#ifdef __cplusplus
+}
+#endif

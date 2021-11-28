@@ -171,7 +171,6 @@ void SpiToolkit::disconnect() {
     hal_gpio_init(&SPI_MISO, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
 }
 
-
 static bool read_sfdp() {
     return false;
 }
@@ -221,18 +220,14 @@ bool SpiToolkit::detect_flash() {
             if(read_sfdp()) {
                 // Use SFDP
             } else {
-                const ChipInfo_t* chip = ChipInfos;
-                while(chip->name != NULL) {
-                    if(chip->vendor_id == id[0] && chip->type_id == id[1] &&
-                       chip->capacity_id == id[2]) {
-                        last_info.name = chip->name;
-                        last_info.size = chip->size;
-                        last_info.write_mode = chip->write_mode;
-                        last_info.erase_gran = chip->erase_gran;
-                        last_info.erase_gran_cmd = chip->erase_gran_cmd;
-                        last_info.valid = true;
-                        break;
-                    }
+                const ChipInfo_t* chip = spi_chip_get_details(id[0], id[1], id[2]);
+                if(chip != nullptr) {
+                    last_info.name = chip->name;
+                    last_info.size = chip->size;
+                    last_info.write_mode = chip->write_mode;
+                    last_info.erase_gran = chip->erase_gran;
+                    last_info.erase_gran_cmd = chip->erase_gran_cmd;
+                    last_info.valid = true;
                 }
             }
             break;
@@ -246,7 +241,8 @@ bool SpiToolkit::detect_flash() {
         hal_gpio_init(&SPI_MISO, GpioModeAnalog, GpioPullNo, GpioSpeedVeryHigh);
     }
 #ifdef FLASHMGR_MOCK
-    else {
+    {
+        last_info.vendor_id = SpiChipVendor_WINBOND;
         last_info.name = "W25QMOCK";
         last_info.size = 256 * 1024L;
         last_info.write_mode = CHIP_WM_PAGE_256B;
@@ -286,7 +282,6 @@ bool SpiToolkit::write_block(
     const size_t offset,
     const uint8_t* const p_data,
     const size_t data_len) {
-
     furi_assert(p_data);
     furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
 
@@ -298,7 +293,7 @@ bool SpiToolkit::write_block(
     return true;
 #else // FLASHMGR_MOCK
     return false;
-#endif// FLASHMGR_MOCK
+#endif // FLASHMGR_MOCK
 }
 
 bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const size_t data_len) {

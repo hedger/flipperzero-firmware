@@ -5,11 +5,13 @@
 #include "../../lfrfid/view/elements/string-element.h"
 
 #include "../flash_manager_worker.h"
+#include "../spi/spi_chips.h"
 
 void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
     this->app = app;
     chip_detected = false;
     string_init(chip_id);
+    string_init(chip_extra);
 
     ContainerVM* container = app->view_controller;
 
@@ -18,12 +20,13 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
     button->set_callback(
         app, cbc::obtain_connector(this, &FlashManagerSceneChipID::back_callback));
 
-    auto line_1 = container->add<StringElement>();
-    auto line_2 = container->add<StringElement>();
+    header_line = container->add<StringElement>();
+    detail_line = container->add<StringElement>();
     status_line = container->add<StringElement>();
 
-    line_1->set_text("Looking for SPI chip...", 64, 17, AlignCenter, AlignBottom, FontSecondary);
-    line_2->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
+    header_line->set_text(
+        "Looking for SPI chip...", 64, 17, AlignCenter, AlignBottom, FontSecondary);
+    detail_line->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
     status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
 
     app->view_controller.switch_to<ContainerVM>();
@@ -36,6 +39,7 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
 
 void FlashManagerSceneChipID::tick() {
     if(chip_id_task->completed()) {
+        FURI_LOG_I(TAG, "id task completed: succ %d, valid %d, id %d", chip_id_task->success, flash_info.valid, chip_id_task->success && flash_info.vendor_id);
         if(chip_id_task->success && flash_info.valid) {
             if(!chip_detected) {
                 chip_detected = true;
@@ -43,13 +47,13 @@ void FlashManagerSceneChipID::tick() {
             }
 
         } else {
-            string_printf(chip_id, "NOTHING FOUND");
+            string_printf(chip_extra, "NOTHING FOUND");
         }
     } else {
-        string_printf(chip_id, "detecting...");
+        string_printf(chip_extra, "detecting...");
     }
 
-    status_line->update_text(string_get_cstr(chip_id));
+    status_line->update_text(string_get_cstr(chip_extra));
 }
 
 bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* event) {
@@ -64,8 +68,7 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
             FlashManager::SceneType::ReadImgFileNameInputScene);
         break;
     case FlashManager::EventType::OpWriteChip:
-        app->scene_controller.switch_to_scene(
-            FlashManager::SceneType::WriteImgProcessScene);
+        app->scene_controller.switch_to_scene(FlashManager::SceneType::WriteImgProcessScene);
         break;
     default:
         break;
@@ -76,8 +79,18 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
 
 void FlashManagerSceneChipID::process_found_chip() {
     // TODO: better format, vendor name, ...
-    string_printf(chip_id, "VID %x: %x b", flash_info.vendor_id, flash_info.size);
+    string_printf(
+        chip_id,
+        "%s %s %dK",
+        spi_vendor_get_name(flash_info.vendor_id),
+        flash_info.name,
+        flash_info.size / 1024);
+    FURI_LOG_I(TAG, "id: '%s'", string_get_cstr(chip_id));
+    string_printf(chip_extra, "VID %x: %x b", flash_info.vendor_id, flash_info.size);
+    FURI_LOG_I(TAG, "extra: '%s'", string_get_cstr(chip_extra));
 
+    detail_line->update_text(string_get_cstr(chip_extra));
+    
     ContainerVM* container = app->view_controller;
     auto button = container->add<ButtonElement>();
 
@@ -86,7 +99,7 @@ void FlashManagerSceneChipID::process_found_chip() {
 
     // we have a file name in text store -> next OP is write
     // TODO: warn on size mismatch
-    if (strlen(app->text_store.text)) {
+    if(strlen(app->text_store.text)) {
         next_operation = "Write";
         callback = cbc::obtain_connector(this, &FlashManagerSceneChipID::write_chip_callback);
     } else {
@@ -100,6 +113,7 @@ void FlashManagerSceneChipID::process_found_chip() {
 void FlashManagerSceneChipID::on_exit(FlashManager* app) {
     app->view_controller.get<ContainerVM>()->clean();
     string_clear(chip_id);
+    string_clear(chip_extra);
 }
 
 void FlashManagerSceneChipID::read_chip_callback(void* context) {
