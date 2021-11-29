@@ -1,5 +1,16 @@
 #include "flash_manager_file_tools.h"
 
+static inline const char* get_suffix_for_chip(ChipType chip) {
+    switch(chip) {
+    case ChipType::SPI:
+        return ".spi";
+    case ChipType::I2C:
+        return ".i2c";
+    default:
+        return "";
+    }
+}
+
 bool FlashManagerFileTools::make_app_folder() {
     //if(!storage_simply_mkdir(storage, app_folder)) {
     //    dialog_message_show_storage_error(dialogs, "Cannot create\napp folder");
@@ -8,19 +19,14 @@ bool FlashManagerFileTools::make_app_folder() {
     return file_worker.mkdir(dump_directory);
 }
 
-bool FlashManagerFileTools::open_dump_file_read(const char* filename) {
-    std::string full_filename;
-    if(filename[0] != '/')
-        full_filename = make_full_name(filename);
-    else
-        full_filename = filename;
-
+bool FlashManagerFileTools::open_dump_file_read(const char* filename, ChipType chip) {
+    std::string full_filename = make_full_name(filename, chip);;
     return file_worker.open(full_filename.c_str(), FSAM_READ, FSOM_OPEN_EXISTING);
 }
 
-bool FlashManagerFileTools::open_dump_file_write(const char* filename) {
+bool FlashManagerFileTools::open_dump_file_write(const char* filename, ChipType chip) {
     std::string dirname(dump_directory);
-    auto full_filename = make_full_name(filename);
+    auto full_filename = make_full_name(filename, chip);
 
     if(!file_worker.mkdir(dirname.c_str())) return false;
 
@@ -28,25 +34,25 @@ bool FlashManagerFileTools::open_dump_file_write(const char* filename) {
 }
 
 bool FlashManagerFileTools::is_dump_file_exist(const char* filename, bool* exist) {
-    std::string full_path = make_full_name(filename);
+    std::string full_path = make_full_name(filename, ChipType::Unknown);
     return file_worker.is_file_exist(full_path.c_str(), exist);
 }
 
-std::string FlashManagerFileTools::make_full_name(const std::string& name) const {
+std::string FlashManagerFileTools::make_full_name(const std::string& name, ChipType chip) const {
     if (!name.empty() && (name[0] == '/')) { // assume it's absolute path -> no processing needed
         return name;
     }
-    return std::string("") + dump_directory + "/" + name + dump_extension;
+    return std::string("") + dump_directory + "/" + name + get_suffix_for_chip(chip) + dump_extension;
 }
 
 bool FlashManagerFileTools::rename_dump_file(const char* filename, const char* newname) {
-    std::string old_filename = make_full_name(filename);
-    std::string new_filename = make_full_name(newname);
+    std::string old_filename = make_full_name(filename, ChipType::Unknown);
+    std::string new_filename = make_full_name(newname, ChipType::Unknown);
     return file_worker.rename(old_filename.c_str(), new_filename.c_str());
 }
 
-bool FlashManagerFileTools::remove_dump_file(const char* name) {
-    std::string full_filename = make_full_name(name);
+bool FlashManagerFileTools::remove_dump_file(const char* name, ChipType chip) {
+    std::string full_filename = make_full_name(name, chip);
     return file_worker.remove(full_filename.c_str());
 }
 

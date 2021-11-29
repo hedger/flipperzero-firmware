@@ -4,6 +4,7 @@
 
 class StringElement;
 class WorkerTask;
+class ButtonElement;
 
 class FlashManagerSceneReadDump : public GenericScene<FlashManager> {
     static const size_t DUMP_READ_BLOCK_BYTES = 4 * 1024;
@@ -20,12 +21,14 @@ private:
     bool enqueue_next_block();
 
     //void result_callback(void* context);
-    void back_callback(void* context);
+    void cancel_callback(void* context);
     void done_callback(void* context);
 
     StringElement* status_line;
+    ButtonElement* cancel_button;
 
-    bool read_completed = false;
+    bool read_completed;
+    bool cancelled;
     string_t status_text;
     size_t bytes_read;
     std::unique_ptr<WorkerTask> reader_task;

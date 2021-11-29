@@ -85,6 +85,10 @@ void ContainerVM::view_draw_callback(Canvas* canvas, void* model) {
     canvas_set_font(canvas, FontPrimary);
 
     for(const auto& element : data->elements) {
+        if(!element->is_enabled()) {
+            continue;
+        }
+
         element->draw(canvas);
     }
 }
@@ -95,6 +99,10 @@ bool ContainerVM::view_input_callback(InputEvent* event, void* context) {
 
     with_view_model_cpp(view, ContainerVMModel, model, {
         for(const auto& element : model->data->elements) {
+            if(!element->is_enabled()) {
+                continue;
+            }
+
             if(element->input(event)) {
                 consumed = true;
             }

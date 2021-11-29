@@ -33,7 +33,8 @@ public:
         Next,
         MenuSelected,
         OpReadChip,
-        OpWriteChip
+        OpWriteChip,
+        Cancel
     };
 
     enum class SceneType : uint8_t {

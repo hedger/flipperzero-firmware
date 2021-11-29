@@ -3,6 +3,7 @@
 #include "../spi/spi_api.h"
 
 class StringElement;
+class ButtonElement;
 class WorkerTask;
 
 class FlashManagerSceneWriteDump : public GenericScene<FlashManager> {
@@ -20,13 +21,15 @@ private:
     bool enqueue_next_block();
 
     //void result_callback(void* context);
-    void back_callback(void* context);
+    void cancel_callback(void* context);
     void done_callback(void* context);
 
     StringElement* header_line;
     StringElement* status_line;
+    ButtonElement* cancel_button;
 
-    bool write_completed = false;
+    bool write_completed;
+    bool cancelled;
     string_t status_text;
     size_t bytes_written;
     std::unique_ptr<WorkerTask> writer_task;

@@ -27,10 +27,13 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
     header_line->set_text(
         "Looking for SPI chip...", 64, 17, AlignCenter, AlignBottom, FontSecondary);
     detail_line->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
-    status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
+    status_line->set_text("detecting...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
 
     app->view_controller.switch_to<ContainerVM>();
+    start_chip_id();
+}
 
+void FlashManagerSceneChipID::start_chip_id() {
     chip_id_task = std::make_unique<WorkerTask>(
         WorkerOperation::ChipId, 0, reinterpret_cast<uint8_t*>(&flash_info), sizeof(flash_info));
 
@@ -38,7 +41,7 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
 }
 
 void FlashManagerSceneChipID::tick() {
-    if(chip_id_task->completed()) {
+    if(chip_id_task && chip_id_task->completed()) {
         FURI_LOG_I(
             TAG,
             "id task completed: succ %d, valid %d, id %d",
@@ -55,9 +58,12 @@ void FlashManagerSceneChipID::tick() {
         } else {
             string_printf(chip_extra, "NOTHING FOUND");
         }
-    } else {
-        string_printf(chip_extra, "detecting...");
+
+        chip_id_task.reset();
     }
+    //} else {
+    //    string_printf(chip_extra, "detecting...");
+    //}
 
     status_line->update_text(string_get_cstr(chip_extra));
 }

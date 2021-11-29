@@ -15,6 +15,15 @@ public:
     // TODO that must be accessible only to inheritors
     void lock_model();
     void unlock_model(bool need_redraw);
+    inline void set_enabled(bool value) {
+        enabled = value;
+    };
+    inline bool is_enabled() const {
+        return enabled;
+    };
+
+protected:
+    bool enabled = true;
 
 private:
     View* view = nullptr;

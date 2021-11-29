@@ -13,6 +13,7 @@ public:
 
 private:
     FlashManager* app;
+    void start_chip_id();
     void process_found_chip();
 
     //void result_callback(void* context);

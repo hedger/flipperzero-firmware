@@ -1,5 +1,7 @@
 #pragma once
 
+#include "chip_type.h"
+
 #include <file-worker-cpp.h>
 #include <memory>
 #include <string>
@@ -8,11 +10,11 @@
 class FlashManagerFileTools {
 public:
     bool make_app_folder();
-    bool open_dump_file_read(const char* filename);
-    bool open_dump_file_write(const char* filename);
+    bool open_dump_file_read(const char* filename, ChipType chip);
+    bool open_dump_file_write(const char* filename, ChipType chip);
     bool is_dump_file_exist(const char* filename, bool* exist);
     bool rename_dump_file(const char* filename, const char* newname);
-    bool remove_dump_file(const char* name);
+    bool remove_dump_file(const char* name, ChipType chip);
     bool close();
     bool check_errors();
     uint32_t get_size();
@@ -28,7 +30,7 @@ public:
 private:
     // std::unique_ptr<IrdaFileSignal> parse_signal(const std::string& str) const;
     // std::unique_ptr<IrdaFileSignal> parse_signal_raw(const std::string& str) const;
-    std::string make_full_name(const std::string& name) const;
+    std::string make_full_name(const std::string& name, ChipType chip) const;
 
     static inline const char* const dump_directory = "/any/flash";
     static inline const char* const dump_extension = ".bin";
