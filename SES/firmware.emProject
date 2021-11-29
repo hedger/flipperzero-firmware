@@ -45,6 +45,7 @@
       armgnu_cl_fpu="fpv4-sp-d16"
       asm_additional_options="-x assembler-with-cpp"
       build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml"
+      build_intermediate_directory="out/$(Configuration)/o/$(ProjectName)"
       build_quietly="Yes"
       c_additional_options="--specs=nano.specs;--specs=nosys.specs;-fdata-sections;-ffunction-sections;-fno-math-errno;-fstack-usage;-mthumb;-Wno-address-of-packed-member;-Wno-missing-field-initializers;-Wno-unused-parameter"
       c_asm_additional_options="-x assembler-with-cpp"
@@ -89,135 +90,186 @@
       target_reset_script="Reset();"
       target_trace_initialize_script="EnableTrace(&quot;$(TraceInterfaceType)&quot;)"
       use_compiler_driver="No" />
+    <folder
+      Name="applications"
+      exclude=""
+      filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
+      path="../../applications"
+      recurse="Yes" />
+    <folder
+      Name="assets"
+      exclude=""
+      filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
+      path="../../assets"
+      recurse="Yes" />
+    <folder
+      Name="core"
+      exclude=""
+      filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
+      path="../../core"
+      recurse="Yes" />
+    <configuration
+      Name="Debug"
+      c_preprocessor_definitions="FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
+      gdb_server_allow_memory_access_during_execution="Yes"
+      gdb_server_autostart_server="No"
+      gdb_server_command_line=""
+      gdb_server_ignore_checksum_errors="No"
+      gdb_server_port="3333"
+      gdb_server_register_access="General and Individual"
+      gdb_server_reset_command="reset halt"
+      gdb_server_type="OpenOCD" />
+    <configuration
+      Name="Spimock"
+      c_preprocessor_definitions="FLASHMGR_MOCK;FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER" />
+    <configuration
+      Name="Release"
+      c_preprocessor_definitions="APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
+      c_preprocessor_undefinitions="NDEBUG"
+      gcc_cl_optimization_level="Size"
+      gcc_optimization_level="Level 2 for size"
+      link_keep_lto_files="Yes"
+      link_time_optimization="Yes" />
     <folder Name="firmware">
       <folder Name="targets">
-        <folder Name="f7">
-          <folder Name="src">
-            <file file_name="../../firmware/targets/f7/Src/comp.c" />
-            <file file_name="../../firmware/targets/f7/Src/freertos-openocd.c" />
-            <file file_name="../../firmware/targets/f7/Src/gpio.c" />
-            <file file_name="../../firmware/targets/f7/Src/main.c" />
-            <file file_name="../../firmware/targets/f7/Src/rtc.c" />
-            <file file_name="../../firmware/targets/f7/Src/stm32wbxx_hal_msp.c" />
-            <file file_name="../../firmware/targets/f7/Src/stm32wbxx_it.c" />
-            <file file_name="../../firmware/targets/f7/Src/system_stm32wbxx.c" />
-            <file file_name="../../firmware/targets/f7/Src/tim.c" />
-          </folder>
-          <file file_name="../../firmware/targets/f7/startup_stm32wb55xx_cm4.s" />
-          <folder Name="furi-hal">
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-bootloader.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-bt.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-clock.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-compress.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-console.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-crypto.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-delay.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-flash.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-gpio.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-i2c.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-ibutton.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-interrupt.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-irda.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-light.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-lock.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-nfc.c">
-              <configuration Name="Debug" build_exclude_from_build="No" />
-            </file>
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-os.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-power.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-pwm.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-resources.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-rfid.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-sd.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-spi.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-spi-config.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-subghz.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-task.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-uart.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-usb.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-usb-cdc.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-usb-hid.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-vcp.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-version.c" />
-            <file file_name="../../firmware/targets/f7/furi-hal/furi-hal-vibro.c" />
-          </folder>
-          <folder Name="ble-glue">
-            <file file_name="../../firmware/targets/f7/ble-glue/app_debug.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/battery_service.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/ble_app.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/ble_glue.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/dev_info_service.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/gap.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/hw_ipcc.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/hw_timerserver.c" />
-            <file file_name="../../firmware/targets/f7/ble-glue/serial_service.c" />
-          </folder>
-          <folder Name="fatfs">
-            <file file_name="../../firmware/targets/f7/fatfs/fatfs.c" />
-            <file file_name="../../firmware/targets/f7/fatfs/spi_sd_hal.c" />
-            <file file_name="../../firmware/targets/f7/fatfs/stm32_adafruit_sd.c" />
-            <file file_name="../../firmware/targets/f7/fatfs/syscall.c" />
-            <file file_name="../../firmware/targets/f7/fatfs/user_diskio.c" />
-          </folder>
-          <configuration Name="Debug" build_exclude_from_build="No" />
+        <folder
+          Name="f7"
+          exclude="cube"
+          filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
+          path="../../firmware/targets/f7"
+          recurse="Yes" />
+        <folder
+          Name="f6"
+          exclude="cube"
+          filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
+          path="../../firmware/targets/f6"
+          recurse="Yes">
+          <configuration Name="Common" build_exclude_from_build="Yes" />
         </folder>
+        <folder
+          Name="furi-hal-include"
+          exclude=""
+          filter=""
+          path="../../firmware/targets/furi-hal-include"
+          recurse="No" />
       </folder>
-      <configuration Name="Debug" build_exclude_from_build="No" />
     </folder>
     <folder Name="lib">
+      <folder
+        Name="app-scened-template"
+        exclude=""
+        filter=""
+        path="../../lib/app-scened-template"
+        recurse="Yes" />
+      <folder
+        Name="drivers"
+        exclude=""
+        filter=""
+        path="../../lib/drivers"
+        recurse="Yes" />
+      <folder
+        Name="fatfs"
+        exclude="cc*"
+        filter=""
+        path="../../lib/fatfs"
+        recurse="Yes" />
+      <folder
+        Name="flipper_file"
+        exclude=""
+        filter=""
+        path="../../lib/flipper_file"
+        recurse="Yes" />
+      <folder
+        Name="heatshrink"
+        exclude=""
+        filter=""
+        path="../../lib/heatshrink"
+        recurse="Yes" />
+      <folder
+        Name="irda"
+        exclude=""
+        filter=""
+        path="../../lib/irda"
+        recurse="Yes" />
+      <folder
+        Name="libusb_stm32"
+        exclude=""
+        filter="*usbd_stm32wb55*;*core*"
+        path="../../lib/libusb_stm32"
+        recurse="Yes" />
+      <folder
+        Name="littlefs"
+        exclude=""
+        filter=""
+        path="../../lib/littlefs"
+        recurse="Yes" />
+      <folder
+        Name="nanopb"
+        exclude=""
+        filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
+        path="../../lib/nanopb"
+        recurse="No" />
+      <folder
+        Name="nfc_protocols"
+        exclude=""
+        filter=""
+        path="../../lib/nfc_protocols"
+        recurse="Yes" />
+      <folder
+        Name="onewire"
+        exclude=""
+        filter=""
+        path="../../lib/onewire"
+        recurse="Yes" />
+      <folder
+        Name="subghz"
+        exclude=""
+        filter=""
+        path="../../lib/subghz"
+        recurse="Yes" />
+      <folder
+        Name="toolbox"
+        exclude=""
+        filter=""
+        path="../../lib/toolbox"
+        recurse="Yes" />
+      <folder
+        Name="u8g2"
+        exclude=""
+        filter=""
+        path="../../lib/u8g2"
+        recurse="Yes" />
+      <folder
+        Name="ST25RFAL002"
+        exclude=""
+        filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
+        path="../../lib/ST25RFAL002"
+        recurse="Yes" />
       <folder Name="STM32CubeWB">
         <folder Name="Drivers">
-          <folder Name="STM32WBxx_HAL_Driver">
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_comp.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cortex.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cryp.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_exti.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_gpio.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_hsem.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_i2c.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_ipcc.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_lptim.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pcd.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pcd_ex.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pwr.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pwr_ex.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rcc.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rtc.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rtc_ex.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_tim.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_tim_ex.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_adc.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_dma.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_gpio.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_i2c.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_lptim.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_lpuart.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_rcc.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_spi.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_tim.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_usart.c" />
-            <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_utils.c" />
-          </folder>
+          <folder
+            Name="STM32WBxx_HAL_Driver"
+            exclude="*_template*"
+            filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
+            path="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver"
+            recurse="Yes" />
+        </folder>
+        <folder Name="FreeRTOS">
+          <folder
+            Name="Source"
+            exclude="CMSIS_RTOS"
+            filter=""
+            path="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source"
+            recurse="No" />
+          <folder
+            Name="CMSIS_RTOS_V2"
+            exclude=""
+            filter=""
+            path="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"
+            recurse="No" />
+          <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" />
         </folder>
         <folder Name="Middlewares">
-          <folder Name="Third_Party">
-            <folder Name="FreeRTOS">
-              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c" />
-              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/list.c" />
-              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/queue.c" />
-              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c" />
-              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/tasks.c" />
-              <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/timers.c" />
-              <folder Name="CMSIS_RTOS_V2">
-                <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c" />
-              </folder>
-              <folder Name="portable">
-                <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" />
-              </folder>
-            </folder>
-          </folder>
           <folder Name="ST">
             <folder Name="STM32_WPAN">
               <folder Name="interface">
@@ -261,254 +313,7 @@
           </folder>
         </folder>
       </folder>
-      <folder Name="toolbox">
-        <file file_name="../../lib/toolbox/args.c" />
-        <file file_name="../../lib/toolbox/hex.c" />
-        <file file_name="../../lib/toolbox/manchester-decoder.c" />
-        <file file_name="../../lib/toolbox/manchester-encoder.c" />
-        <file file_name="../../lib/toolbox/md5.c" />
-        <file file_name="../../lib/toolbox/path.c" />
-        <file file_name="../../lib/toolbox/random_name.c" />
-        <file file_name="../../lib/toolbox/saved_struct.c" />
-        <file file_name="../../lib/toolbox/version.c" />
-      </folder>
-      <folder Name="libusb_stm32">
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32wb55_devfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l476_otgfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l433_devfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l100_devfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32l052_devfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f446_otghs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f446_otgfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f429_otghs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f429_otgfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f105_otgfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_stm32f103_devfs.c" />
-        <file file_name="../../lib/libusb_stm32/src/usbd_core.c" />
-      </folder>
-      <folder Name="nanopb">
-        <file file_name="../../lib/nanopb/pb_common.c" />
-        <file file_name="../../lib/nanopb/pb_decode.c" />
-        <file file_name="../../lib/nanopb/pb_encode.c" />
-      </folder>
-      <folder Name="fatfs">
-        <file file_name="../../lib/fatfs/diskio.c" />
-        <file file_name="../../lib/fatfs/ff.c" />
-        <file file_name="../../lib/fatfs/ff_gen_drv.c" />
-        <folder Name="option">
-          <file file_name="../../lib/fatfs/option/unicode.c" />
-        </folder>
-      </folder>
-      <folder Name="heatshrink">
-        <file file_name="../../lib/heatshrink/heatshrink_decoder.c" />
-        <file file_name="../../lib/heatshrink/heatshrink_encoder.c" />
-      </folder>
-      <folder Name="drivers">
-        <file file_name="../../lib/drivers/lp5562.c" />
-        <file file_name="../../lib/drivers/bq25896.c" />
-        <file file_name="../../lib/drivers/bq27220.c" />
-        <file file_name="../../lib/drivers/cc1101.c" />
-      </folder>
-      <folder Name="u8g2">
-        <file file_name="../../lib/u8g2/u8g2_bitmap.c" />
-        <file file_name="../../lib/u8g2/u8g2_box.c" />
-        <file file_name="../../lib/u8g2/u8g2_buffer.c" />
-        <file file_name="../../lib/u8g2/u8g2_circle.c" />
-        <file file_name="../../lib/u8g2/u8g2_d_memory.c" />
-        <file file_name="../../lib/u8g2/u8g2_font.c" />
-        <file file_name="../../lib/u8g2/u8g2_fonts.c" />
-        <file file_name="../../lib/u8g2/u8g2_glue.c" />
-        <file file_name="../../lib/u8g2/u8g2_hvline.c" />
-        <file file_name="../../lib/u8g2/u8g2_intersection.c" />
-        <file file_name="../../lib/u8g2/u8g2_line.c" />
-        <file file_name="../../lib/u8g2/u8g2_ll_hvline.c" />
-        <file file_name="../../lib/u8g2/u8g2_setup.c" />
-        <file file_name="../../lib/u8g2/u8x8_8x8.c" />
-        <file file_name="../../lib/u8g2/u8x8_byte.c" />
-        <file file_name="../../lib/u8g2/u8x8_cad.c" />
-        <file file_name="../../lib/u8g2/u8x8_display.c" />
-        <file file_name="../../lib/u8g2/u8x8_gpio.c" />
-        <file file_name="../../lib/u8g2/u8x8_setup.c" />
-      </folder>
-      <folder Name="app-scened-template">
-        <file file_name="../../lib/app-scened-template/file-worker.c" />
-        <file file_name="../../lib/app-scened-template/file-worker-cpp.cpp" />
-        <file file_name="../../lib/app-scened-template/text-store.cpp" />
-        <folder Name="view-modules">
-          <file file_name="../../lib/app-scened-template/view-modules/byte-input-vm.cpp" />
-          <file file_name="../../lib/app-scened-template/view-modules/dialog-ex-vm.cpp" />
-          <file file_name="../../lib/app-scened-template/view-modules/popup-vm.cpp" />
-          <file file_name="../../lib/app-scened-template/view-modules/submenu-vm.cpp" />
-          <file file_name="../../lib/app-scened-template/view-modules/text-input-vm.cpp" />
-        </folder>
-      </folder>
-      <folder Name="littlefs">
-        <file file_name="../../lib/littlefs/lfs.c" />
-        <file file_name="../../lib/littlefs/lfs_util.c" />
-      </folder>
-      <folder Name="ST25RFAL002">
-        <file file_name="../../lib/ST25RFAL002/platform.c" />
-        <file file_name="../../lib/ST25RFAL002/timer.c" />
-        <folder Name="source">
-          <file file_name="../../lib/ST25RFAL002/source/custom_analog_config.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_analogConfig.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_crc.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_dpo.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_iso15693_2.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_isoDep.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_nfc.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_nfca.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcb.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcDep.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcf.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_nfcv.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_st25tb.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_st25xv.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_t1t.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_t2t.c" />
-          <file file_name="../../lib/ST25RFAL002/source/rfal_t4t.c" />
-          <folder Name="st25r3916">
-            <file file_name="../../lib/ST25RFAL002/source/st25r3916/rfal_rfst25r3916.c" />
-            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916.c" />
-            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_aat.c" />
-            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_com.c" />
-            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_irq.c" />
-            <file file_name="../../lib/ST25RFAL002/source/st25r3916/st25r3916_led.c" />
-          </folder>
-        </folder>
-      </folder>
-      <folder Name="flipper_file">
-        <file file_name="../../lib/flipper_file/file_helper.c" />
-        <file file_name="../../lib/flipper_file/flipper_file.c" />
-        <file file_name="../../lib/flipper_file/flipper_file_float.c" />
-        <file file_name="../../lib/flipper_file/flipper_file_helper.c" />
-        <file file_name="../../lib/flipper_file/flipper_file_hex.c" />
-        <file file_name="../../lib/flipper_file/flipper_file_int32.c" />
-        <file file_name="../../lib/flipper_file/flipper_file_string.c" />
-        <file file_name="../../lib/flipper_file/flipper_file_uint32.c" />
-      </folder>
-      <folder Name="nfc_protocols">
-        <file file_name="../../lib/nfc_protocols/emv_decoder.c" />
-        <file file_name="../../lib/nfc_protocols/mifare_ultralight.c" />
-      </folder>
-      <folder Name="irda">
-        <folder Name="encoder_decoder">
-          <file file_name="../../lib/irda/encoder_decoder/irda.c" />
-          <folder Name="common">
-            <file file_name="../../lib/irda/encoder_decoder/common/irda_common_decoder.c" />
-            <file file_name="../../lib/irda/encoder_decoder/common/irda_common_encoder.c" />
-            <file file_name="../../lib/irda/encoder_decoder/common/irda_common_protocol_defs.c" />
-          </folder>
-          <folder Name="nec">
-            <file file_name="../../lib/irda/encoder_decoder/nec/irda_decoder_nec.c" />
-            <file file_name="../../lib/irda/encoder_decoder/nec/irda_encoder_nec.c" />
-            <file file_name="../../lib/irda/encoder_decoder/nec/irda_nec_spec.c" />
-          </folder>
-          <folder Name="rc5">
-            <file file_name="../../lib/irda/encoder_decoder/rc5/irda_decoder_rc5.c" />
-            <file file_name="../../lib/irda/encoder_decoder/rc5/irda_encoder_rc5.c" />
-            <file file_name="../../lib/irda/encoder_decoder/rc5/irda_rc5_spec.c" />
-          </folder>
-          <folder Name="sirc">
-            <file file_name="../../lib/irda/encoder_decoder/sirc/irda_decoder_sirc.c" />
-            <file file_name="../../lib/irda/encoder_decoder/sirc/irda_encoder_sirc.c" />
-            <file file_name="../../lib/irda/encoder_decoder/sirc/irda_sirc_spec.c" />
-          </folder>
-          <folder Name="samsung">
-            <file file_name="../../lib/irda/encoder_decoder/samsung/irda_decoder_samsung.c" />
-            <file file_name="../../lib/irda/encoder_decoder/samsung/irda_encoder_samsung.c" />
-            <file file_name="../../lib/irda/encoder_decoder/samsung/irda_samsung_spec.c" />
-          </folder>
-          <folder Name="rc6">
-            <file file_name="../../lib/irda/encoder_decoder/rc6/irda_decoder_rc6.c" />
-            <file file_name="../../lib/irda/encoder_decoder/rc6/irda_encoder_rc6.c" />
-            <file file_name="../../lib/irda/encoder_decoder/rc6/irda_rc6_spec.c" />
-          </folder>
-        </folder>
-        <folder Name="worker">
-          <file file_name="../../lib/irda/worker/irda_transmit.c" />
-          <file file_name="../../lib/irda/worker/irda_worker.c" />
-        </folder>
-      </folder>
-      <folder Name="onewire">
-        <file file_name="../../lib/onewire/blanks_writer.cpp" />
-        <file file_name="../../lib/onewire/maxim_crc.cpp" />
-        <file file_name="../../lib/onewire/one_wire_device.cpp" />
-        <file file_name="../../lib/onewire/one_wire_device_ds_1990.cpp" />
-        <file file_name="../../lib/onewire/one_wire_master.cpp" />
-        <file file_name="../../lib/onewire/one_wire_slave.cpp" />
-        <file file_name="../../lib/onewire/one_wire_timings.cpp" />
-      </folder>
-      <folder Name="subghz">
-        <file file_name="../../lib/subghz/subghz_file_encoder_worker.c" />
-        <file file_name="../../lib/subghz/subghz_keystore.c" />
-        <file file_name="../../lib/subghz/subghz_parser.c" />
-        <file file_name="../../lib/subghz/subghz_worker.c" />
-        <folder Name="protocols">
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_came.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_came_atomo.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_came_twee.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_cfm.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_common.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_faac_slh.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_gate_tx.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_hormann.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_ido.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_keeloq.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_keeloq_common.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_kia.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_nero_radio.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_nero_sketch.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_nice_flo.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_nice_flor_s.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_princeton.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_raw.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_scher_khan.c" />
-          <file file_name="../../lib/subghz/protocols/subghz_protocol_star_line.c" />
-        </folder>
-      </folder>
-      <configuration Name="Debug" build_exclude_from_build="No" />
     </folder>
-    <folder
-      Name="applications"
-      exclude=""
-      filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
-      path="../../applications"
-      recurse="Yes" />
-    <folder
-      Name="assets"
-      exclude=""
-      filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
-      path="../../assets"
-      recurse="Yes" />
-    <folder
-      Name="core"
-      exclude=""
-      filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
-      path="../../core"
-      recurse="Yes" />
-    <configuration
-      Name="Debug"
-      c_preprocessor_definitions="FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
-      gdb_server_allow_memory_access_during_execution="Yes"
-      gdb_server_autostart_server="No"
-      gdb_server_command_line=""
-      gdb_server_ignore_checksum_errors="No"
-      gdb_server_port="3333"
-      gdb_server_register_access="General and Individual"
-      gdb_server_reset_command="reset halt"
-      gdb_server_type="OpenOCD" />
-    <configuration
-      Name="Spimock"
-      c_preprocessor_definitions="FLASHMGR_MOCK;FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER" />
-    <configuration
-      Name="Release"
-      c_preprocessor_definitions="APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
-      c_preprocessor_undefinitions="NDEBUG"
-      gcc_cl_optimization_level="Size"
-      gcc_optimization_level="Level 2 for size"
-      link_keep_lto_files="Yes"
-      link_time_optimization="Yes" />
   </project>
   <configuration Name="Common" arm_library_optimization="Small" />
 </solution>
