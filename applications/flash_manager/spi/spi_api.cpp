@@ -108,30 +108,30 @@ static bool readByte(uint8_t* dst) {
     return result;
 }
 
-static bool write(uint8_t opCode) {
-    bool result = CS_LOW();
-    if(result) {
-        result &= writeByte(opCode);
-    }
-    result &= CS_HIGH();
-    return result;
-}
+//static bool write(uint8_t opCode) {
+//    bool result = CS_LOW();
+//    if(result) {
+//        result &= writeByte(opCode);
+//    }
+//    result &= CS_HIGH();
+//    return result;
+//}
 
-static bool write(uint8_t opCode, uint8_t* data, int len) {
-    bool result = CS_LOW();
-    if(result) {
-        result &= writeByte(opCode);
-        if(result) {
-            while(len != 0) {
-                result &= writeByte(*data++);
-                if(!result) break;
-                --len;
-            }
-        }
-        result &= CS_HIGH();
-    }
-    return result;
-}
+//static bool write(uint8_t opCode, uint8_t* data, int len) {
+//    bool result = CS_LOW();
+//    if(result) {
+//        result &= writeByte(opCode);
+//        if(result) {
+//            while(len != 0) {
+//                result &= writeByte(*data++);
+//                if(!result) break;
+//                --len;
+//            }
+//        }
+//        result &= CS_HIGH();
+//    }
+//    return result;
+//}
 
 static bool write_read(
     uint8_t opCode,
@@ -179,7 +179,7 @@ bool SpiToolkit::detect_flash() {
 #ifdef FLASHMGR_MOCK
         last_info.vendor_id = SpiChipVendor_WINBOND;
         last_info.name = "W25QMOCK";
-        last_info.size = 256 * 1024L;
+        last_info.size = 64 * 1024L;
         last_info.write_mode = CHIP_WM_PAGE_256B;
         last_info.erase_gran = 4096;
         last_info.erase_gran_cmd = 0x20;
