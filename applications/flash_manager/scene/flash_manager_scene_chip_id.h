@@ -13,6 +13,7 @@ public:
     void on_exit(FlashManager* app) final;
 
     void start_chip_id();
+
 private:
     FlashManager* app;
     void process_found_chip();
@@ -24,10 +25,8 @@ private:
     static void read_chip_callback(void* context);
     static void write_chip_callback(void* context);
 
-    ButtonElement* run_detect_btn;
-    StringElement* header_line;
-    StringElement* detail_line;
-    StringElement* status_line;
+    ButtonElement *run_detect_btn, *back_btn, *next_btn;
+    StringElement *header_line, *detail_line, *status_line;
 
     bool chip_detected;
     string_t chip_id, chip_extra;

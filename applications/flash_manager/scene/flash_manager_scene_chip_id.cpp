@@ -26,19 +26,18 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
 
     ContainerVM* container = app->view_controller;
 
-    auto back_btn = container->add<ButtonElement>();
+    back_btn = container->add<ButtonElement>();
     back_btn->set_type(ButtonElement::Type::Left, "Back");
     back_btn->set_callback(this, &FlashManagerSceneChipID::back_callback);
     //app, cbc::obtain_connector(this, &FlashManagerSceneChipID::back_callback));
 
     run_detect_btn = container->add<ButtonElement>();
     run_detect_btn->set_type(ButtonElement::Type::Center, "Scan");
-    //run_detect_btn->set_callback(this, &wrapper);
-    //run_detect_btn->set_callback(
-    //    app, cbc::obtain_connector(this, &FlashManagerSceneChipID::start_chip_id));
     run_detect_btn->set_callback(this, &FlashManagerSceneChipID::rescan_callback);
-    //app, cbc::obtain_connector(this, &FlashManagerSceneChipID::rescan_callback));
     run_detect_btn->set_enabled(false);
+
+    next_btn = container->add<ButtonElement>();
+    next_btn->set_enabled(false);
 
     header_line = container->add<StringElement>();
     detail_line = container->add<StringElement>();
@@ -63,7 +62,11 @@ void FlashManagerSceneChipID::start_chip_id() {
 }
 
 void FlashManagerSceneChipID::tick() {
-    run_detect_btn->set_enabled(!(bool)chip_id_task);
+    bool chip_detection_not_running = !(bool)chip_id_task;
+
+    run_detect_btn->set_enabled(chip_detection_not_running);
+    back_btn->set_enabled(chip_detection_not_running);
+    next_btn->set_enabled(chip_detection_not_running);
 
     if(chip_id_task && chip_id_task->completed()) {
         FURI_LOG_I(
@@ -108,6 +111,11 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
     case FlashManager::EventType::OpWriteChip:
         app->scene_controller.switch_to_scene(FlashManager::SceneType::WriteImgProcessScene);
         break;
+    case FlashManager::EventType::Back:
+        if ((bool)chip_id_task) {
+            // don't leave view while still detecting.
+            consumed = true;
+        }
     default:
         break;
     }
@@ -129,9 +137,6 @@ void FlashManagerSceneChipID::process_found_chip() {
 
     detail_line->update_text(string_get_cstr(chip_id));
 
-    ContainerVM* container = app->view_controller;
-    auto button = container->add<ButtonElement>();
-
     const char* next_operation = "Read";
     ButtonElementCallback callback;
 
@@ -144,8 +149,9 @@ void FlashManagerSceneChipID::process_found_chip() {
         callback = &FlashManagerSceneChipID::read_chip_callback;
     }
 
-    button->set_type(ButtonElement::Type::Right, next_operation);
-    button->set_callback(this, callback);
+    next_btn->set_type(ButtonElement::Type::Right, next_operation);
+    next_btn->set_callback(this, callback);
+    next_btn->set_enabled(true);
 }
 
 void FlashManagerSceneChipID::on_exit(FlashManager* app) {
