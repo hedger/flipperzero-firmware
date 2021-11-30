@@ -3,7 +3,7 @@
 #include <lib/toolbox/random_name.h>
 
 void FlashManagerSceneReadDumpInputFilename::on_enter(FlashManager* app, bool need_restore) {
-    // TODO: fix 
+    // TODO: fix
     const char* key_name = ""; //app->worker.key.get_name();
 
     bool key_name_empty = !strcmp(key_name, "");

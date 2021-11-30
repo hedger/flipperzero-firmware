@@ -20,8 +20,7 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
 
     cancel_button = container->add<ButtonElement>();
     cancel_button->set_type(ButtonElement::Type::Left, "Cancel");
-    cancel_button->set_callback(
-        app, cbc::obtain_connector(this, &FlashManagerSceneWriteDump::cancel_callback));
+    cancel_button->set_callback(this, &FlashManagerSceneWriteDump::cancel_callback);
 
     header_line = container->add<StringElement>();
     auto line_2 = container->add<StringElement>();
@@ -48,7 +47,7 @@ bool FlashManagerSceneWriteDump::on_event(FlashManager* app, FlashManager::Event
         tick();
         break;
     case FlashManager::EventType::Back:
-        if(!write_completed || !cancelled) {
+        if(!write_completed && !cancelled) {
             // no going back!
             consumed = true;
         }
@@ -75,8 +74,7 @@ void FlashManagerSceneWriteDump::finish_write() {
         ContainerVM* container = app->view_controller;
         auto button = container->add<ButtonElement>();
         button->set_type(ButtonElement::Type::Right, "Exit");
-        button->set_callback(
-            app, cbc::obtain_connector(this, &FlashManagerSceneWriteDump::done_callback));
+        button->set_callback(this, &FlashManagerSceneWriteDump::done_callback);
         cancel_button->set_enabled(false);
     }
 }
@@ -148,11 +146,14 @@ void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
 
 void FlashManagerSceneWriteDump::done_callback(void* context) {
     FlashManager::Event event{.type = FlashManager::EventType::Back};
-    app->view_controller.send_event(&event);
+    reinterpret_cast<FlashManagerSceneWriteDump*>(context)->app->view_controller.send_event(
+        &event);
 }
 
 void FlashManagerSceneWriteDump::cancel_callback(void* context) {
-    cancelled = true;
+    FlashManagerSceneWriteDump* thisScene = reinterpret_cast<FlashManagerSceneWriteDump*>(context);
+    thisScene->cancelled = true;
+
     FlashManager::Event event{.type = FlashManager::EventType::Back};
-    app->view_controller.send_event(&event);
+    thisScene->app->view_controller.send_event(&event);
 }

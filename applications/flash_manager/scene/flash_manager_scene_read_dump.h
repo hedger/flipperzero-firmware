@@ -21,8 +21,8 @@ private:
     bool enqueue_next_block();
 
     //void result_callback(void* context);
-    void cancel_callback(void* context);
-    void done_callback(void* context);
+    static void cancel_callback(void* context);
+    static void done_callback(void* context);
 
     StringElement* status_line;
     ButtonElement* cancel_button;

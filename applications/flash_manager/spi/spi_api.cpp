@@ -177,6 +177,7 @@ static bool read_sfdp() {
 
 bool SpiToolkit::detect_flash() {
 #ifdef FLASHMGR_MOCK
+        osDelay(2500);
         last_info.vendor_id = SpiChipVendor_WINBOND;
         last_info.name = "W25QMOCK";
         last_info.size = 64 * 1024L;

@@ -156,6 +156,9 @@ public:
         while(!exit) {
             app->view_controller.receive_event(&event);
 
+            //if(event.type == TApp::EventType::Exit) 
+            //    break;
+
             consumed = scenes[current_scene_index]->on_event(app, &event);
 
             if(!consumed) {

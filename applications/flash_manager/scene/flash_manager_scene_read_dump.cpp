@@ -20,8 +20,7 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
 
     cancel_button = container->add<ButtonElement>();
     cancel_button->set_type(ButtonElement::Type::Left, "Cancel");
-    cancel_button->set_callback(
-        app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::cancel_callback));
+    cancel_button->set_callback(this, &FlashManagerSceneReadDump::cancel_callback);
 
     auto line_1 = container->add<StringElement>();
     auto line_2 = container->add<StringElement>();
@@ -45,11 +44,12 @@ bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event*
         tick();
         break;
     case FlashManager::EventType::Back:
-        if (!read_completed || !cancelled) {
+        if(!read_completed && !cancelled) {
             // no going back!
             consumed = true;
+            break;
         }
-        break;
+
     case FlashManager::EventType::Cancel:
     case FlashManager::EventType::Next:
         app->scene_controller.search_and_switch_to_previous_scene(
@@ -69,14 +69,13 @@ void FlashManagerSceneReadDump::finish_read() {
         ContainerVM* container = app->view_controller;
         auto button = container->add<ButtonElement>();
         button->set_type(ButtonElement::Type::Right, "Exit");
-        button->set_callback(
-            app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
+        button->set_callback(this, &FlashManagerSceneReadDump::done_callback);
         cancel_button->set_enabled(false);
     }
 }
 
 void FlashManagerSceneReadDump::tick() {
-    if (cancelled) {
+    if(cancelled) {
         return;
     }
 
@@ -131,7 +130,7 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
 
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     app->file_tools.close();
-    if (cancelled) {
+    if(cancelled) {
         FURI_LOG_I(TAG, "removing unfinished dump '%s'", app->text_store.text);
         app->file_tools.remove_dump_file(app->text_store.text, ChipType::SPI);
     }
@@ -144,11 +143,13 @@ void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
 
 void FlashManagerSceneReadDump::done_callback(void* context) {
     FlashManager::Event event{.type = FlashManager::EventType::Next};
-    app->view_controller.send_event(&event);
+    reinterpret_cast<FlashManagerSceneReadDump*>(context)->app->view_controller.send_event(&event);
 }
 
 void FlashManagerSceneReadDump::cancel_callback(void* context) {
-    cancelled = true;
+    FlashManagerSceneReadDump* thisScene = reinterpret_cast<FlashManagerSceneReadDump*>(context);
+    thisScene->cancelled = true;
+
     FlashManager::Event event{.type = FlashManager::EventType::Cancel};
-    app->view_controller.send_event(&event);
+    thisScene->app->view_controller.send_event(&event);
 }
