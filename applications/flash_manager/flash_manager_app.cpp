@@ -33,9 +33,9 @@ int32_t FlashManager::run(const char* args) {
         FURI_LOG_I(TAG, "started app to write '%s'", args);
         text_store.set(args);
         //load_key_data(args, &worker.key);
-        scene_controller.add_scene(SceneType::ChipIDScene, new FlashManagerSceneChipID());
+        scene_controller.add_scene(SceneType::Start, new FlashManagerSceneChipID());
         scene_controller.add_scene(SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
-        scene_controller.process(100, SceneType::ChipIDScene);
+        scene_controller.process(TICK_LEN_MS, SceneType::ChipIDScene);
     } else {
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());
         //scene_controller.add_scene(SceneType::ByteInputScene, new FlashManagerSceneByteInput());
@@ -44,7 +44,7 @@ int32_t FlashManager::run(const char* args) {
             SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
         scene_controller.add_scene(
             SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
-        scene_controller.process(100);
+        scene_controller.process(TICK_LEN_MS);
     }
 
     worker->stop();

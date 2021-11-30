@@ -41,21 +41,24 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
 bool FlashManagerSceneWriteDump::on_event(FlashManager* app, FlashManager::Event* event) {
     bool consumed = false;
 
+    FURI_LOG_I(TAG, "FlashManagerSceneWriteDump on_event %d", event->type);
+
     switch(event->type) {
     case FlashManager::EventType::Tick:
         tick();
         break;
     case FlashManager::EventType::Back:
-        if (!write_completed || !cancelled) {
+        if(!write_completed || !cancelled) {
             // no going back!
             consumed = true;
         }
         break;
-    case FlashManager::EventType::Cancel:
-    case FlashManager::EventType::Next:
-        app->scene_controller.search_and_switch_to_previous_scene(
-            {FlashManager::SceneType::Exit});
-        break;
+    //case FlashManager::EventType::Cancel:
+    //case FlashManager::EventType::Next:
+    //    //app->scene_controller.search_and_switch_to_previous_scene(
+    //    //    {FlashManager::SceneType::Exit});
+    //    app->scene_controller.switch_to_scene(FlashManager::SceneType::Exit);
+    //    break;
     default:
         break;
     }
@@ -71,7 +74,7 @@ void FlashManagerSceneWriteDump::finish_write() {
 
         ContainerVM* container = app->view_controller;
         auto button = container->add<ButtonElement>();
-        button->set_type(ButtonElement::Type::Right, "Done");
+        button->set_type(ButtonElement::Type::Right, "Exit");
         button->set_callback(
             app, cbc::obtain_connector(this, &FlashManagerSceneWriteDump::done_callback));
         cancel_button->set_enabled(false);
@@ -144,12 +147,12 @@ void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
 }
 
 void FlashManagerSceneWriteDump::done_callback(void* context) {
-    FlashManager::Event event{.type = FlashManager::EventType::Next};
+    FlashManager::Event event{.type = FlashManager::EventType::Back};
     app->view_controller.send_event(&event);
 }
 
 void FlashManagerSceneWriteDump::cancel_callback(void* context) {
     cancelled = true;
-    FlashManager::Event event{.type = FlashManager::EventType::Cancel};
+    FlashManager::Event event{.type = FlashManager::EventType::Back};
     app->view_controller.send_event(&event);
 }

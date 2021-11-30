@@ -7,6 +7,18 @@
 #include "../flash_manager_worker.h"
 #include "../spi/spi_chips.h"
 
+//static void wrapper(void* env) {
+//    FURI_LOG_I(TAG, "wrapper()");
+//    FlashManagerSceneChipID* pp = (FlashManagerSceneChipID*)env;
+//    pp->start_chip_id(nullptr);
+//}
+
+void FlashManagerSceneChipID::rescan_callback(void* context) {
+    FURI_LOG_I(TAG, "wrapper2()");
+    start_chip_id(nullptr);
+
+}
+
 void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
     this->app = app;
     chip_detected = false;
@@ -15,10 +27,19 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
 
     ContainerVM* container = app->view_controller;
 
-    auto button = container->add<ButtonElement>();
-    button->set_type(ButtonElement::Type::Left, "Back");
-    button->set_callback(
+    auto back_btn = container->add<ButtonElement>();
+    back_btn->set_type(ButtonElement::Type::Left, "Back");
+    back_btn->set_callback(
         app, cbc::obtain_connector(this, &FlashManagerSceneChipID::back_callback));
+
+    run_detect_btn = container->add<ButtonElement>();
+    run_detect_btn->set_type(ButtonElement::Type::Center, "Scan");
+    //run_detect_btn->set_callback(this, &wrapper);
+    //run_detect_btn->set_callback(
+    //    app, cbc::obtain_connector(this, &FlashManagerSceneChipID::start_chip_id));
+    run_detect_btn->set_callback(
+        app, cbc::obtain_connector(this, &FlashManagerSceneChipID::rescan_callback));
+    run_detect_btn->set_enabled(false);
 
     header_line = container->add<StringElement>();
     detail_line = container->add<StringElement>();
@@ -33,7 +54,9 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
     start_chip_id();
 }
 
-void FlashManagerSceneChipID::start_chip_id() {
+void FlashManagerSceneChipID::start_chip_id(void*) {
+    FURI_LOG_I(TAG, "start_chip_id()");
+    run_detect_btn->set_enabled(false);
     chip_id_task = std::make_unique<WorkerTask>(
         WorkerOperation::ChipId, 0, reinterpret_cast<uint8_t*>(&flash_info), sizeof(flash_info));
 
@@ -60,6 +83,8 @@ void FlashManagerSceneChipID::tick() {
         }
 
         chip_id_task.reset();
+    } else { 
+        run_detect_btn->set_enabled(true);
     }
     //} else {
     //    string_printf(chip_extra, "detecting...");
@@ -70,6 +95,8 @@ void FlashManagerSceneChipID::tick() {
 
 bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* event) {
     bool consumed = false;
+
+    FURI_LOG_I(TAG, "FlashManagerSceneChipID::on_event %d", event->type);
 
     switch(event->type) {
     case FlashManager::EventType::Tick:

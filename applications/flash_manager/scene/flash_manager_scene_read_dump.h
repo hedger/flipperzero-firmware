@@ -2,9 +2,9 @@
 #include "../flash_manager.h"
 #include "../spi/spi_api.h"
 
+class ButtonElement;
 class StringElement;
 class WorkerTask;
-class ButtonElement;
 
 class FlashManagerSceneReadDump : public GenericScene<FlashManager> {
     static const size_t DUMP_READ_BLOCK_BYTES = 4 * 1024;

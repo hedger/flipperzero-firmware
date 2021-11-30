@@ -9,6 +9,9 @@ typedef enum {
 } SubmenuIndex;
 
 void FlashManagerSceneStart::on_enter(FlashManager* app, bool need_restore) {
+    this->app = app;
+    app->text_store.set("");
+
     auto submenu = app->view_controller.get<SubmenuVM>();
     auto callback = cbc::obtain_connector(this, &FlashManagerSceneStart::submenu_callback);
 

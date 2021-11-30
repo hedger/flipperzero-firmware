@@ -1,6 +1,8 @@
 #include <map>
 #include <forward_list>
 #include <initializer_list>
+#include <furi.h>
+#include <furi-hal.h>
 
 #define GENERIC_SCENE_ENUM_VALUES Exit, Start
 #define GENERIC_EVENT_ENUM_VALUES Tick, Back
@@ -42,6 +44,7 @@ public:
      * @param need_restore true, if we want the scene to restore its parameters
      */
     void switch_to_scene(typename TApp::SceneType scene_index, bool need_restore = false) {
+        FURI_LOG_I("SceneController", "switch_to_scene: idx %d, restore %d", scene_index, need_restore);
         if(scene_index != TApp::SceneType::Exit) {
             scenes[current_scene_index]->on_exit(app);
             current_scene_index = scene_index;

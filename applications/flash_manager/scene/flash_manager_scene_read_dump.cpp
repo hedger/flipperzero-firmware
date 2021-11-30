@@ -68,7 +68,7 @@ void FlashManagerSceneReadDump::finish_read() {
 
         ContainerVM* container = app->view_controller;
         auto button = container->add<ButtonElement>();
-        button->set_type(ButtonElement::Type::Right, "Done");
+        button->set_type(ButtonElement::Type::Right, "Exit");
         button->set_callback(
             app, cbc::obtain_connector(this, &FlashManagerSceneReadDump::done_callback));
         cancel_button->set_enabled(false);
