@@ -1,5 +1,5 @@
 #include "flash_manager_worker.h"
-#include "spi/spi_api.h"
+#include "spi/spi_toolkit.h"
 #include "spi/task_executor.h"
 #include <furi.h>
 

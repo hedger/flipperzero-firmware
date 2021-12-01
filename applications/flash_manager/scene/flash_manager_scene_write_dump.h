@@ -1,6 +1,6 @@
 #pragma once
 #include "../flash_manager.h"
-#include "../spi/spi_api.h"
+#include "../spi/spi_toolkit.h"
 
 class StringElement;
 class ButtonElement;

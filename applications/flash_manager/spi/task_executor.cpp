@@ -1,5 +1,5 @@
 #include "task_executor.h"
-#include "spi_api.h"
+#include "spi_toolkit.h"
 
 #include <furi.h>
 
