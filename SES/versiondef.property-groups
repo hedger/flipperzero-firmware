@@ -1,0 +1,13 @@
+<!DOCTYPE CrossStudio_Group_Values>
+<propertyGroups>
+	<group default="None" group="Options" long="Select device options" name="flipperPlatform" page="Flipper" short="HW revision">
+		<groupEntry name="V6">
+			<property name="flipper_platform_rev" value="F6"/>
+			<cdefine name="AAAAAAAAAAAA" value="BBBBBBBBBBBBBBBBBBBBBBBBBB"/>
+		</groupEntry>
+		<groupEntry name="V7">
+			<property name="flipper_platform_rev" value="F7"/>
+			<cdefine name="AAAAAAAAAAAA" value="CCCCCCCCCCCCCCCCCCCCCCCCCC"/>
+		</groupEntry>
+	</group>
+</propertyGroups>
