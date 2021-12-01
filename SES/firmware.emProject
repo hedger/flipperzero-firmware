@@ -30,6 +30,10 @@
     hidden="Yes"
     macros="FlipperHwRev=F7" />
   <configuration
+    Name="Mock SPI"
+    c_preprocessor_definitions="FLASHMGR_MOCK"
+    hidden="Yes" />
+  <configuration
     Name="Common"
     THREAD_SCRIPT="FreeRTOS CM7"
     Target="STM32WB55RGVx"
@@ -88,11 +92,10 @@
     property_groups_file_path="D:/projects/flipper/fw/SES/flipper.property-groups.xml" />
   <configuration
     Name="dbg"
-    inherited_configurations="Internal;Debug;FlipperF6" />
+    inherited_configurations="Internal;Debug;FlipperF6;Mock SPI" />
   <configuration
     Name="rel"
     inherited_configurations="Internal;Release;FlipperF6" />
-  <configuration Name="External GNU" hidden="Yes" />
   <project Name="firmware">
     <configuration
       BUILD_OPTIONS="ARM GNU"
@@ -132,11 +135,6 @@
       gdb_server_register_access="General and Individual"
       gdb_server_reset_command="reset halt"
       gdb_server_type="OpenOCD" />
-    <configuration
-      Name="Spimock"
-      c_additional_options_from_file="D:/projects/flipper/fw/SES/versiondef.inc"
-      c_preprocessor_definitions="FLASHMGR_MOCK;FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
-      flipperPlatform="V7" />
     <configuration
       Name="Release"
       c_preprocessor_definitions="APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
@@ -383,7 +381,6 @@
       project_type="Executable" />
     <configuration Name="Debug" />
     <configuration Name="Release" />
-    <configuration Name="Spimock" />
     <configuration
       BUILD_OPTIONS="ARM GNU"
       Name="External GNU"
@@ -481,7 +478,6 @@
           </folder>
         </folder>
       </folder>
-      <configuration Name="Spimock" build_exclude_from_build="Yes" />
     </folder>
     <folder
       Name="u8g2"
@@ -498,10 +494,6 @@
       <file file_name="../../lib/drivers/lp5562.c" />
       <file file_name="../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Source/Templates/gcc/startup_stm32wb55xx_cm4.s" />
     </folder>
-    <configuration
-      BUILD_OPTIONS="ARM GNU"
-      Name="Spimock"
-      build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml" />
     <file file_name="../../lib/toolbox/version.c" />
   </project>
 </solution>
