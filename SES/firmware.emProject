@@ -16,11 +16,13 @@
   <configuration
     FLIPPER_PLATFORM="F6"
     Name="FlipperF6"
+    c_preprocessor_definitions="TARGET=6"
     hidden="Yes"
     macros="FlipperHwRev=F6" />
   <configuration
     FLIPPER_PLATFORM="F7"
     Name="FlipperF7"
+    c_preprocessor_definitions="TARGET=7"
     hidden="Yes"
     macros="FlipperHwRev=F7" />
   <configuration
@@ -62,7 +64,9 @@
     c_only_additional_options="-std=gnu17"
     clang_gnu_version="None"
     debug_threads_script="$(StudioDir)/samples/FreeRTOSPlugin_CM7.js"
-    external_c_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c $(COptions) $(COnlyOptions) $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
+    external_assemble_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c $(AsmOptions) @$(SolutionDir)/version.inc $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -o &quot;$(RelTargetPath)&quot;"
+    external_c_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c $(COptions) $(COnlyOptions) @$(SolutionDir)/version.inc -DBUILD_DATE=\&quot;$(DateDay)-$(DateMonth)-$(DateYear)\&quot; $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
+    external_cpp_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-g++&quot; -c $(COptions) $(CppOnlyOptions) @$(SolutionDir)/version.inc $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
     external_cpp_link_command="&quot;$(ToolChainDir)/arm-none-eabi-g++&quot; $(LinkOptions) -T &quot;$(RelLinkerScriptPath)&quot; @$(RelObjectsFilePath) -o &quot;$(RelTargetPath)&quot; -Xlinker -Map=&quot;$(RelMapPath)&quot;"
     external_link_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; $(LinkOptions) -T &quot;$(RelLinkerScriptPath)&quot; $(Objects) -o &quot;$(RelTargetPath)&quot; -Xlinker -Map=&quot;$(RelMapPath)&quot;"
     external_objects_file_name="tmp/$(Configuration)/o/$(ProjectName)/obj.lst"
@@ -87,6 +91,8 @@
     linker_post_build_command="&quot;$(ToolChainDir)/arm-none-eabi-objcopy&quot; &quot;$(RelTargetPath)&quot; &quot;$(PostLinkOutputFilePath)&quot; -Obinary"
     linker_post_build_command_output_file="$(OutDir)/$(ProjectName).bin"
     macros="DeviceHeaderFile=../../lib/STM32CubeWB/Drivers/CMSIS/Device/Include/stm32wbxx.h;DeviceLibraryIdentifier=M4lf;DeviceSystemFile=../../firmware/targets/$(FlipperHwRev)/Src/system_stm32wbxx.c;DeviceFamily=STM32WBxx;DeviceSubFamily=STM32WB55;Target=STM32WB55RGVx"
+    pre_build_command="bash -c ./gen-version.sh"
+    pre_build_command_wd="$(ProjectDir)/.."
     property_groups_file_path="D:/projects/flipper/fw/SES/flipper.property-groups.xml" />
   <configuration
     Name="dbg"
@@ -102,7 +108,7 @@
       build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml"
       build_quietly="Yes"
       c_additional_options="--specs=nano.specs;--specs=nosys.specs;-Wno-address-of-packed-member;-Wno-missing-field-initializers;-Wno-unused-parameter"
-      c_preprocessor_definitions="__STM32WBxx_FAMILY;__STM32WB55_SUBFAMILY;ARM_MATH_CM4;STM32WB;USB_PMASIZE=0x400;STM32WB55xx;USE_FULL_LL_DRIVER;USE_HAL_DRIVER;HAVE_FREERTOS;PB_ENABLE_MALLOC;PB_WITHOUT_64BIT;_GNU_SOURCE;LFS_CONFIG=lfs_config.h;GIT_COMMIT=\\&quot;Y0BAB0BA\\&quot;;GIT_BRANCH=\\&quot;hedger/SES\\&quot;;GIT_BRANCH_NUM=\\&quot;1337\\&quot;;BUILD_DATE=\\&quot;25-11-2021\\&quot;;VERSION=\\&quot;unknown\\&quot;;TARGET=7;BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000"
+      c_preprocessor_definitions="__STM32WBxx_FAMILY;__STM32WB55_SUBFAMILY;ARM_MATH_CM4;STM32WB;USB_PMASIZE=0x400;STM32WB55xx;USE_FULL_LL_DRIVER;USE_HAL_DRIVER;HAVE_FREERTOS;PB_ENABLE_MALLOC;PB_WITHOUT_64BIT;_GNU_SOURCE;LFS_CONFIG=lfs_config.h;BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000"
       c_user_include_directories="../../assets/compiled;../../core;../../applications;../../lib;../../lib/mlib;../../lib/u8g2;../../lib/littlefs;../../lib/ST25RFAL002;../../lib/ST25RFAL002/include;../../lib/ST25RFAL002/source/st25r3916;../../lib/nfc_protocols;../../lib/callback-connector;../../lib/app-template;../../lib/app_scene_template;../../lib/fnv1a-hash;../../lib/onewire;../../lib/cyfral;../../lib/common-api;../../lib/drivers;../../lib/file_reader;../../lib/irda/encoder_decoder;../../lib/irda/worker;../../lib/app-scened-template;../../lib/libusb_stm32/inc;../../lib/nanopb;../../lib/heatshrink;../../lib/flipper_file;../../;../../firmware/targets/furi-hal-include;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc/Legacy;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Include;../../lib/STM32CubeWB/Drivers/CMSIS/Include;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/include;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F;../../firmware/targets/$(FlipperHwRev)/ble-glue;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/template;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/utilities;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci;../../firmware/targets/$(FlipperHwRev)/furi-hal;../../firmware/targets/$(FlipperHwRev)/Inc;../../firmware/targets/$(FlipperHwRev)/fatfs"
       cpp_only_additional_options="-std=gnu++17;-fno-threadsafe-statics;-fno-use-cxa-atexit;-fno-exceptions;-fno-rtti"
       debug_leave_target_running="Yes"
@@ -361,7 +367,7 @@
       armgnu_cl_fpu="fpv4-sp-d16"
       build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml"
       c_additional_options="-mcpu=cortex-m4;-Og;-g;-fdata-sections;-ffunction-sections;-fno-math-errno;-fstack-usage;-MMD;-MP;-Wall;-mfloat-abi=hard"
-      c_preprocessor_definitions="BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000;STM32WB55xx;USE_FULL_LL_DRIVER;GIT_COMMIT=\\&quot;2d4728a0\\&quot;;GIT_BRANCH=\\&quot;hedger/ses\\&quot;;GIT_BRANCH_NUM=\\&quot;957\\&quot;;BUILD_DATE=\\&quot;30-11-2021\\&quot;;VERSION=\\&quot;unknown\\&quot;;TARGET=7;FURI_DEBUG;NDEBUG"
+      c_preprocessor_definitions="BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000;STM32WB55xx;USE_FULL_LL_DRIVER;FURI_DEBUG;NDEBUG"
       c_user_include_directories=".;../../bootloader;../../;../../bootloader/targets/furi-hal-include;../../bootloader/targets/f6/furi-hal;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc;../../lib/STM32CubeWB/Drivers/CMSIS/Include;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Include;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc;../../lib/drivers;../../lib/u8g2"
       debug_target_connection="J-Link"
       external_assemble_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -x assembler-with-cpp  -c $(AsmOptions) $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
