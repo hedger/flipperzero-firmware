@@ -29,6 +29,7 @@ void FlashManagerSceneChipID::on_enter(FlashManager* app, bool need_restore) {
     back_btn = container->add<ButtonElement>();
     back_btn->set_type(ButtonElement::Type::Left, "Back");
     back_btn->set_callback(this, &FlashManagerSceneChipID::back_callback);
+    back_btn->set_enabled(false);
     //app, cbc::obtain_connector(this, &FlashManagerSceneChipID::back_callback));
 
     run_detect_btn = container->add<ButtonElement>();

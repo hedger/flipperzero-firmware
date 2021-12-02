@@ -120,7 +120,6 @@
       project_can_build_in_parallel="Yes"
       project_directory="firmware"
       project_type="Executable"
-      target_reset_script=""
       target_trace_initialize_script="EnableTrace(&quot;$(TraceInterfaceType)&quot;)"
       use_compiler_driver="No" />
     <configuration
@@ -128,7 +127,6 @@
       c_preprocessor_definitions="FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
       gdb_server_allow_memory_access_during_execution="Yes"
       gdb_server_autostart_server="No"
-      gdb_server_command_line=""
       gdb_server_ignore_checksum_errors="No"
       gdb_server_port="3333"
       gdb_server_register_access="General and Individual"
@@ -144,19 +142,16 @@
       link_time_optimization="Yes" />
     <folder
       Name="applications"
-      exclude=""
       filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
       path="../../applications"
       recurse="Yes" />
     <folder
       Name="assets"
-      exclude=""
       filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
       path="../../assets"
       recurse="Yes" />
     <folder
       Name="core"
-      exclude=""
       filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
       path="../../core"
       recurse="Yes" />
@@ -180,8 +175,6 @@
         </folder>
         <folder
           Name="furi-hal-include"
-          exclude=""
-          filter=""
           path="../../firmware/targets/furi-hal-include"
           recurse="No" />
       </folder>
@@ -189,85 +182,61 @@
     <folder Name="lib">
       <folder
         Name="app-scened-template"
-        exclude=""
-        filter=""
         path="../../lib/app-scened-template"
         recurse="Yes" />
       <folder
         Name="drivers"
-        exclude=""
-        filter=""
         path="../../lib/drivers"
         recurse="Yes" />
       <folder
         Name="fatfs"
         exclude="cc*"
-        filter=""
         path="../../lib/fatfs"
         recurse="Yes" />
       <folder
         Name="flipper_file"
-        exclude=""
-        filter=""
         path="../../lib/flipper_file"
         recurse="Yes" />
       <folder
         Name="heatshrink"
-        exclude=""
-        filter=""
         path="../../lib/heatshrink"
         recurse="Yes" />
       <folder
         Name="irda"
-        exclude=""
-        filter=""
         path="../../lib/irda"
         recurse="Yes" />
       <folder
         Name="libusb_stm32"
-        exclude=""
         filter="*usbd_stm32wb55*;*core*"
         path="../../lib/libusb_stm32"
         recurse="Yes" />
       <folder
         Name="littlefs"
-        exclude=""
-        filter=""
         path="../../lib/littlefs"
         recurse="Yes" />
       <folder
         Name="nanopb"
-        exclude=""
         filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
         path="../../lib/nanopb"
         recurse="No" />
       <folder
         Name="nfc_protocols"
-        exclude=""
-        filter=""
         path="../../lib/nfc_protocols"
         recurse="Yes" />
       <folder
         Name="onewire"
-        exclude=""
-        filter=""
         path="../../lib/onewire"
         recurse="Yes" />
       <folder
         Name="subghz"
-        exclude=""
-        filter=""
         path="../../lib/subghz"
         recurse="Yes" />
       <folder
         Name="toolbox"
-        exclude=""
-        filter=""
         path="../../lib/toolbox"
         recurse="Yes" />
       <folder
         Name="ST25RFAL002"
-        exclude=""
         filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
         path="../../lib/ST25RFAL002"
         recurse="Yes" />
@@ -284,13 +253,10 @@
           <folder
             Name="Source"
             exclude="CMSIS_RTOS"
-            filter=""
             path="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source"
             recurse="No" />
           <folder
             Name="CMSIS_RTOS_V2"
-            exclude=""
-            filter=""
             path="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"
             recurse="No" />
           <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" />
@@ -341,8 +307,6 @@
       </folder>
       <folder
         Name="u8g2"
-        exclude=""
-        filter=""
         path="../../lib/u8g2"
         recurse="Yes" />
     </folder>
@@ -395,16 +359,12 @@
     <file file_name="../../bootloader/src/main.c" />
     <folder
       Name="f6"
-      exclude=""
-      filter=""
       path="../../bootloader/targets/f6"
       recurse="Yes">
       <configuration Name="FlipperF7" build_exclude_from_build="Yes" />
     </folder>
     <folder
       Name="f7"
-      exclude=""
-      filter=""
       path="../../bootloader/targets/f7"
       recurse="Yes">
       <configuration Name="FlipperF6" build_exclude_from_build="Yes" />
@@ -422,13 +382,10 @@
         <folder
           Name="Source"
           exclude="CMSIS_RTOS"
-          filter=""
           path="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source"
           recurse="No" />
         <folder
           Name="CMSIS_RTOS_V2"
-          exclude=""
-          filter=""
           path="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"
           recurse="No" />
         <file file_name="../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" />
@@ -479,8 +436,6 @@
     </folder>
     <folder
       Name="u8g2"
-      exclude=""
-      filter=""
       path="../../lib/u8g2"
       recurse="Yes" />
     <folder Name="Drivers">
