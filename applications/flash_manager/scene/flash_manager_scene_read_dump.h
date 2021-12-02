@@ -33,5 +33,5 @@ private:
     string_t detail_text, status_text;
     size_t bytes_read;
     std::unique_ptr<WorkerTask> reader_task;
-    std::unique_ptr<uint8_t[]> read_buffer;
+    std::unique_ptr<uint8_t[]> read_buffer, verification_buffer;
 };

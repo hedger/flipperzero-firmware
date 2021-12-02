@@ -30,6 +30,8 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     string_printf(status_text, "Please be patient.");
 
     const char* operationHintText = app->runVerification ? "Verifying..." : "Reading dump...";
+    FURI_LOG_I(TAG, "hint: %s, file: '%s'", operationHintText, app->text_store.text);
+
     line_1->set_text(operationHintText, 64, 17, AlignCenter, AlignBottom, FontSecondary);
     detail_line->set_text("", 64, 29, AlignCenter, AlignBottom, FontSecondary);
     status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
@@ -37,6 +39,7 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     // TODO: error check, empty check
     if(app->runVerification) {
         app->file_tools.open_dump_file_read(app->text_store.text, ChipType::SPI);
+        verification_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
     } else {
         app->file_tools.open_dump_file_write(app->text_store.text, ChipType::SPI);
     }
@@ -106,15 +109,17 @@ void FlashManagerSceneReadDump::tick() {
 
     if(reader_task->completed()) {
         if(reader_task->success) {
-            if (app->runVerification) {
-                std::unique_ptr<uint8_t[]> file_buffer;
-                app->file_tools.read_buffer(file_buffer.get(), reader_task->size);
-                if (!memcmp(file_buffer.get(), reader_task->data, reader_task->size)) {
+            if(app->runVerification) {
+                app->file_tools.read_buffer(verification_buffer.get(), reader_task->size);
+                if(!memcmp(verification_buffer.get(), reader_task->data, reader_task->size)) {
                     FURI_LOG_I(TAG, "verify: block @%x OK", reader_task->offset);
-                    string_printf(status_text, "Block %x+%x OK", reader_task->offset, reader_task->size);
+                    string_printf(
+                        detail_text, "Block %x+%x OK", reader_task->offset, reader_task->size);
                 } else {
                     FURI_LOG_I(TAG, "verify: block @%x MISMATCHED");
-                    string_printf(status_text, "Block %x+%x FAILED!", reader_task->offset, reader_task->size);
+                    string_printf(
+                        detail_text, "Block %x+%x FAILED!", reader_task->offset, reader_task->size);
+                    // TODO: break
                 }
             } else {
                 app->file_tools.write_buffer(reader_task->data, reader_task->size);
@@ -123,6 +128,8 @@ void FlashManagerSceneReadDump::tick() {
             if(bytes_read < flash->size) {
                 enqueue_next_block();
             }
+        } else {
+            // TODO
         }
         progress = bytes_read * 100 / flash->size;
     } else {
@@ -149,9 +156,8 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
 }
 
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
-    app->runVerification = false;
     app->file_tools.close();
-    if(cancelled) {
+    if(cancelled && !app->runVerification) {
         FURI_LOG_I(TAG, "removing unfinished dump '%s'", app->text_store.text);
         app->file_tools.remove_dump_file(app->text_store.text, ChipType::SPI);
     }
@@ -161,10 +167,15 @@ void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     string_clear(status_text);
     app->text_store.set("");
     read_buffer.reset();
+    app->runVerification = false;
 }
 
 void FlashManagerSceneReadDump::done_callback(void* context) {
-    FlashManager::Event event{.type = FlashManager::EventType::Next};
+    FlashManagerSceneReadDump* thisScene = reinterpret_cast<FlashManagerSceneReadDump*>(context);
+
+    FlashManager::Event event{
+        .type = thisScene->app->runVerification ? FlashManager::EventType::Back :
+                                                  FlashManager::EventType::Next};
     reinterpret_cast<FlashManagerSceneReadDump*>(context)->app->view_controller.send_event(&event);
 }
 

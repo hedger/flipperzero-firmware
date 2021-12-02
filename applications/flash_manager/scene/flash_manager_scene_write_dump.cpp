@@ -147,7 +147,9 @@ void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
     app->file_tools.close();
     app->view_controller.get<ContainerVM>()->clean();
     string_clear(status_text);
-    app->text_store.set("");
+    if (!app->runVerification){
+        app->text_store.set("");
+    }
     write_buffer.reset();
 }
 
