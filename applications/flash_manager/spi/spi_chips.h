@@ -7,6 +7,9 @@ extern "C" {
 #endif
 
 typedef enum {
+    SpiChipCommand_WRITE_ENABLE = 0x06,
+    SpiChipCommand_VOLATILE_SR_WRITE_ENABLE = 0x50,
+    SpiChipCommand_READ_SFDP_REGISTER = 0x5A,
     SpiChipCommand_JEDEC_ID = 0x9f,
 } SpiChipCommand;
 
@@ -52,7 +55,6 @@ typedef struct {
     uint32_t erase_gran; /**< erase granularity (bytes) */
     uint8_t erase_gran_cmd; /**< erase granularity size block command */
 } ChipInfo_t;
-
 
 extern const VendorName_t VendorNames[];
 extern const ChipInfo_t ChipInfos[];

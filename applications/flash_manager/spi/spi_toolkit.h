@@ -3,6 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* maximum number of erase type support on JESD216 (V1.0) */
+#define SFDP_ERASE_TYPE_MAX_NUM 4
+
 struct SpiFlashInfo_t {
     bool valid;
     size_t size;
@@ -13,6 +16,19 @@ struct SpiFlashInfo_t {
     uint16_t write_mode;
     uint32_t erase_gran;
     uint8_t erase_gran_cmd;
+    uint8_t minor_rev;
+    uint8_t major_rev;
+    uint8_t erase_4k_cmd;
+    uint16_t write_gran;
+    uint8_t vola_sr_we_cmd;
+    bool erase_4k;
+    bool sr_is_non_vola;
+    bool addr_3_byte;
+    bool addr_4_byte;
+    struct {
+        uint32_t size; /**< erase sector size (bytes). 0x00: not available */
+        uint8_t cmd; /**< erase command */
+    } eraser[SFDP_ERASE_TYPE_MAX_NUM]; /**< supported eraser types table */
 };
 
 class SpiToolkit {
