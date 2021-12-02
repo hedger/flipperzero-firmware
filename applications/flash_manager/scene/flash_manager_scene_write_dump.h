@@ -8,6 +8,7 @@ class WorkerTask;
 
 class FlashManagerSceneWriteDump : public GenericScene<FlashManager> {
     static const size_t DUMP_READ_BLOCK_BYTES = 4 * 1024;
+
 public:
     void on_enter(FlashManager* app, bool need_restore) final;
     bool on_event(FlashManager* app, FlashManager::Event* event) final;
@@ -22,11 +23,12 @@ private:
 
     //void result_callback(void* context);
     static void cancel_callback(void* context);
+    static void verify_callback(void* context);
     static void done_callback(void* context);
 
     StringElement* header_line;
     StringElement* status_line;
-    ButtonElement* cancel_button;
+    ButtonElement *cancel_btn, *run_verification_btn;
 
     bool write_completed;
     bool cancelled;

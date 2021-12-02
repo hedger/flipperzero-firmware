@@ -9,11 +9,9 @@
 FlashManager::FlashManager()
     : scene_controller{this}
     , text_store{128}
-    , notification{"notification"}
-    //, storage{"storage"}
-    //, dialogs{"dialogs"} 
-    {
-
+    , notification{"notification"} //, storage{"storage"}
+//, dialogs{"dialogs"}
+{
 }
 
 FlashManager::~FlashManager() {
@@ -34,7 +32,10 @@ int32_t FlashManager::run(const char* args) {
         text_store.set(args);
         //load_key_data(args, &worker.key);
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneChipID());
-        scene_controller.add_scene(SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
+        scene_controller.add_scene(
+            SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
+        scene_controller.add_scene(
+            SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
         scene_controller.process(TICK_LEN_MS, SceneType::Start);
     } else {
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());

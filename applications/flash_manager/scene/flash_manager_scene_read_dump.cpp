@@ -13,6 +13,7 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     read_completed = false;
     cancelled = false;
 
+    string_init(detail_text);
     string_init(status_text);
     read_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
 
@@ -23,15 +24,22 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     cancel_button->set_callback(this, &FlashManagerSceneReadDump::cancel_callback);
 
     auto line_1 = container->add<StringElement>();
-    auto line_2 = container->add<StringElement>();
+    detail_line = container->add<StringElement>();
     status_line = container->add<StringElement>();
 
-    line_1->set_text("Reading dump...", 64, 17, AlignCenter, AlignBottom, FontSecondary);
-    line_2->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
+    string_printf(status_text, "Please be patient.");
+
+    const char* operationHintText = app->runVerification ? "Verifying..." : "Reading dump...";
+    line_1->set_text(operationHintText, 64, 17, AlignCenter, AlignBottom, FontSecondary);
+    detail_line->set_text("", 64, 29, AlignCenter, AlignBottom, FontSecondary);
     status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
 
     // TODO: error check, empty check
-    app->file_tools.open_dump_file_write(app->text_store.text, ChipType::SPI);
+    if(app->runVerification) {
+        app->file_tools.open_dump_file_read(app->text_store.text, ChipType::SPI);
+    } else {
+        app->file_tools.open_dump_file_write(app->text_store.text, ChipType::SPI);
+    }
 
     app->view_controller.switch_to<ContainerVM>();
 }
@@ -98,8 +106,19 @@ void FlashManagerSceneReadDump::tick() {
 
     if(reader_task->completed()) {
         if(reader_task->success) {
-            // TODO: write 'read_buffer' to file
-            app->file_tools.write_buffer(reader_task->data, reader_task->size);
+            if (app->runVerification) {
+                std::unique_ptr<uint8_t[]> file_buffer;
+                app->file_tools.read_buffer(file_buffer.get(), reader_task->size);
+                if (!memcmp(file_buffer.get(), reader_task->data, reader_task->size)) {
+                    FURI_LOG_I(TAG, "verify: block @%x OK", reader_task->offset);
+                    string_printf(status_text, "Block %x+%x OK", reader_task->offset, reader_task->size);
+                } else {
+                    FURI_LOG_I(TAG, "verify: block @%x MISMATCHED");
+                    string_printf(status_text, "Block %x+%x FAILED!", reader_task->offset, reader_task->size);
+                }
+            } else {
+                app->file_tools.write_buffer(reader_task->data, reader_task->size);
+            }
             bytes_read += reader_task->size;
             if(bytes_read < flash->size) {
                 enqueue_next_block();
@@ -111,6 +130,7 @@ void FlashManagerSceneReadDump::tick() {
             (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / flash->size;
     }
 
+    detail_line->update_text(string_get_cstr(detail_text));
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
 }
@@ -129,6 +149,7 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
 }
 
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
+    app->runVerification = false;
     app->file_tools.close();
     if(cancelled) {
         FURI_LOG_I(TAG, "removing unfinished dump '%s'", app->text_store.text);
@@ -136,6 +157,7 @@ void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     }
 
     app->view_controller.get<ContainerVM>()->clean();
+    string_clear(detail_text);
     string_clear(status_text);
     app->text_store.set("");
     read_buffer.reset();

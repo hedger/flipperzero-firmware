@@ -18,9 +18,14 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
 
     ContainerVM* container = app->view_controller;
 
-    cancel_button = container->add<ButtonElement>();
-    cancel_button->set_type(ButtonElement::Type::Left, "Cancel");
-    cancel_button->set_callback(this, &FlashManagerSceneWriteDump::cancel_callback);
+    cancel_btn = container->add<ButtonElement>();
+    cancel_btn->set_type(ButtonElement::Type::Left, "Cancel");
+    cancel_btn->set_callback(this, &FlashManagerSceneWriteDump::cancel_callback);
+
+    run_verification_btn = container->add<ButtonElement>();
+    run_verification_btn->set_type(ButtonElement::Type::Center, "Verify");
+    run_verification_btn->set_callback(this, &FlashManagerSceneWriteDump::verify_callback);
+    run_verification_btn->set_enabled(false);
 
     header_line = container->add<StringElement>();
     auto line_2 = container->add<StringElement>();
@@ -53,11 +58,12 @@ bool FlashManagerSceneWriteDump::on_event(FlashManager* app, FlashManager::Event
         }
         break;
     //case FlashManager::EventType::Cancel:
-    //case FlashManager::EventType::Next:
-    //    //app->scene_controller.search_and_switch_to_previous_scene(
-    //    //    {FlashManager::SceneType::Exit});
-    //    app->scene_controller.switch_to_scene(FlashManager::SceneType::Exit);
-    //    break;
+    case FlashManager::EventType::Next:
+        //app->scene_controller.search_and_switch_to_previous_scene(
+        //    {FlashManager::SceneType::Exit});
+        app->runVerification = true;
+        app->scene_controller.switch_to_scene(FlashManager::SceneType::ReadImgProcessScene);
+        break;
     default:
         break;
     }
@@ -75,7 +81,8 @@ void FlashManagerSceneWriteDump::finish_write() {
         auto button = container->add<ButtonElement>();
         button->set_type(ButtonElement::Type::Right, "Exit");
         button->set_callback(this, &FlashManagerSceneWriteDump::done_callback);
-        cancel_button->set_enabled(false);
+        cancel_btn->set_enabled(false);
+        run_verification_btn->set_enabled(true);
     }
 }
 
@@ -146,6 +153,12 @@ void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
 
 void FlashManagerSceneWriteDump::done_callback(void* context) {
     FlashManager::Event event{.type = FlashManager::EventType::Back};
+    reinterpret_cast<FlashManagerSceneWriteDump*>(context)->app->view_controller.send_event(
+        &event);
+}
+
+void FlashManagerSceneWriteDump::verify_callback(void* context) {
+    FlashManager::Event event{.type = FlashManager::EventType::Next};
     reinterpret_cast<FlashManagerSceneWriteDump*>(context)->app->view_controller.send_event(
         &event);
 }

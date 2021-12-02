@@ -28,6 +28,7 @@ class FlashManagerWorker;
 
 class FlashManager {
     static const int TICK_LEN_MS = 100;
+
 public:
     enum class EventType : uint8_t {
         GENERIC_EVENT_ENUM_VALUES,
@@ -64,16 +65,16 @@ public:
     //RecordController<Storage> storage;
     //RecordController<DialogsApp> dialogs;
 
-    ~FlashManager();
-    FlashManager();
-
     std::unique_ptr<FlashManagerWorker> worker;
+
+    static const uint8_t MAX_FILE_NAME_LEN = 100;
+    char file_name[MAX_FILE_NAME_LEN];
+    bool runVerification = false;
+
+    FlashManagerFileTools file_tools;
 
     int32_t run(const char* args);
 
-
-    static const uint8_t file_name_size = 100;
-    char file_name[file_name_size];
-
-    FlashManagerFileTools file_tools;
+    FlashManager();
+    ~FlashManager();
 };
