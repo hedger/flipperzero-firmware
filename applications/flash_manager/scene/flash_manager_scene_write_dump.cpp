@@ -45,7 +45,7 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
 bool FlashManagerSceneWriteDump::on_event(FlashManager* app, FlashManager::Event* event) {
     bool consumed = false;
 
-    FURI_LOG_I(TAG, "FlashManagerSceneWriteDump on_event %d", event->type);
+    //FURI_LOG_I(TAG, "FlashManagerSceneWriteDump on_event %d", event->type);
 
     switch(event->type) {
     case FlashManager::EventType::Tick:

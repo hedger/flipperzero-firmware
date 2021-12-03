@@ -243,10 +243,14 @@ bool SpiToolkit::detect_flash() {
     for(;;) {
         uint8_t id[3];
         if(spi_wrapper_write_read(SpiChipCommand_JEDEC_ID, NULL, 0, id, 3)) {
+            FURI_LOG_I(TAG, "RAW CHIP ID: %x %x %x", id[0], id[1], id[2]);
+
             last_info.vendor_id = id[0];
             last_info.type_id = id[1];
             last_info.capacity_id = id[2];
             if(read_sfdp(&last_info)) {
+                FURI_LOG_I(TAG, "SFDP OK!");
+
                 last_info.valid = true;
             } else {
                 const ChipInfo_t* chip = spi_chip_get_details(id[0], id[1], id[2]);
@@ -262,10 +266,10 @@ bool SpiToolkit::detect_flash() {
             break;
         }
     }
-    if(!last_info.valid) {
-        // Chip access error or unknown type
-        spi_wrapper_deinit();
-    }
+    //if(!last_info.valid) {
+    //    // Chip access error or unknown type
+    //    //spi_wrapper_deinit();
+    //}
     return last_info.valid;
 }
 
@@ -301,7 +305,6 @@ bool SpiToolkit::write_block(
     const size_t offset,
     const uint8_t* const p_data,
     const size_t data_len) {
-
     SpiLock lock;
 
     furi_assert(p_data);

@@ -13,20 +13,20 @@
 static FuriHalSpiBusHandle* const p_spi_bus = &furi_hal_spi_bus_handle_external;
 
 bool spi_wrapper_init() {
-    furi_hal_spi_bus_handle_init(&furi_hal_spi_bus_handle_external);
+    furi_hal_spi_bus_handle_init(p_spi_bus);
     return true;
 }
 
 void spi_wrapper_deinit() {
-    furi_hal_spi_bus_handle_deinit(&furi_hal_spi_bus_handle_external);
+    furi_hal_spi_bus_handle_deinit(p_spi_bus);
 }
 
 void spi_wrapper_acquire_bus() {
-    furi_hal_spi_acquire(&furi_hal_spi_bus_handle_external);
+    furi_hal_spi_acquire(p_spi_bus);
 }
 
 void spi_wrapper_release_bus() {
-    furi_hal_spi_release(&furi_hal_spi_bus_handle_external);
+    furi_hal_spi_release(p_spi_bus);
 }
 
 bool spi_wrapper_write_read(
@@ -35,18 +35,16 @@ bool spi_wrapper_write_read(
     int write_len,
     uint8_t* read_data,
     int read_len) {
-    uint8_t localOpCode[10] = {opCode};
-    if(!furi_hal_spi_bus_tx(&furi_hal_spi_bus_handle_external, &localOpCode, 1, SPI_TIMEOUT)) {
+    uint8_t localOpCode = opCode;
+    if(!furi_hal_spi_bus_tx(p_spi_bus, &localOpCode, 1, SPI_TIMEOUT)) {
         return false;
     }
 
     if(write_data && write_len &&
-       !furi_hal_spi_bus_tx(
-           &furi_hal_spi_bus_handle_external, write_data, write_len, SPI_TIMEOUT)) {
+       !furi_hal_spi_bus_tx(p_spi_bus, write_data, write_len, SPI_TIMEOUT)) {
         return false;
     }
-    return furi_hal_spi_bus_rx(
-        &furi_hal_spi_bus_handle_external, read_data, read_len, SPI_TIMEOUT);
+    return furi_hal_spi_bus_rx(p_spi_bus, read_data, read_len, SPI_TIMEOUT);
 }
 
 #endif // FLASMMGR_SPI_BITBANG

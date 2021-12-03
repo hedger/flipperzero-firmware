@@ -31,6 +31,7 @@ typedef enum {
     SpiChipVendor_GIGADEVICE = 0xC8,
     SpiChipVendor_ISSI = 0xD5,
     SpiChipVendor_WINBOND = 0xEF,
+    SpiChipVendor_BOYA = 0x68,
 } SpiChipVendor;
 
 typedef struct {
