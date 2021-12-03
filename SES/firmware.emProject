@@ -184,10 +184,7 @@
         Name="app-scened-template"
         path="../../lib/app-scened-template"
         recurse="Yes" />
-      <folder
-        Name="drivers"
-        path="../../lib/drivers"
-        recurse="Yes" />
+      <folder Name="drivers" path="../../lib/drivers" recurse="Yes" />
       <folder
         Name="fatfs"
         exclude="cc*"
@@ -197,23 +194,14 @@
         Name="flipper_file"
         path="../../lib/flipper_file"
         recurse="Yes" />
-      <folder
-        Name="heatshrink"
-        path="../../lib/heatshrink"
-        recurse="Yes" />
-      <folder
-        Name="irda"
-        path="../../lib/irda"
-        recurse="Yes" />
+      <folder Name="heatshrink" path="../../lib/heatshrink" recurse="Yes" />
+      <folder Name="irda" path="../../lib/irda" recurse="Yes" />
       <folder
         Name="libusb_stm32"
         filter="*usbd_stm32wb55*;*core*"
         path="../../lib/libusb_stm32"
         recurse="Yes" />
-      <folder
-        Name="littlefs"
-        path="../../lib/littlefs"
-        recurse="Yes" />
+      <folder Name="littlefs" path="../../lib/littlefs" recurse="Yes" />
       <folder
         Name="nanopb"
         filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
@@ -223,18 +211,9 @@
         Name="nfc_protocols"
         path="../../lib/nfc_protocols"
         recurse="Yes" />
-      <folder
-        Name="onewire"
-        path="../../lib/onewire"
-        recurse="Yes" />
-      <folder
-        Name="subghz"
-        path="../../lib/subghz"
-        recurse="Yes" />
-      <folder
-        Name="toolbox"
-        path="../../lib/toolbox"
-        recurse="Yes" />
+      <folder Name="onewire" path="../../lib/onewire" recurse="Yes" />
+      <folder Name="subghz" path="../../lib/subghz" recurse="Yes" />
+      <folder Name="toolbox" path="../../lib/toolbox" recurse="Yes" />
       <folder
         Name="ST25RFAL002"
         filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s;*.ld"
@@ -305,10 +284,7 @@
           </folder>
         </folder>
       </folder>
-      <folder
-        Name="u8g2"
-        path="../../lib/u8g2"
-        recurse="Yes" />
+      <folder Name="u8g2" path="../../lib/u8g2" recurse="Yes" />
     </folder>
     <configuration Name="dbg" />
   </project>
@@ -357,16 +333,10 @@
       macros="GCCVersion=10.3"
       project_type="Externally Built Executable" />
     <file file_name="../../bootloader/src/main.c" />
-    <folder
-      Name="f6"
-      path="../../bootloader/targets/f6"
-      recurse="Yes">
+    <folder Name="f6" path="../../bootloader/targets/f6" recurse="Yes">
       <configuration Name="FlipperF7" build_exclude_from_build="Yes" />
     </folder>
-    <folder
-      Name="f7"
-      path="../../bootloader/targets/f7"
-      recurse="Yes">
+    <folder Name="f7" path="../../bootloader/targets/f7" recurse="Yes">
       <configuration Name="FlipperF6" build_exclude_from_build="Yes" />
     </folder>
     <folder Name="STM32CubeWB">
@@ -434,10 +404,7 @@
         </folder>
       </folder>
     </folder>
-    <folder
-      Name="u8g2"
-      path="../../lib/u8g2"
-      recurse="Yes" />
+    <folder Name="u8g2" path="../../lib/u8g2" recurse="Yes" />
     <folder Name="Drivers">
       <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_gpio.c" />
       <file file_name="../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_i2c.c" />

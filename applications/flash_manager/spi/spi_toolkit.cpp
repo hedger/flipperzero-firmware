@@ -7,7 +7,19 @@
 
 #define TAG "SPIAPI"
 
+class SpiLock {
+public:
+    SpiLock() {
+        spi_wrapper_acquire_bus();
+    }
+
+    ~SpiLock() {
+        spi_wrapper_release_bus();
+    }
+};
+
 SpiToolkit::SpiToolkit() {
+    spi_wrapper_init();
 }
 
 SpiToolkit::~SpiToolkit() {
@@ -34,7 +46,12 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
     /* read SFDP header */
     const uint8_t cmd1[] = {0, 0, 0, 0xFF};
 
-    if (!write_read(SpiChipCommand_READ_SFDP_REGISTER, (uint8_t *)&cmd1[0], sizeof(cmd1), header, sizeof(header)))
+    if(!spi_wrapper_write_read(
+           SpiChipCommand_READ_SFDP_REGISTER,
+           (uint8_t*)&cmd1[0],
+           sizeof(cmd1),
+           header,
+           sizeof(header)))
         return false;
 
     /* check SFDP header */
@@ -49,42 +66,42 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
         return false;
     }
 
-    const uint8_t cmd2[] = {
-            0,
-            0,
-            0x08,
-            0xFF
-    };
-    if (!write_read(SpiChipCommand_READ_SFDP_REGISTER,  (uint8_t *)&cmd2[0], sizeof(cmd2), header, sizeof(header)))
+    const uint8_t cmd2[] = {0, 0, 0x08, 0xFF};
+    if(!spi_wrapper_write_read(
+           SpiChipCommand_READ_SFDP_REGISTER,
+           (uint8_t*)&cmd2[0],
+           sizeof(cmd2),
+           header,
+           sizeof(header)))
         return false;
 
     // uint8_t id = header[0];
     info->minor_rev = header[1];
     info->major_rev = header[2];
     uint8_t len = header[3];
-    uint32_t table_addr     = (long)header[4] | (long)header[5] << 8 | (long)header[6] << 16;
+    uint32_t table_addr = (long)header[4] | (long)header[5] << 8 | (long)header[6] << 16;
     /* check JEDEC basic flash parameter header */
-    if (info->major_rev > SUPPORT_MAX_SFDP_MAJOR_REV)
-            // "Error: This reversion JEDEC basic flash parameter header is not supported.",
+    if(info->major_rev > SUPPORT_MAX_SFDP_MAJOR_REV)
+        // "Error: This reversion JEDEC basic flash parameter header is not supported.",
         return false;
 
-    if (len < BASIC_TABLE_LEN)
+    if(len < BASIC_TABLE_LEN)
         // "Error: The JEDEC basic flash parameter table length error.",
         return false;
 
     /* parameter table */
-    uint8_t table[BASIC_TABLE_LEN * 4] = { 0 }, i, j;
+    uint8_t table[BASIC_TABLE_LEN * 4] = {0}, i, j;
     uint8_t cmd3[] = {
         (uint8_t)((table_addr >> 16) & 0xFF),
         (uint8_t)((table_addr >> 8) & 0xFF),
         (uint8_t)((table_addr >> 0) & 0xFF),
-        0xFF
-    };
-    if (!write_read(SpiChipCommand_READ_SFDP_REGISTER, &cmd3[0], sizeof(cmd3), table, sizeof(table)))
+        0xFF};
+    if(!spi_wrapper_write_read(
+           SpiChipCommand_READ_SFDP_REGISTER, &cmd3[0], sizeof(cmd3), table, sizeof(table)))
         return false;
 
     info->erase_4k_cmd = table[1];
-    switch (table[0] & 0x03) {
+    switch(table[0] & 0x03) {
     case 1:
         // 4 KB Erase is supported throughout the device.
         info->erase_4k = true;
@@ -98,7 +115,7 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
         return false;
     }
 
-    switch ((table[0] & (0x01 << 2)) >> 2) {
+    switch((table[0] & (0x01 << 2)) >> 2) {
     case 0:
         // Write granularity is 1 byte.
         info->write_gran = 1;
@@ -110,7 +127,7 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
     }
 
     /* volatile status register block protect bits */
-    switch ((table[0] & (0x01 << 3)) >> 3) {
+    switch((table[0] & (0x01 << 3)) >> 3) {
     case 0:
         /* Block Protect bits in device's status register are solely non-volatile or may be
          * programmed either as volatile using the 50h instruction for write enable or non-volatile
@@ -140,7 +157,7 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
     }
 
     /* get address bytes, number of bytes used in addressing flash array read, write and erase. */
-    switch ((table[2] & (0x03 << 1)) >> 1) {
+    switch((table[2] & (0x03 << 1)) >> 1) {
     case 0:
         // 3-Byte only addressing.
         info->addr_3_byte = true;
@@ -163,8 +180,9 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
         return false;
     }
     /* get flash memory capacity */
-    uint32_t table2_temp = ((long)table[7] << 24) | ((long)table[6] << 16) | ((long)table[5] << 8) | (long)table[4];
-    switch ((table[7] & (0x01 << 7)) >> 7) {
+    uint32_t table2_temp = ((long)table[7] << 24) | ((long)table[6] << 16) |
+                           ((long)table[5] << 8) | (long)table[4];
+    switch((table[7] & (0x01 << 7)) >> 7) {
     case 0:
         info->size = 1 + (table2_temp >> 3);
         break;
@@ -180,7 +198,7 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
     }
 
     /* get erase size and erase command  */
-    for (i = 0, j = 0; i < SFDP_ERASE_TYPE_MAX_NUM; i++) {
+    for(i = 0, j = 0; i < SFDP_ERASE_TYPE_MAX_NUM; i++) {
         if(table[28 + 2 * i] != 0x00) {
             info->eraser[j].size = 1L << table[28 + 2 * i];
             info->eraser[j].cmd = table[28 + 2 * i + 1];
@@ -188,11 +206,10 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
         }
     }
     /* sort the eraser size from small to large */
-    for (i = 0, j = 0; i < SFDP_ERASE_TYPE_MAX_NUM; i++) {
+    for(i = 0, j = 0; i < SFDP_ERASE_TYPE_MAX_NUM; i++) {
         if(info->eraser[i].size) {
             for(j = i + 1; j < SFDP_ERASE_TYPE_MAX_NUM; j++) {
-                if(info->eraser[j].size != 0 &&
-                   info->eraser[i].size > info->eraser[j].size) {
+                if(info->eraser[j].size != 0 && info->eraser[i].size > info->eraser[j].size) {
                     /* swap the small eraser */
                     uint32_t temp_size = info->eraser[i].size;
                     uint8_t temp_cmd = info->eraser[i].cmd;
@@ -208,6 +225,7 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
 }
 
 bool SpiToolkit::detect_flash() {
+    SpiLock lock;
 #ifdef FLASHMGR_MOCK
     osDelay(2500);
     last_info.vendor_id = SpiChipVendor_WINBOND;
@@ -224,7 +242,7 @@ bool SpiToolkit::detect_flash() {
 
     for(;;) {
         uint8_t id[3];
-        if(write_read(SpiChipCommand_JEDEC_ID, NULL, 0, id, 3)) {
+        if(spi_wrapper_write_read(SpiChipCommand_JEDEC_ID, NULL, 0, id, 3)) {
             last_info.vendor_id = id[0];
             last_info.type_id = id[1];
             last_info.capacity_id = id[2];
@@ -252,6 +270,8 @@ bool SpiToolkit::detect_flash() {
 }
 
 bool SpiToolkit::chip_erase() {
+    SpiLock lock;
+
     FURI_LOG_I(TAG, "Erasing chip");
 
 #ifdef FLASHMGR_MOCK
@@ -264,6 +284,8 @@ bool SpiToolkit::chip_erase() {
 }
 
 bool SpiToolkit::sector_erase(uint16_t n_sector) {
+    SpiLock lock;
+
     FURI_LOG_I(TAG, "Erasing sector %d", n_sector);
 
 #ifdef FLASHMGR_MOCK
@@ -279,6 +301,9 @@ bool SpiToolkit::write_block(
     const size_t offset,
     const uint8_t* const p_data,
     const size_t data_len) {
+
+    SpiLock lock;
+
     furi_assert(p_data);
     furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
 
@@ -294,6 +319,8 @@ bool SpiToolkit::write_block(
 }
 
 bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const size_t data_len) {
+    SpiLock lock;
+
     furi_assert(p_data);
     furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
 

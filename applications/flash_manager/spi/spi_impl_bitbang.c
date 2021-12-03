@@ -7,6 +7,14 @@
 
 #include <furi-hal-gpio.h>
 
+void spi_wrapper_acquire_bus() {
+
+}
+
+void spi_wrapper_release_bus() {
+
+}
+
 
 static GpioPin SPI_MOSI = {GPIOA, GPIO_PIN_7};
 static GpioPin SPI_MISO = {GPIOA, GPIO_PIN_6};
@@ -101,7 +109,7 @@ static bool readByte(uint8_t* dst) {
     return result;
 }
 
-bool write_read(
+bool spi_wrapper_write_read(
     uint8_t opCode,
     uint8_t* write_data,
     int write_len,
