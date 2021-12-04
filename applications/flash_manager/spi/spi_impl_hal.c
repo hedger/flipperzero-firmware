@@ -15,6 +15,8 @@
 #pragma region SPI CONFIG
 //static FuriHalSpiBusHandle* const p_spi_bus = &furi_hal_spi_bus_handle_external;
 
+//!!! #define USE_SPI_LOG
+
 static const LL_SPI_InitTypeDef flash_manager_spi_preset_external_safe = {
     .Mode = LL_SPI_MODE_MASTER,
     .TransferDirection = LL_SPI_FULL_DUPLEX,
@@ -22,31 +24,53 @@ static const LL_SPI_InitTypeDef flash_manager_spi_preset_external_safe = {
     .ClockPolarity = LL_SPI_POLARITY_LOW,
     .ClockPhase = LL_SPI_PHASE_1EDGE,
     .NSS = LL_SPI_NSS_SOFT,
-    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV256,
+#ifdef USE_SPI_LOG
+    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV16, // DIV256,
+#else
+    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV16,
+#endif
     .BitOrder = LL_SPI_MSB_FIRST,
     .CRCCalculation = LL_SPI_CRCCALCULATION_DISABLE,
     .CRCPoly = 7,
 };
 
 // TODO: remove when better HAL api arrives, pure c+p of furi_hal_spi_bus_r_handle_event_callback
-inline static void flash_manager_spi_handle_event_callback(FuriHalSpiBusHandle* handle, FuriHalSpiBusHandleEvent event, const LL_SPI_InitTypeDef* preset) {
-    if (event == FuriHalSpiBusHandleEventInit) {
+inline static void flash_manager_spi_handle_event_callback(
+    FuriHalSpiBusHandle* handle,
+    FuriHalSpiBusHandleEvent event,
+    const LL_SPI_InitTypeDef* preset) {
+    if(event == FuriHalSpiBusHandleEventInit) {
         hal_gpio_write(handle->cs, true);
         hal_gpio_init(handle->cs, GpioModeOutputPushPull, GpioPullNo, GpioSpeedVeryHigh);
-    } else if (event == FuriHalSpiBusHandleEventDeinit) {
+    } else if(event == FuriHalSpiBusHandleEventDeinit) {
         hal_gpio_write(handle->cs, true);
         hal_gpio_init(handle->cs, GpioModeAnalog, GpioPullNo, GpioSpeedLow);
-    } else if (event == FuriHalSpiBusHandleEventActivate) {
+    } else if(event == FuriHalSpiBusHandleEventActivate) {
         LL_SPI_Init(handle->bus->spi, (LL_SPI_InitTypeDef*)preset);
         LL_SPI_SetRxFIFOThreshold(handle->bus->spi, LL_SPI_RX_FIFO_TH_QUARTER);
         LL_SPI_Enable(handle->bus->spi);
 
-        hal_gpio_init_ex(handle->miso, GpioModeAltFunctionPushPull, GpioPullNo, GpioSpeedVeryHigh, GpioAltFn5SPI1);
-        hal_gpio_init_ex(handle->mosi, GpioModeAltFunctionPushPull, GpioPullNo, GpioSpeedVeryHigh, GpioAltFn5SPI1);
-        hal_gpio_init_ex(handle->sck, GpioModeAltFunctionPushPull, GpioPullNo, GpioSpeedVeryHigh, GpioAltFn5SPI1);
+        hal_gpio_init_ex(
+            handle->miso,
+            GpioModeAltFunctionPushPull,
+            GpioPullNo,
+            GpioSpeedVeryHigh,
+            GpioAltFn5SPI1);
+        hal_gpio_init_ex(
+            handle->mosi,
+            GpioModeAltFunctionPushPull,
+            GpioPullNo,
+            GpioSpeedVeryHigh,
+            GpioAltFn5SPI1);
+        hal_gpio_init_ex(
+            handle->sck,
+            GpioModeAltFunctionPushPull,
+            GpioPullNo,
+            GpioSpeedVeryHigh,
+            GpioAltFn5SPI1);
 
         hal_gpio_write(handle->cs, false);
-    } else if (event == FuriHalSpiBusHandleEventDeactivate) {
+    } else if(event == FuriHalSpiBusHandleEventDeactivate) {
         hal_gpio_write(handle->cs, true);
 
         hal_gpio_init(handle->miso, GpioModeAnalog, GpioPullNo, GpioSpeedLow);
@@ -57,17 +81,20 @@ inline static void flash_manager_spi_handle_event_callback(FuriHalSpiBusHandle* 
     }
 }
 
-static void flash_manager_spi_handle_bus_event_callback(FuriHalSpiBusHandle* handle, FuriHalSpiBusHandleEvent event) {
-    flash_manager_spi_handle_event_callback(handle, event, &flash_manager_spi_preset_external_safe);
+static void flash_manager_spi_handle_bus_event_callback(
+    FuriHalSpiBusHandle* handle,
+    FuriHalSpiBusHandleEvent event) {
+    flash_manager_spi_handle_event_callback(
+        handle, event, &flash_manager_spi_preset_external_safe);
 }
 
 FuriHalSpiBusHandle furi_hal_spi_bus_handle_external_flash = {
-    .bus=&furi_hal_spi_bus_r,
-    .callback=flash_manager_spi_handle_bus_event_callback,
-    .miso=&gpio_ext_pa6,
-    .mosi=&gpio_ext_pa7,
-    .sck=&gpio_ext_pb3,
-    .cs=&gpio_ext_pa4,
+    .bus = &furi_hal_spi_bus_r,
+    .callback = flash_manager_spi_handle_bus_event_callback,
+    .miso = &gpio_ext_pa6,
+    .mosi = &gpio_ext_pa7,
+    .sck = &gpio_ext_pb3,
+    .cs = &gpio_ext_pa4,
 };
 
 static FuriHalSpiBusHandle* const p_spi_bus = &furi_hal_spi_bus_handle_external_flash;
@@ -91,7 +118,8 @@ void spi_wrapper_release_bus() {
     furi_hal_spi_release(p_spi_bus);
 }
 
-static void log_buffer_as_hex(uint8_t* inptr, const int size) {
+#ifdef USE_SPI_LOG
+void log_buffer_as_hex(uint8_t* inptr, const int size) {
     char *buf_str = (char*)malloc(3 * size), *buf_ptr = buf_str;
     if(buf_str) {
         for(int i = 0; i < size; i++) {
@@ -101,6 +129,7 @@ static void log_buffer_as_hex(uint8_t* inptr, const int size) {
         free(buf_str);
     }
 }
+#endif
 
 bool spi_wrapper_write_read(
     uint8_t opCode,
@@ -108,58 +137,42 @@ bool spi_wrapper_write_read(
     int write_len,
     uint8_t* read_data,
     int read_len) {
-    //hal_gpio_write(p_spi_bus->cs, true);
-    //bool result = true;
+    hal_gpio_write(p_spi_bus->cs, true);
+    bool result = false;
 
+#ifdef USE_SPI_LOG
     uint8_t* tx_buffer = malloc(1 + write_len);
     tx_buffer[0] = opCode;
-    if(write_len) {
+    if(write_len != 0) {
         memcpy(&tx_buffer[1], write_data, write_len);
     }
-
-    //hal_gpio_write(p_spi_bus->cs, false);
-
     FURI_LOG_I(TAG, "SPI TX");
     log_buffer_as_hex(tx_buffer, 1 + write_len);
-
-    if(!furi_hal_spi_bus_tx(p_spi_bus, tx_buffer, 1 + write_len, SPI_TIMEOUT)) {
-        free(tx_buffer);
-        return false;
-    }
     free(tx_buffer);
+#endif
 
-    if(read_data && read_len &&
-       !furi_hal_spi_bus_rx(p_spi_bus, read_data, read_len, SPI_TIMEOUT)) {
-        return false;
+    hal_gpio_write(p_spi_bus->cs, false);
+    for(;;) {
+        if(!furi_hal_spi_bus_tx(p_spi_bus, &opCode, 1, SPI_TIMEOUT)) break;
+        if(write_data != NULL && write_len != 0 &&
+           !furi_hal_spi_bus_tx(p_spi_bus, write_data, write_len, SPI_TIMEOUT))
+            break;
+
+        if(read_data != NULL && read_len != 0 &&
+           !furi_hal_spi_bus_rx(p_spi_bus, read_data, read_len, SPI_TIMEOUT))
+            break;
+#ifdef USE_SPI_LOG
+        if(read_data) {
+            FURI_LOG_I(TAG, "SPI RX");
+            log_buffer_as_hex(read_data, read_len);
+        }
+#endif
+        result = true;
+        break;
     }
-    FURI_LOG_I(TAG, "SPI RX");
-    log_buffer_as_hex(read_data, read_len);
+    hal_gpio_write(p_spi_bus->cs, true);
 
-    //hal_gpio_write(p_spi_bus->cs, true);
-
-    return true;
-
-    //for(;;) {
-    //    hal_gpio_write(p_spi_bus->cs, false);
-    //    if(!furi_hal_spi_bus_tx(p_spi_bus, &opCode, 1, SPI_TIMEOUT)) {
-    //        result = false;
-    //        break;
-    //    }
-
-    //    if(  && write_len &&
-    //       !furi_hal_spi_bus_tx(p_spi_bus, write_data, write_len, SPI_TIMEOUT)) {
-    //        result = false;
-    //        break;
-    //    }
-    //    if(read_data && read_len &&
-    //       !furi_hal_spi_bus_rx(p_spi_bus, read_data, read_len, SPI_TIMEOUT)) {
-    //        result = false;
-    //        break;
-    //    }
-    //    break;
-    //}
-    //hal_gpio_write(p_spi_bus->cs, true);
-    //return result;
+    return result;
 }
 
 #endif // FLASMMGR_SPI_BITBANG

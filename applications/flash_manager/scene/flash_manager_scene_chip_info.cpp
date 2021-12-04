@@ -20,7 +20,7 @@ void FlashManagerSceneChipInfo::on_enter(FlashManager* app, bool need_restore) {
         spi_vendor_get_name(flash_info->vendor_id),
         flash_info->name,
         flash_info->size / 1024);
-    string_printf(chip_extra, "VID %x: %x b", flash_info->vendor_id, flash_info->size);
+    string_printf(chip_extra, "VID %02X: %u KB", flash_info->vendor_id, flash_info->size / 1024);
 
     FURI_LOG_I(TAG, "id: '%s'", string_get_cstr(chip_id));
     FURI_LOG_I(TAG, "extra: '%s'", string_get_cstr(chip_extra));

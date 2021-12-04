@@ -45,29 +45,141 @@ static bool release_deep_sleep() {
     return false;
 }
 
-static bool wait_busy() {
+static bool wait_busy(uint32_t wait_in_10ticks) {
     uint8_t status;
-    int retries = 10;
-    bool result;
+    bool result = false;
 
-    while(retries != 0) {
+    while(wait_in_10ticks != 0) {
         result = read_status(&status);
         if(result && ((status & SpiStatusRegister_BUSY) == 0)) {
             break;
         }
         osDelay(10);
-        --retries;
+        --wait_in_10ticks;
     }
-    return (result && ((status & SpiStatusRegister_BUSY) == 0));
+    return (result && (status & SpiStatusRegister_BUSY) == 0);
+}
+
+static bool set_write_enabled(bool enabled) {
+    bool result;
+    uint8_t status, cmd = enabled ? SpiChipCommand_WRITE_ENABLE : SpiChipCommand_WRITE_DISABLE;
+    result = spi_wrapper_write_read(cmd, NULL, 0, NULL, 0);
+    if(result) {
+        result = read_status(&status);
+    }
+    if(result) {
+        if(enabled && (status & SpiStatusRegister_WEL) == 0) {
+            // Can't enable write status.
+            return false;
+        } else if(!enabled && (status & SpiStatusRegister_WEL) != 0) {
+            // Can't disable write status.
+            return false;
+        }
+    }
+    return result;
 }
 
 static int make_adress_byte_array(struct SpiFlashInfo_t* info, uint32_t addr, uint8_t* array) {
     int len, i;
-    len = info->addr_4_byte ? 4 : 3;
+    len = (!info->addr_3_byte && info->addr_4_byte) ? 4 : 3;
     for(i = 0; i < len; i++) {
         array[i] = (addr >> ((len - (i + 1)) * 8)) & 0xFF;
     }
     return len;
+}
+
+static bool page256_or_1_byte_write(
+    struct SpiFlashInfo_t* info,
+    uint32_t addr,
+    size_t size,
+    uint16_t write_gran,
+    uint8_t* data) {
+    furi_assert(write_gran == 1 || write_gran == 256);
+    bool result = false;
+    static uint8_t cmd_data[4 + SpiToolkit::SPI_MAX_BLOCK_SIZE];
+    size_t data_size;
+
+    while(size) {
+        /* set the flash write enable */
+        result = set_write_enabled(true);
+        if(!result) break;
+
+        int cmd_size = make_adress_byte_array(info, addr, cmd_data);
+        /* make write align and calculate next write address */
+        if(addr % write_gran != 0) {
+            if(size > write_gran - (addr % write_gran)) {
+                data_size = write_gran - (addr % write_gran);
+            } else {
+                data_size = size;
+            }
+        } else {
+            if(size > write_gran) {
+                data_size = write_gran;
+            } else {
+                data_size = size;
+            }
+        }
+        size -= data_size;
+        addr += data_size;
+        memcpy(&cmd_data[cmd_size], data, data_size);
+        data += data_size;
+
+        result = spi_wrapper_write_read(
+            SpiChipCommand_PAGE_PROGRAM, cmd_data, cmd_size + data_size, NULL, 0);
+        if(!result) break;
+        result = wait_busy(10);
+        if(!result) break;
+    }
+    set_write_enabled(false);
+    return result;
+}
+
+static bool aai_write(struct SpiFlashInfo_t* info, uint32_t addr, size_t size, uint8_t* data) {
+    bool result = false;
+
+    /* The address must be even for AAI write mode. So it must write one byte first when address is odd. */
+    if(addr % 2 != 0) {
+        result = page256_or_1_byte_write(info, addr++, 1, 1, data++);
+        if(!result) {
+            set_write_enabled(false);
+            return false;
+        }
+        size--;
+    }
+
+    result = set_write_enabled(true);
+    if(!result) {
+        set_write_enabled(false);
+        return false;
+    }
+
+    uint8_t cmd_data[8], cmd_size;
+    cmd_size = make_adress_byte_array(info, addr, cmd_data);
+    while(size >= 2) {
+        cmd_data[cmd_size] = *data;
+        cmd_data[cmd_size + 1] = *(data + 1);
+
+        result = spi_wrapper_write_read(
+            SpiChipCommand_AAI_WORD_PROGRAM, cmd_data, cmd_size + 2, NULL, 0);
+        if(!result) break;
+        result = wait_busy(20);
+        if(!result) break;
+        cmd_size = 0;
+        size -= 2;
+        addr += 2;
+        data += 2;
+    }
+    /* set the flash write disable for exit AAI mode */
+    result = set_write_enabled(false);
+    /* write last one byte data when origin write size is odd */
+    if(result && size == 1) {
+        result = page256_or_1_byte_write(info, addr, 1, 1, data);
+    }
+
+    if(!result) {
+        set_write_enabled(false);
+    }
+    return result;
 }
 
 #define SUPPORT_MAX_SFDP_MAJOR_REV 1
@@ -281,11 +393,12 @@ bool SpiToolkit::detect_flash() {
     for(;;) {
         uint8_t id[3];
         if(spi_wrapper_write_read(SpiChipCommand_JEDEC_ID, NULL, 0, id, 3)) {
-            FURI_LOG_I(TAG, "RAW CHIP ID: %x %x %x", id[0], id[1], id[2]);
+            FURI_LOG_I(TAG, "RAW CHIP ID: %02X %02X %02X", id[0], id[1], id[2]);
 
             last_info.vendor_id = id[0];
             last_info.type_id = id[1];
             last_info.capacity_id = id[2];
+            last_info.write_mode = CHIP_WM_PAGE_256B;
 
             const ChipInfo_t* chip = spi_chip_get_details(id[0], id[1], id[2]);
             if(chip != nullptr) {
@@ -322,39 +435,65 @@ bool SpiToolkit::detect_flash() {
 }
 
 bool SpiToolkit::chip_erase() {
-    SpiLock lock;
-
     FURI_LOG_I(TAG, "Erasing chip");
 
 #ifdef FLASHMGR_MOCK
     osDelay(4000);
     // TODO: chip_erase
     return true;
-#else // FLASHMGR_MOCK
-    return false;
 #endif // FLASHMGR_MOCK
+
+    bool result = true;
+
+    if(last_info.valid) {
+        SpiLock lock;
+        if(release_deep_sleep() && wait_busy(10)) {
+            if(set_write_enabled(true)) {
+                if(last_info.write_mode & CHIP_WM_DUAL_BUFFER) {
+                    uint8_t cmd[3] = {0x94, 0x80, 0x9A};
+                    result = spi_wrapper_write_read(SpiChipCommand_ERASE_CHIP, cmd, 3, NULL, 0);
+                } else {
+                    result = spi_wrapper_write_read(SpiChipCommand_ERASE_CHIP, NULL, 0, NULL, 0);
+                }
+                if(result) {
+                    result = wait_busy(last_info.size / (3 * 1024));
+                    set_write_enabled(false);
+                    if(!result) {
+                        FURI_LOG_I(TAG, "Chip Erase timeout error");
+                    }
+                    return result;
+                }
+                FURI_LOG_I(TAG, "Can't start Chip Erase");
+            } else {
+                FURI_LOG_I(TAG, "Can't change Write Enable");
+            }
+        } else {
+            FURI_LOG_I(TAG, "Chip status: BUSY");
+        }
+        set_write_enabled(false);
+    } else {
+        FURI_LOG_I(TAG, "Chip info not valid");
+    }
+    return false;
 }
 
 bool SpiToolkit::sector_erase(uint16_t n_sector) {
     SpiLock lock;
 
     FURI_LOG_I(TAG, "Erasing sector %d", n_sector);
-
 #ifdef FLASHMGR_MOCK
     osDelay(1000);
     // TODO: sector_erase
     return true;
-#else // FLASHMGR_MOCK
-    return false;
 #endif // FLASHMGR_MOCK
+
+    return false;
 }
 
 bool SpiToolkit::write_block(
     const size_t offset,
     const uint8_t* const p_data,
     const size_t data_len) {
-    SpiLock lock;
-
     furi_assert(p_data);
     furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
 
@@ -362,11 +501,29 @@ bool SpiToolkit::write_block(
 
 #ifdef FLASHMGR_MOCK
     osDelay(100);
-    // TODO: write_block
     return true;
-#else // FLASHMGR_MOCK
-    return false;
 #endif // FLASHMGR_MOCK
+
+    bool result = false;
+
+    if(last_info.valid) {
+        if((offset + data_len) <= last_info.size) {
+            SpiLock lock;
+            if(last_info.write_mode & CHIP_WM_PAGE_256B) {
+                result =
+                    page256_or_1_byte_write(&last_info, offset, data_len, 256, (uint8_t*)p_data);
+            } else if(last_info.write_mode & CHIP_WM_AAI) {
+                result = aai_write(&last_info, offset, data_len, (uint8_t*)p_data);
+            } else if(last_info.write_mode & CHIP_WM_DUAL_BUFFER) {
+                FURI_LOG_I(TAG, "Dual-buffer mode not implemented");
+            }
+        } else {
+            FURI_LOG_I(TAG, "Flash address is out of bound.");
+        }
+    } else {
+        FURI_LOG_I(TAG, "Chip info not valid");
+    }
+    return result;
 }
 
 bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const size_t data_len) {
@@ -383,7 +540,7 @@ bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const si
     if(last_info.valid) {
         if((offset + data_len) <= last_info.size) {
             SpiLock lock;
-            if(release_deep_sleep() && wait_busy()) {
+            if(release_deep_sleep() && wait_busy(10)) {
                 FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
                 uint8_t cmd[4];
                 if(spi_wrapper_write_read(
