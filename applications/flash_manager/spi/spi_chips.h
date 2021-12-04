@@ -7,11 +7,20 @@ extern "C" {
 #endif
 
 typedef enum {
+    SpiChipCommand_READ_DATA = 0x03,
+    SpiChipCommand_READ_STATUS = 0x05,
     SpiChipCommand_WRITE_ENABLE = 0x06,
     SpiChipCommand_VOLATILE_SR_WRITE_ENABLE = 0x50,
     SpiChipCommand_READ_SFDP_REGISTER = 0x5A,
-    SpiChipCommand_JEDEC_ID = 0x9f,
+    SpiChipCommand_JEDEC_ID = 0x9F,
+    SpiChipCommand_RELEASE_DEEP = 0xAB,
 } SpiChipCommand;
+
+enum {
+    SpiStatusRegister_BUSY = (1 << 0), /**< busing */
+    SpiStatusRegister_WEL = (1 << 1), /**< write enable latch */
+    SpiStatusRegister_SRP = (1 << 7), /**< status register protect */
+};
 
 typedef enum {
     SpiChipVendor_CYPRESS = 0x01,

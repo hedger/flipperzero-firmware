@@ -133,7 +133,7 @@ void FlashManagerSceneChipID::process_found_chip() {
         flash_info.name,
         flash_info.size / 1024);
     FURI_LOG_I(TAG, "id: '%s'", string_get_cstr(chip_id));
-    string_printf(chip_extra, "VID %x: %x b", flash_info.vendor_id, flash_info.size);
+    string_printf(chip_extra, "VID %x: %xKB", flash_info.vendor_id, flash_info.size / 1024);
     FURI_LOG_I(TAG, "extra: '%s'", string_get_cstr(chip_extra));
 
     detail_line->update_text(string_get_cstr(chip_id));

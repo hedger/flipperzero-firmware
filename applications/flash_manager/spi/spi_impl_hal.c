@@ -35,16 +35,31 @@ bool spi_wrapper_write_read(
     int write_len,
     uint8_t* read_data,
     int read_len) {
-    uint8_t localOpCode = opCode;
-    if(!furi_hal_spi_bus_tx(p_spi_bus, &localOpCode, 1, SPI_TIMEOUT)) {
-        return false;
-    }
 
-    if(write_data && write_len &&
-       !furi_hal_spi_bus_tx(p_spi_bus, write_data, write_len, SPI_TIMEOUT)) {
-        return false;
+    hal_gpio_write(p_spi_bus->cs, true);
+    bool result = true;
+
+    for(;;) {
+        hal_gpio_write(p_spi_bus->cs, false);
+        if(!furi_hal_spi_bus_tx(p_spi_bus, &opCode, 1, SPI_TIMEOUT)) {
+            result = false;
+            break;
+        }
+
+        if(write_data && write_len &&
+           !furi_hal_spi_bus_tx(p_spi_bus, write_data, write_len, SPI_TIMEOUT)) {
+            result = false;
+            break;
+        }
+        if(read_data && read_len &&
+           !furi_hal_spi_bus_rx(p_spi_bus, read_data, read_len, SPI_TIMEOUT)) {
+            result = false;
+            break;
+        }
+        break;
     }
-    return furi_hal_spi_bus_rx(p_spi_bus, read_data, read_len, SPI_TIMEOUT);
+    hal_gpio_write(p_spi_bus->cs, true);
+    return result;
 }
 
 #endif // FLASMMGR_SPI_BITBANG
