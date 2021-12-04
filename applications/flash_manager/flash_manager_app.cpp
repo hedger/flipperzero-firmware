@@ -31,6 +31,7 @@ int32_t FlashManager::run(const char* args) {
     if(strlen(args)) {
         FURI_LOG_I(TAG, "started app to write '%s'", args);
         text_store.set(args);
+        run_in_app_mode = true;
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneChipID());
         scene_controller.add_scene(SceneType::ChipInfoScene, new FlashManagerSceneChipInfo());
         scene_controller.add_scene(SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());

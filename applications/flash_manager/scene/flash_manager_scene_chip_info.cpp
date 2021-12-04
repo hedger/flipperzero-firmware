@@ -38,7 +38,7 @@ void FlashManagerSceneChipInfo::on_enter(FlashManager* app, bool need_restore) {
     const char* next_op = "Next";
     ButtonElementCallback next_cb = FlashManagerSceneChipInfo::next_callback;
 
-    if(strlen(app->text_store.text)) {
+    if(app->run_in_app_mode) {
         next_op = "Write";
         next_cb = &FlashManagerSceneChipInfo::write_callback;
     }
@@ -68,11 +68,23 @@ bool FlashManagerSceneChipInfo::on_event(FlashManager* app, FlashManager::Event*
 
     switch(event->type) {
     case FlashManager::EventType::Back:
-        app->scene_controller.search_and_switch_to_previous_scene({FlashManager::SceneType::Start});
-        consumed = true;
+        // TODO: fix me
+        if(app->run_in_app_mode) {
+            app->scene_controller.switch_to_previous_scene();
+            //consumed = true;
+        } else {
+            app->scene_controller.search_and_switch_to_previous_scene(
+                {FlashManager::SceneType::Start});
+            consumed = true;
+        }
         break;
     case FlashManager::EventType::Retry:
-        app->scene_controller.switch_to_previous_scene();
+        // TODO: fix me
+        if(app->run_in_app_mode) {
+            app->scene_controller.switch_to_scene(FlashManager::SceneType::Start);
+        } else {
+            app->scene_controller.switch_to_scene(FlashManager::SceneType::ChipIDScene);
+        }
         break;
     case FlashManager::EventType::OpReadChip:
         app->scene_controller.switch_to_next_scene(

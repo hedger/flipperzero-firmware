@@ -361,7 +361,7 @@ bool SpiToolkit::write_block(
     FURI_LOG_I(TAG, "Writing %d bytes @ %x", data_len, offset);
 
 #ifdef FLASHMGR_MOCK
-    osDelay(100);
+    osDelay(10);
     // TODO: write_block
     return true;
 #else // FLASHMGR_MOCK

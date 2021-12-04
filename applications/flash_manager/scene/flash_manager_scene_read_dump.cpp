@@ -63,8 +63,12 @@ bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event*
 
     case FlashManager::EventType::Cancel:
     case FlashManager::EventType::Next:
-        app->scene_controller.search_and_switch_to_previous_scene(
-            {FlashManager::SceneType::Start});
+        if(!app->run_in_app_mode) {
+            app->scene_controller.search_and_switch_to_previous_scene(
+                {FlashManager::SceneType::Start});
+        } else {
+            app->scene_controller.switch_to_previous_scene();
+        }
         break;
     default:
         break;

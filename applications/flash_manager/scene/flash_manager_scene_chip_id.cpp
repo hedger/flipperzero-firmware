@@ -58,7 +58,7 @@ void FlashManagerSceneChipID::tick() {
             flash_info->vendor_id);
 
         if(chip_id_task->success && flash_info->valid) {
-            app->scene_controller.switch_to_next_scene(FlashManager::SceneType::ChipInfoScene);
+            app->scene_controller.switch_to_scene(FlashManager::SceneType::ChipInfoScene);
         } else {
             status_line->update_text("NOTHING FOUND");
             scan_btn->set_enabled(true);
@@ -97,7 +97,7 @@ bool FlashManagerSceneChipID::on_event(FlashManager* app, FlashManager::Event* e
 
 void FlashManagerSceneChipID::on_exit(FlashManager* app) {
     app->view_controller.get<ContainerVM>()->clean();
-    chip_id_task.reset();
+    //chip_id_task.reset();
 }
 
 void FlashManagerSceneChipID::back_callback(void* context) {

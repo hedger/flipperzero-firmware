@@ -59,8 +59,6 @@ bool FlashManagerSceneWriteDump::on_event(FlashManager* app, FlashManager::Event
         break;
     //case FlashManager::EventType::Cancel:
     case FlashManager::EventType::Next:
-        //app->scene_controller.search_and_switch_to_previous_scene(
-        //    {FlashManager::SceneType::Exit});
         app->runVerification = true;
         app->scene_controller.switch_to_scene(FlashManager::SceneType::ReadImgProcessScene);
         break;
@@ -147,7 +145,7 @@ void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
     app->file_tools.close();
     app->view_controller.get<ContainerVM>()->clean();
     string_clear(status_text);
-    if (!app->runVerification){
+    if(!app->runVerification) {
         app->text_store.set("");
     }
     write_buffer.reset();

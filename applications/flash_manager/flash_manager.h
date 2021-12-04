@@ -73,6 +73,7 @@ public:
 
     static const uint8_t MAX_FILE_NAME_LEN = 100;
     char file_name[MAX_FILE_NAME_LEN];
+    bool run_in_app_mode = false;
     bool runVerification = false;
 
     FlashManagerFileTools file_tools;
