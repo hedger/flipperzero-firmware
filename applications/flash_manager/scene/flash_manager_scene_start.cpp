@@ -33,9 +33,6 @@ bool FlashManagerSceneStart::on_event(FlashManager* app, FlashManager::Event* ev
     if(event->type == FlashManager::EventType::MenuSelected) {
         submenu_item_selected = event->payload.menu_index;
         switch(event->payload.menu_index) {
-        case SubmenuByteInput:
-            app->scene_controller.switch_to_next_scene(FlashManager::SceneType::ByteInputScene);
-            break;
         case SubmenuChipID:
             app->scene_controller.switch_to_next_scene(FlashManager::SceneType::ChipIDScene);
             break;
@@ -51,11 +48,6 @@ void FlashManagerSceneStart::on_exit(FlashManager* app) {
 }
 
 void FlashManagerSceneStart::submenu_callback(void* context, uint32_t index) {
-    FlashManager* app = static_cast<FlashManager*>(context);
-    FlashManager::Event event;
-
-    event.type = FlashManager::EventType::MenuSelected;
-    event.payload.menu_index = index;
-
+    FlashManager::Event event{.payload = {.menu_index = index}, .type = FlashManager::EventType::MenuSelected};
     app->view_controller.send_event(&event);
 }

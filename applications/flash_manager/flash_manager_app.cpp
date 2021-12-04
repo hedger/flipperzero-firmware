@@ -2,6 +2,7 @@
 #include "flash_manager_worker.h"
 #include "scene/flash_manager_scene_start.h"
 #include "scene/flash_manager_scene_chip_id.h"
+#include "scene/flash_manager_scene_chip_info.h"
 #include "scene/flash_manager_scene_read_input_name.h"
 #include "scene/flash_manager_scene_read_dump.h"
 #include "scene/flash_manager_scene_write_dump.h"
@@ -30,24 +31,24 @@ int32_t FlashManager::run(const char* args) {
     if(strlen(args)) {
         FURI_LOG_I(TAG, "started app to write '%s'", args);
         text_store.set(args);
-        //load_key_data(args, &worker.key);
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneChipID());
-        scene_controller.add_scene(
-            SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
-        scene_controller.add_scene(
-            SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
+        scene_controller.add_scene(SceneType::ChipInfoScene, new FlashManagerSceneChipInfo());
+        scene_controller.add_scene(SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
+        scene_controller.add_scene(SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
         scene_controller.process(TICK_LEN_MS, SceneType::Start);
     } else {
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());
-        //scene_controller.add_scene(SceneType::ByteInputScene, new FlashManagerSceneByteInput());
         scene_controller.add_scene(SceneType::ChipIDScene, new FlashManagerSceneChipID());
-        scene_controller.add_scene(
-            SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
-        scene_controller.add_scene(
-            SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
+        scene_controller.add_scene(SceneType::ChipInfoScene, new FlashManagerSceneChipInfo());
+        scene_controller.add_scene(SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
+        scene_controller.add_scene(SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
         scene_controller.process(TICK_LEN_MS);
     }
 
     worker->stop();
     return 0;
+}
+
+SpiFlashInfo_t* FlashManager::get_flash_info() {
+    return &flash_info;
 }

@@ -16,22 +16,14 @@ public:
 
 private:
     FlashManager* app;
-    void process_found_chip();
+    SpiFlashInfo_t* flash_info;
 
-    //void result_callback(void* context);
     void tick();
-    static void rescan_callback(void* context);
     static void back_callback(void* context);
-    static void read_chip_callback(void* context);
-    static void write_chip_callback(void* context);
+    static void scan_callback(void* context);
 
-    ButtonElement *run_detect_btn, *back_btn, *next_btn;
+    ButtonElement *back_btn, *scan_btn;
     StringElement *header_line, *detail_line, *status_line;
-
-    bool chip_detected;
-    string_t chip_id, chip_extra;
-    SpiFlashInfo_t flash_info;
-    size_t chip_size;
 
     std::unique_ptr<WorkerTask> chip_id_task;
 };

@@ -227,7 +227,7 @@ static bool read_sfdp(struct SpiFlashInfo_t* info) {
 bool SpiToolkit::detect_flash() {
     SpiLock lock;
 #ifdef FLASHMGR_MOCK
-    osDelay(2500);
+    osDelay(1500);
     last_info.vendor_id = SpiChipVendor_WINBOND;
     last_info.name = "W25QMOCK";
     last_info.size = 64 * 1024L;

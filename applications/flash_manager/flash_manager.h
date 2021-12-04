@@ -22,6 +22,8 @@
 #include <dialogs/dialogs.h>
 #include <notification/notification-messages.h>
 
+#include "spi/spi_toolkit.h"
+
 #define TAG "FlashManager"
 
 class FlashManagerWorker;
@@ -34,6 +36,8 @@ public:
         GENERIC_EVENT_ENUM_VALUES,
         Next,
         MenuSelected,
+        Scan,
+        Retry,
         OpReadChip,
         OpWriteChip,
         Cancel
@@ -41,11 +45,11 @@ public:
 
     enum class SceneType : uint8_t {
         GENERIC_SCENE_ENUM_VALUES,
-        ByteInputScene,
-        ChipIDScene,
-        ReadImgFileNameInputScene,
-        ReadImgProcessScene,
-        WriteImgProcessScene
+        ChipIDScene, // ScanScene
+        ChipInfoScene, // InfoScene
+        ReadImgFileNameInputScene, // SaveNameScene
+        ReadImgProcessScene, // ReadScene
+        WriteImgProcessScene // WriteScene
     };
 
     class Event {
@@ -77,4 +81,9 @@ public:
 
     FlashManager();
     ~FlashManager();
+
+    SpiFlashInfo_t* get_flash_info();
+
+private:
+    SpiFlashInfo_t flash_info;
 };
