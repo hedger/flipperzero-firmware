@@ -56,6 +56,7 @@ extern void storage_cli_init();
 extern void subghz_cli_init();
 extern void power_cli_init();
 extern void unit_tests_cli_init();
+extern void flash_manager_cli_init();
 
 // Settings
 extern int32_t notification_settings_app(void* p);
@@ -195,9 +196,14 @@ const FlipperOnStartHook FLIPPER_ON_SYSTEM_START[] = {
     storage_cli_init,
 #endif
 
+#ifdef PLUGIN_FLASH_MANAGER
+    flash_manager_cli_init,
+#endif
+
 #ifdef APP_UNIT_TESTS
     unit_tests_cli_init,
 #endif
+
 };
 
 const size_t FLIPPER_ON_SYSTEM_START_COUNT =

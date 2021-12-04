@@ -24,10 +24,10 @@ const VendorName_t VendorNames[] = {
     {NULL, 0}};
 
 const ChipInfo_t ChipInfos[] = {
-    {"AT25DF161SHT", // TODO: validate!
+    {"AT25DF161", // TODO: validate!
      SpiChipVendor_ATMEL,
      0x46,
-     0x00,
+     0x02,
      2L * 1024L * 1024L,
      (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_DUAL_BUFFER),
      512,
