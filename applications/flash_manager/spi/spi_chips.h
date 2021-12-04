@@ -7,13 +7,17 @@ extern "C" {
 #endif
 
 typedef enum {
+    SpiChipCommand_PAGE_PROGRAM = 0x02,
     SpiChipCommand_READ_DATA = 0x03,
+    SpiChipCommand_WRITE_DISABLE = 0x04,
     SpiChipCommand_READ_STATUS = 0x05,
     SpiChipCommand_WRITE_ENABLE = 0x06,
     SpiChipCommand_VOLATILE_SR_WRITE_ENABLE = 0x50,
     SpiChipCommand_READ_SFDP_REGISTER = 0x5A,
     SpiChipCommand_JEDEC_ID = 0x9F,
     SpiChipCommand_RELEASE_DEEP = 0xAB,
+    SpiChipCommand_AAI_WORD_PROGRAM = 0xAD,
+    SpiChipCommand_ERASE_CHIP = 0xC7,
 } SpiChipCommand;
 
 enum {

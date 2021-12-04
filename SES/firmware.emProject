@@ -94,7 +94,7 @@
     property_groups_file_path="$(ProjectDir)/../flipper.property-groups.xml" />
   <configuration
     Name="dbg"
-    inherited_configurations="Internal;Debug;FlipperF7" />
+    inherited_configurations="Internal;Debug;FlipperF7;Mock SPI" />
   <configuration
     Name="rel"
     inherited_configurations="Internal;Release;FlipperF6" />
