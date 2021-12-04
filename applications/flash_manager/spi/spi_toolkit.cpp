@@ -33,6 +33,43 @@ void SpiToolkit::disconnect() {
     spi_wrapper_deinit();
 }
 
+static bool read_status(uint8_t* const status) {
+    return spi_wrapper_write_read(SpiChipCommand_READ_STATUS, NULL, 0, status, 1);
+}
+
+static bool release_deep_sleep() {
+    if(spi_wrapper_write_read(SpiChipCommand_RELEASE_DEEP, NULL, 0, NULL, 0)) {
+        osDelay(1);
+        return true;
+    }
+    return false;
+}
+
+static bool wait_busy() {
+    uint8_t status;
+    int retries = 10;
+    bool result;
+
+    while(retries != 0) {
+        result = read_status(&status);
+        if(result && ((status & SpiStatusRegister_BUSY) == 0)) {
+            break;
+        }
+        osDelay(10);
+        --retries;
+    }
+    return (result && ((status & SpiStatusRegister_BUSY) == 0));
+}
+
+static int make_adress_byte_array(struct SpiFlashInfo_t* info, uint32_t addr, uint8_t* array) {
+    int len, i;
+    len = info->addr_4_byte ? 4 : 3;
+    for(i = 0; i < len; i++) {
+        array[i] = (addr >> ((len - (i + 1)) * 8)) & 0xFF;
+    }
+    return len;
+}
+
 #define SUPPORT_MAX_SFDP_MAJOR_REV 1
 /* the JEDEC basic flash parameter table length is 9 DWORDs (288-bit) on JESD216 (V1.0) initial release standard */
 #define BASIC_TABLE_LEN 9
@@ -238,34 +275,49 @@ bool SpiToolkit::detect_flash() {
 
     return true;
 #endif // FLASHMGR_MOCK
-    last_info.valid = false;
+
+    memset(&last_info, 0, sizeof(last_info));
 
     for(;;) {
         uint8_t id[3];
         if(spi_wrapper_write_read(SpiChipCommand_JEDEC_ID, NULL, 0, id, 3)) {
+            FURI_LOG_I(TAG, "RAW CHIP ID: %x %x %x", id[0], id[1], id[2]);
+
             last_info.vendor_id = id[0];
             last_info.type_id = id[1];
             last_info.capacity_id = id[2];
+
+            const ChipInfo_t* chip = spi_chip_get_details(id[0], id[1], id[2]);
+            if(chip != nullptr) {
+                last_info.name = chip->name;
+                last_info.size = chip->size;
+                last_info.write_mode = chip->write_mode;
+                last_info.erase_gran = chip->erase_gran;
+                last_info.erase_gran_cmd = chip->erase_gran_cmd;
+                last_info.valid = true;
+            }
+
             if(read_sfdp(&last_info)) {
+                FURI_LOG_I(TAG, "SFDP OK");
+                last_info.valid = true;
+            } else if(chip != nullptr) {
+                FURI_LOG_I(TAG, "SFDP Failed, use table info");
+                last_info.name = chip->name;
+                last_info.size = chip->size;
+                last_info.write_mode = chip->write_mode;
+                last_info.erase_gran = chip->erase_gran;
+                last_info.erase_gran_cmd = chip->erase_gran_cmd;
                 last_info.valid = true;
             } else {
-                const ChipInfo_t* chip = spi_chip_get_details(id[0], id[1], id[2]);
-                if(chip != nullptr) {
-                    last_info.name = chip->name;
-                    last_info.size = chip->size;
-                    last_info.write_mode = chip->write_mode;
-                    last_info.erase_gran = chip->erase_gran;
-                    last_info.erase_gran_cmd = chip->erase_gran_cmd;
-                    last_info.valid = true;
-                }
+                FURI_LOG_I(TAG, "Can't define chip type");
             }
             break;
         }
     }
-    if(!last_info.valid) {
-        // Chip access error or unknown type
-        spi_wrapper_deinit();
-    }
+    //if(!last_info.valid) {
+    //    // Chip access error or unknown type
+    //    //spi_wrapper_deinit();
+    //}
     return last_info.valid;
 }
 
@@ -301,7 +353,6 @@ bool SpiToolkit::write_block(
     const size_t offset,
     const uint8_t* const p_data,
     const size_t data_len) {
-
     SpiLock lock;
 
     furi_assert(p_data);
@@ -319,23 +370,40 @@ bool SpiToolkit::write_block(
 }
 
 bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const size_t data_len) {
-    SpiLock lock;
-
     furi_assert(p_data);
     furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
 
-    FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
-
 #ifdef FLASHMGR_MOCK
     osDelay(10);
-    // TODO: read_block
-    //FURI_LOG_I(TAG, "memset @ %x len %x", p_data, data_len);
+    FURI_LOG_I(TAG, "memset @ %x len %x", p_data, data_len);
     memset(p_data, 0xCD, data_len);
-
     return true;
-#else // FLASHMGR_MOCK
-    return false;
 #endif // FLASHMGR_MOCK
+
+    if(last_info.valid) {
+        if((offset + data_len) <= last_info.size) {
+            SpiLock lock;
+            if(release_deep_sleep() && wait_busy()) {
+                FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
+                uint8_t cmd[4];
+                if(spi_wrapper_write_read(
+                       SpiChipCommand_READ_DATA,
+                       cmd,
+                       make_adress_byte_array(&last_info, offset, cmd),
+                       p_data,
+                       data_len))
+                    return true;
+                FURI_LOG_I(TAG, "Read data failed");
+            } else {
+                FURI_LOG_I(TAG, "Chip status: BUSY");
+            }
+        } else {
+            FURI_LOG_I(TAG, "Flash address is out of bound.");
+        }
+    } else {
+        FURI_LOG_I(TAG, "Chip info not valid");
+    }
+    return false;
 }
 
 SpiFlashInfo_t const* SpiToolkit::get_info() const {

@@ -20,9 +20,26 @@ const VendorName_t VendorNames[] = {
     {"Winbond", SpiChipVendor_WINBOND},
     {"Micronix", SpiChipVendor_MICRONIX},
     {"Nor-Mem", SpiChipVendor_NOR_MEM},
+    {"BOYA", SpiChipVendor_BOYA},
     {NULL, 0}};
 
 const ChipInfo_t ChipInfos[] = {
+    {"AT25DF161SHT", // TODO: validate!
+     SpiChipVendor_ATMEL,
+     0x46,
+     0x00,
+     2L * 1024L * 1024L,
+     (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_DUAL_BUFFER),
+     512,
+     0x81},
+    {"BY25Q128AS", // TODO: validate!
+     SpiChipVendor_BOYA,
+     0x40,
+     0x18,
+     16L * 1024L * 1024L,
+     (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_DUAL_BUFFER),
+     512,
+     0x81},
     {"AT45DB161E",
      SpiChipVendor_ATMEL,
      0x26,
