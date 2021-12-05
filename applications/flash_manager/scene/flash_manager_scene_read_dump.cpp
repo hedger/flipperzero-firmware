@@ -10,13 +10,17 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     this->app = app;
 
     bytes_read = 0;
+    bytes_queued = 0;
     verification_file_size = 0;
     read_completed = false;
     cancelled = false;
 
     string_init(detail_text);
     string_init(status_text);
-    read_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
+
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        read_buffers[i] = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
+    }
 
     ContainerVM* container = app->view_controller;
 
@@ -106,10 +110,6 @@ void FlashManagerSceneReadDump::tick() {
     const SpiFlashInfo_t* flash = app->worker->toolkit->get_info();
     furi_assert(flash && flash->valid);
 
-    if(!reader_task) {
-        enqueue_next_block();
-    }
-
     if(bytes_read >= get_job_size()) {
         finish_read();
     }
@@ -118,37 +118,18 @@ void FlashManagerSceneReadDump::tick() {
         return;
     }
 
+    check_tasks_update_progress();
+}
+
+void FlashManagerSceneReadDump::check_tasks_update_progress() {
     uint32_t progress = 0;
 
-    if(reader_task->completed()) {
-        if(reader_task->success) {
-            if(app->runVerification) {
-                app->file_tools.read_buffer(verification_buffer.get(), reader_task->size);
-                if(!memcmp(verification_buffer.get(), reader_task->data, reader_task->size)) {
-                    FURI_LOG_I(TAG, "verify: block @%x OK", reader_task->offset);
-                    string_printf(
-                        detail_text, "Block %x+%x OK", reader_task->offset, reader_task->size);
-                } else {
-                    FURI_LOG_I(TAG, "verify: block @%x MISMATCHED");
-                    string_printf(
-                        detail_text, "Block %x+%x FAILED!", reader_task->offset, reader_task->size);
-                    // TODO: break
-                }
-            } else {
-                app->file_tools.write_buffer(reader_task->data, reader_task->size);
-            }
-            bytes_read += reader_task->size;
-            if(bytes_read < get_job_size()) {
-                enqueue_next_block();
-            }
-        } else {
-            // TODO
-        }
-        progress = bytes_read * 100 / get_job_size();
-    } else {
-        progress =
-            (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / get_job_size();
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        check_task_state(reader_tasks[i]);
     }
+
+    //header_line->update_text("Writing chip...");
+    progress = bytes_read * 100 / get_job_size();
 
     detail_line->update_text(string_get_cstr(detail_text));
     string_printf(status_text, "%d%% done", progress);
@@ -161,21 +142,89 @@ void FlashManagerSceneReadDump::tick() {
     }
 }
 
+bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& task) {
+    if(!(bool)task) {
+        return enqueue_next_block();
+    }
+
+    if(task->completed()) {
+        if(app->runVerification) {
+            app->file_tools.seek(task->offset);
+            app->file_tools.read_buffer(verification_buffer.get(), task->size);
+            if(!memcmp(verification_buffer.get(), task->data, task->size)) {
+                FURI_LOG_I(TAG, "verify: block @%x OK", task->offset);
+                string_printf(detail_text, "Block %x+%x OK", task->offset, task->size);
+            } else {
+                FURI_LOG_I(TAG, "verify: block @%x MISMATCHED");
+                string_printf(detail_text, "Block %x+%x FAILED!", task->offset, task->size);
+                // TODO: break
+            }
+        } else {
+            app->file_tools.write_buffer(task->data, task->size);
+        }
+
+        if(task->success) {
+            bytes_read += task->size;
+            return enqueue_next_block();
+        } else {
+            cancelled = true;
+            status_line->update_text("FAILED :(");
+            finish_read();
+            return false;
+        }
+    }
+    return false;
+}
+
 bool FlashManagerSceneReadDump::enqueue_next_block() {
-    FURI_LOG_I(TAG, "enqueue_next_block: read %d", bytes_read);
+    if(bytes_queued >= get_job_size()) {
+        return false;
+    }
+
+    FURI_LOG_I(TAG, "enqueue_next_block: read %d, queued %d", bytes_read, bytes_queued);
     // TODO: fix tail
     size_t block_size = DUMP_READ_BLOCK_BYTES;
 
-    reader_task = std::make_unique<WorkerTask>(
-        WorkerOperation::BlockRead, bytes_read, read_buffer.get(), block_size);
+    bool free_task_found = false;
+    int free_task_id = 0;
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        auto& task = reader_tasks[i];
 
+        if(!task || (task && task->completed())) {
+            free_task_id = i;
+            free_task_found = true;
+            break;
+        }
+    }
+
+    if(!free_task_found) {
+        return false;
+    }
+
+    furi_assert(free_task_id < TASK_DEPTH);
+
+    auto& target_task = reader_tasks[free_task_id];
+    auto& target_buffer = read_buffers[free_task_id];
+
+    target_task = std::make_unique<WorkerTask>(
+        WorkerOperation::BlockRead, bytes_queued, target_buffer.get(), block_size);
+    FURI_LOG_I(
+        TAG,
+        "enqueue_next_block(): put block from file @ %x + %x to queue task %d to flash @ %x",
+        bytes_queued,
+        block_size,
+        free_task_id,
+        bytes_queued);
+
+    bytes_queued += block_size;
     // TODO: check result
     FURI_LOG_I(TAG, "enqueue_next_block: adding");
-    return app->worker->enqueue_task(reader_task.get());
+    return app->worker->enqueue_task(target_task.get());
 }
 
 size_t FlashManagerSceneReadDump::get_job_size() const {
-    return verification_file_size ? verification_file_size : app->worker->toolkit->get_info()->size;
+    return verification_file_size ? verification_file_size :
+                                    app->worker->toolkit->get_info()->size;
 }
 
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
@@ -189,7 +238,9 @@ void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     string_clear(detail_text);
     string_clear(status_text);
     app->text_store.set("");
-    read_buffer.reset();
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        read_buffers[i].reset();
+    }
     app->runVerification = false;
 }
 

@@ -29,7 +29,7 @@ const ChipInfo_t ChipInfos[] = {
      0x46,
      0x02,
      //2L * 1024L * 1024L,
-     32L * 1024L,
+     512L * 1024L, // FIXME!
      (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_PAGE_256B),
      256,
      0x81},
@@ -37,7 +37,8 @@ const ChipInfo_t ChipInfos[] = {
      SpiChipVendor_BOYA,
      0x40,
      0x18,
-     16L * 1024L * 1024L,
+     //16L * 1024L * 1024L, // FIXME
+     2L * 1024L * 1024L,
      (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_PAGE_256B),
      256,
      0x81},
@@ -210,7 +211,7 @@ const char* spi_vendor_get_name(const uint8_t code) {
 }
 
 const ChipInfo_t* spi_chip_get_details(const uint8_t vid, const uint8_t tid, const uint8_t capid) {
-    for (const ChipInfo_t* chip = ChipInfos; chip->name != NULL; ++chip) {
+    for(const ChipInfo_t* chip = ChipInfos; chip->name != NULL; ++chip) {
         if(chip->vendor_id == vid && chip->type_id == tid && chip->capacity_id == capid) {
             return chip;
         }

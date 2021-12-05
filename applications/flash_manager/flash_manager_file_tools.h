@@ -20,6 +20,8 @@ public:
     uint32_t get_size();
     bool write_buffer(const uint8_t* data, size_t length);
     bool read_buffer(uint8_t* data, size_t max_length); 
+    bool seek(size_t offset);
+    size_t ftell();
 
     // std::unique_ptr<IrdaAppFileParser::IrdaFileSignal> read_signal();
     // bool save_signal(const IrdaAppSignal& signal, const char* name);

@@ -24,7 +24,8 @@ bool FlashManagerFileTools::make_app_folder() {
 }
 
 bool FlashManagerFileTools::open_dump_file_read(const char* filename, ChipType chip) {
-    std::string full_filename = make_full_name(filename, chip);;
+    std::string full_filename = make_full_name(filename, chip);
+    ;
     return file_worker.open(full_filename.c_str(), FSAM_READ, FSOM_OPEN_EXISTING);
 }
 
@@ -43,10 +44,11 @@ bool FlashManagerFileTools::is_dump_file_exist(const char* filename, bool* exist
 }
 
 std::string FlashManagerFileTools::make_full_name(const std::string& name, ChipType chip) const {
-    if (!name.empty() && (name[0] == '/')) { // assume it's absolute path -> no processing needed
+    if(!name.empty() && (name[0] == '/')) { // assume it's absolute path -> no processing needed
         return name;
     }
-    return std::string("") + dump_directory + "/" + name + get_suffix_for_chip(chip) + dump_extension;
+    return std::string("") + dump_directory + "/" + name + get_suffix_for_chip(chip) +
+           dump_extension;
 }
 
 bool FlashManagerFileTools::rename_dump_file(const char* filename, const char* newname) {
@@ -78,4 +80,14 @@ bool FlashManagerFileTools::write_buffer(const uint8_t* data, size_t length) {
 
 bool FlashManagerFileTools::read_buffer(uint8_t* data, size_t max_length) {
     return file_worker.read(data, max_length);
+}
+
+bool FlashManagerFileTools::seek(size_t offset) {
+    return file_worker.seek(offset, true);
+}
+
+size_t FlashManagerFileTools::ftell() {
+    uint64_t position;
+    file_worker.tell(&position);
+    return static_cast<size_t>(position);
 }

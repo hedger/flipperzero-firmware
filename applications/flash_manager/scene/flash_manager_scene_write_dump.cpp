@@ -10,11 +10,14 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
     this->app = app;
 
     bytes_written = 0;
+    bytes_queued = 0;
     write_completed = false;
     cancelled = false;
 
     string_init(status_text);
-    write_buffer = std::make_unique<uint8_t[]>(DUMP_WRITE_BLOCK_BYTES);
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        write_buffers[i] = std::make_unique<uint8_t[]>(DUMP_WRITE_BLOCK_BYTES);
+    }
 
     ContainerVM* container = app->view_controller;
 
@@ -43,12 +46,16 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
     FURI_LOG_I(TAG, "file size to write: %d", bin_file_size);
 
     write_to_chip_size = bin_file_size;
-    if (bin_file_size > chip_size) {
+    if(bin_file_size > chip_size) {
         // TODO: error?
-        FURI_LOG_W(TAG, "file size 0x%x exceeds flash size %x, clamping to flash", bin_file_size, chip_size);
+        FURI_LOG_W(
+            TAG,
+            "file size 0x%x exceeds flash size %x, clamping to flash",
+            bin_file_size,
+            chip_size);
         write_to_chip_size = chip_size;
     }
-    
+
     app->view_controller.switch_to<ContainerVM>();
 }
 
@@ -106,9 +113,9 @@ void FlashManagerSceneWriteDump::tick() {
     const SpiFlashInfo_t* flash = app->worker->toolkit->get_info();
     furi_assert(flash && flash->valid);
 
-    if(!writer_task) {
-        writer_task = std::make_unique<WorkerTask>(WorkerOperation::ChipErase);
-        app->worker->enqueue_task(writer_task.get());
+    if(!writer_tasks[0]) {
+        writer_tasks[0] = std::make_unique<WorkerTask>(WorkerOperation::ChipErase);
+        app->worker->enqueue_task(writer_tasks[0].get());
         return;
     }
 
@@ -120,45 +127,93 @@ void FlashManagerSceneWriteDump::tick() {
         return;
     }
 
-    uint32_t progress = 0;
+    check_tasks_update_progress();
+}
 
-    if(writer_task->completed()) {
-        if(writer_task->success) {
-            bytes_written += writer_task->size;
-            if(bytes_written < write_to_chip_size) {
-                enqueue_next_block();
-            }
+void FlashManagerSceneWriteDump::check_tasks_update_progress() {
+    uint32_t progress = 0;
+    bool wip = false;
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        wip |= check_task_state(writer_tasks[i]);
+    }
+    if(!wip && (bytes_written == 0)) {
+        return;
+    }
+    header_line->update_text("Writing chip...");
+    progress = bytes_written * 100 / write_to_chip_size;
+    string_printf(status_text, "%d%% done", progress);
+    status_line->update_text(string_get_cstr(status_text));
+}
+
+bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& task) {
+    if(!(bool)task) {
+        return enqueue_next_block();
+    }
+
+    if(task->completed()) {
+        if(task->success) {
+            bytes_written += task->size;
+            return enqueue_next_block();
         } else {
             cancelled = true;
             status_line->update_text("FAILED :(");
             finish_write();
-            return;
+            return false;
         }
-        header_line->update_text("Writing chip...");
-        progress = bytes_written * 100 / write_to_chip_size;
-    } else {
-        progress = (bytes_written + (writer_task->progress * writer_task->size / 100)) * 100 /
-                   write_to_chip_size;
     }
-
-    string_printf(status_text, "%d%% done", progress);
-    status_line->update_text(string_get_cstr(status_text));
+    return false;
     
     app->notify_red_blink();
 }
 
 bool FlashManagerSceneWriteDump::enqueue_next_block() {
-    FURI_LOG_I(TAG, "enqueue_next_block: written %d", bytes_written);
+    if(bytes_queued >= write_to_chip_size) {
+        return false;
+    }
+    FURI_LOG_I(TAG, "enqueue_next_block: written %d, queued %d", bytes_written, bytes_queued);
     // TODO: fix tail
     size_t block_size = DUMP_WRITE_BLOCK_BYTES;
 
-    app->file_tools.read_buffer(write_buffer.get(), block_size);
-    writer_task = std::make_unique<WorkerTask>(
-        WorkerOperation::BlockWrite, bytes_written, write_buffer.get(), block_size);
+    bool free_task_found = false;
+    int free_task_id = 0;
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        auto& task = writer_tasks[i];
+        if(task && (task->operation == WorkerOperation::ChipErase) && (!task->completed())) {
+            break;
+        }
+
+        if(!task || (task && task->completed())) {
+            free_task_id = i;
+            free_task_found = true;
+            break;
+        }
+    }
+
+    if(!free_task_found) {
+        return false;
+    }
+
+    furi_assert(free_task_id < TASK_DEPTH);
+
+    auto& target_task = writer_tasks[free_task_id];
+    auto& target_buffer = write_buffers[free_task_id];
+
+    app->file_tools.read_buffer(target_buffer.get(), block_size);
+    target_task = std::make_unique<WorkerTask>(
+        WorkerOperation::BlockWrite, bytes_queued, target_buffer.get(), block_size);
+    FURI_LOG_I(
+        TAG,
+        "enqueue_next_block(): put block from file @ %x + %x to queue task %d to flash @ %x",
+        bytes_queued,
+        block_size,
+        free_task_id,
+        bytes_queued);
+
+    bytes_queued += block_size;
 
     // TODO: check result
     FURI_LOG_I(TAG, "enqueue_next_block: adding");
-    return app->worker->enqueue_task(writer_task.get());
+    return app->worker->enqueue_task(target_task.get());
 }
 
 void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
@@ -168,7 +223,10 @@ void FlashManagerSceneWriteDump::on_exit(FlashManager* app) {
     if(!app->runVerification) {
         app->text_store.set("");
     }
-    write_buffer.reset();
+
+    for(int i = 0; i < TASK_DEPTH; ++i) {
+        write_buffers[i].reset();
+    }
 }
 
 void FlashManagerSceneWriteDump::done_callback(void* context) {

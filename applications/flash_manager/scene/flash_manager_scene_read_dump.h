@@ -19,7 +19,11 @@ private:
 
     void finish_read();
     void tick();
+
+    void check_tasks_update_progress();
     bool enqueue_next_block();
+    bool check_task_state(std::unique_ptr<WorkerTask>& task);
+
     size_t get_job_size() const;
 
     //void result_callback(void* context);
@@ -32,7 +36,11 @@ private:
     bool read_completed;
     bool cancelled;
     string_t detail_text, status_text;
-    size_t bytes_read, verification_file_size;
-    std::unique_ptr<WorkerTask> reader_task;
-    std::unique_ptr<uint8_t[]> read_buffer, verification_buffer;
+    size_t bytes_read, bytes_queued, verification_file_size;
+
+    static const int TASK_DEPTH = 3;
+    std::unique_ptr<WorkerTask> reader_tasks[TASK_DEPTH];
+    std::unique_ptr<uint8_t[]> read_buffers[TASK_DEPTH];
+    //std::unique_ptr<WorkerTask> reader_task;
+    std::unique_ptr<uint8_t[]> verification_buffer;
 };
