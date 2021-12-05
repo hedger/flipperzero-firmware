@@ -71,7 +71,7 @@ static bool wait_busy(int32_t max_wait_ms, int32_t wait_step = WAIT_STEP) {
 }
 
 static bool set_write_enabled(bool enabled) {
-    FURI_LOG_I(TAG, "Setting WE to %d", enabled);
+    //FURI_LOG_I(TAG, "Setting WE to %d", enabled);
 
     bool result = true;
     uint8_t original_status, status,

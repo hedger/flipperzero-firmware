@@ -29,7 +29,7 @@ const ChipInfo_t ChipInfos[] = {
      0x46,
      0x02,
      //2L * 1024L * 1024L,
-     32L * 1024L,
+     512L * 1024L, // FIXME!
      (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_PAGE_256B),
      256,
      0x81},

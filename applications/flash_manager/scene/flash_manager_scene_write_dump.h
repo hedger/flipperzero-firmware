@@ -19,7 +19,9 @@ private:
 
     void finish_write();
     void tick();
-    bool enqueue_next_block();
+    void enqueue_next_block();
+    void check_tasks_update_progress();
+    void check_task_state(std::unique_ptr<WorkerTask>& task);
 
     //void result_callback(void* context);
     static void cancel_callback(void* context);
@@ -33,7 +35,8 @@ private:
     bool write_completed;
     bool cancelled;
     string_t status_text;
-    size_t bytes_written, write_to_chip_size;
-    std::unique_ptr<WorkerTask> writer_task;
-    std::unique_ptr<uint8_t[]> write_buffer;
+
+    size_t bytes_written, bytes_queued, write_to_chip_size;
+    std::unique_ptr<WorkerTask> writer_task0, writer_task1;
+    std::unique_ptr<uint8_t[]> write_buffer0, write_buffer1;
 };
