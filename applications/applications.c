@@ -221,7 +221,7 @@ const FlipperApplication FLIPPER_PLUGINS[] = {
 #endif
 
 #ifdef PLUGIN_FLASH_MANAGER
-    {.app = flash_manager_app, .name = "Flash Manager", .stack_size = 1024, .icon = &A_Plugins_14},
+    {.app = flash_manager_app, .name = "Flash Manager", .stack_size = 4096, .icon = &A_Plugins_14},
 #endif
 };
 
