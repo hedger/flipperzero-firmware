@@ -11,6 +11,8 @@ typedef enum {
     SpiChipCommand_READ_DATA = 0x03,
     SpiChipCommand_WRITE_DISABLE = 0x04,
     SpiChipCommand_READ_STATUS = 0x05,
+    SpiChipCommand_WRITE_STATUS_REG_1 = 0x01,
+    SpiChipCommand_WRITE_STATUS_REG_2 = 0x31, // TODO: check compliancy
     SpiChipCommand_WRITE_ENABLE = 0x06,
     SpiChipCommand_VOLATILE_SR_WRITE_ENABLE = 0x50,
     SpiChipCommand_READ_SFDP_REGISTER = 0x5A,
@@ -21,8 +23,13 @@ typedef enum {
 } SpiChipCommand;
 
 enum {
-    SpiStatusRegister_BUSY = (1 << 0), /**< busing */
+    SpiStatusRegister_BUSY = (1 << 0), /**< busy */
     SpiStatusRegister_WEL = (1 << 1), /**< write enable latch */
+    SpiStatusRegister_SWP0 = (1 << 2), /**< Software protection status */
+    SpiStatusRegister_SWP1 = (1 << 3), /**< Software protection status */
+    SpiStatusRegister_WP_STATUS = (1 << 4), /**< WRITE PROTECT Pin status */
+    SpiStatusRegister_EPE = (1 << 5), /**< Erase Program Error */
+    SpiStatusRegister_RES = (1 << 6), /**< Reserved */
     SpiStatusRegister_SRP = (1 << 7), /**< status register protect */
 };
 

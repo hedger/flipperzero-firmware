@@ -112,7 +112,6 @@ void FlashManagerSceneWriteDump::tick() {
 
     if(writer_task->completed()) {
         if(writer_task->success) {
-            app->file_tools.read_buffer(writer_task->data, writer_task->size);
             bytes_written += writer_task->size;
             if(bytes_written < flash->size) {
                 enqueue_next_block();
@@ -139,6 +138,7 @@ bool FlashManagerSceneWriteDump::enqueue_next_block() {
     // TODO: fix tail
     size_t block_size = DUMP_READ_BLOCK_BYTES;
 
+    app->file_tools.read_buffer(write_buffer.get(), block_size);
     writer_task = std::make_unique<WorkerTask>(
         WorkerOperation::BlockWrite, bytes_written, write_buffer.get(), block_size);
 

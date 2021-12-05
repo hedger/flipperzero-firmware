@@ -28,8 +28,9 @@ const ChipInfo_t ChipInfos[] = {
      SpiChipVendor_ATMEL,
      0x46,
      0x02,
-     2L * 1024L * 1024L,
-     (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_DUAL_BUFFER),
+     //2L * 1024L * 1024L,
+     32L * 1024L,
+     (SpiWriteMode_t)(CHIP_WM_BYTE | CHIP_WM_PAGE_256B),
      512,
      0x81},
     {"BY25Q128AS", // TODO: validate!
@@ -62,6 +63,7 @@ const ChipInfo_t ChipInfos[] = {
      0x40,
      0x16,
      4L * 1024L * 1024L,
+     //64L * 1024L, // FIXME HACKHACK
      CHIP_WM_PAGE_256B,
      4096,
      0x20},

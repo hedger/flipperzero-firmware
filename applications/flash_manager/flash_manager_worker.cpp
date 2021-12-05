@@ -119,7 +119,12 @@ static int32_t flash_manager_worker_thread(void* context) {
         instance->task_executor->run(pTask);
 
         // instance->active_task = nullptr;
-        FURI_LOG_I(TAG, "task done");
+        FURI_LOG_I(
+            TAG,
+            "task done: op=%d @ %02X, res=%d",
+            pTask->operation,
+            pTask->offset,
+            pTask->success);
     }
 
     FURI_LOG_I(TAG, "worker is done");

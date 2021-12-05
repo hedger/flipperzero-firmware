@@ -94,10 +94,10 @@
     property_groups_file_path="$(ProjectDir)/../flipper.property-groups.xml" />
   <configuration
     Name="dbg"
-    inherited_configurations="Internal;Debug;FlipperF7;Mock SPI" />
+    inherited_configurations="Internal;Debug;FlipperF7" />
   <configuration
     Name="rel"
-    inherited_configurations="Internal;Release;FlipperF6" />
+    inherited_configurations="Internal;Release;FlipperF7" />
   <project Name="firmware">
     <configuration
       BUILD_OPTIONS="ARM GNU"

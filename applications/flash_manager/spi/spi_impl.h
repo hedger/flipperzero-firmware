@@ -13,6 +13,8 @@ void spi_wrapper_deinit();
 void spi_wrapper_acquire_bus();
 void spi_wrapper_release_bus();
 
+void spi_wrapper_set_cs_state(bool state);
+
 bool spi_wrapper_write_read(
     uint8_t opCode,
     uint8_t* write_data,

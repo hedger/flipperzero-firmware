@@ -15,6 +15,10 @@ void spi_wrapper_release_bus() {
 
 }
 
+void spi_wrapper_set_cs_state(bool state) {
+
+}
+
 
 static GpioPin SPI_MOSI = {GPIOA, GPIO_PIN_7};
 static GpioPin SPI_MISO = {GPIOA, GPIO_PIN_6};

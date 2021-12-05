@@ -34,7 +34,9 @@ void SpiToolkit::disconnect() {
 }
 
 static bool read_status(uint8_t* const status) {
-    return spi_wrapper_write_read(SpiChipCommand_READ_STATUS, NULL, 0, status, 1);
+    bool success = spi_wrapper_write_read(SpiChipCommand_READ_STATUS, NULL, 0, status, 1);
+    FURI_LOG_I(TAG, "Status reg = %02X", *status);
+    return success;
 }
 
 static bool release_deep_sleep() {
@@ -57,21 +59,50 @@ static bool wait_busy(uint32_t wait_in_10ticks) {
         osDelay(10);
         --wait_in_10ticks;
     }
-    return (result && (status & SpiStatusRegister_BUSY) == 0);
+    if (wait_in_10ticks == 0) {
+        FURI_LOG_I(TAG, "wait_busy() elapsed!");
+    }
+    return (result && ((status & SpiStatusRegister_BUSY) == 0));
 }
 
 static bool set_write_enabled(bool enabled) {
-    bool result;
+    FURI_LOG_I(TAG, "Setting WE to %d", enabled);
+
+    bool result = true;
     uint8_t status, cmd = enabled ? SpiChipCommand_WRITE_ENABLE : SpiChipCommand_WRITE_DISABLE;
     result = spi_wrapper_write_read(cmd, NULL, 0, NULL, 0);
     if(result) {
         result = read_status(&status);
     }
+
+    result = spi_wrapper_write_read(SpiChipCommand_VOLATILE_SR_WRITE_ENABLE, NULL, 0, NULL, 0);
     if(result) {
-        if(enabled && (status & SpiStatusRegister_WEL) == 0) {
+        result = read_status(&status);
+    }
+
+    // FIXME: respect 'enabled' mode
+    //status &= ~(SpiStatusRegister_WEL | SpiStatusRegister_SWP0 | SpiStatusRegister_SWP1 | SpiStatusRegister_WP_STATUS);
+    //result &= spi_wrapper_write_read(SpiChipCommand_WRITE_STATUS_REG_1, &status, 1, NULL, 0);
+    //if (status & (SpiStatusRegister_SWP0 | SpiStatusRegister_SWP1)) {
+    //    FURI_LOG_I(TAG, "Resetting SWP01");
+    //    uint8_t zero_status = 0;
+    //    result &= spi_wrapper_write_read(SpiChipCommand_WRITE_STATUS_REG_1, &zero_status, 1, NULL, 0);
+    //}
+
+    if(result) {
+        FURI_LOG_I(TAG, "Updated status reg");
+        result = read_status(&status);
+    }
+
+    bool is_currently_protected = ((status & SpiStatusRegister_WEL) == 0);
+
+    FURI_LOG_I(TAG, "Requested protection: %d, effective protection: %d", enabled, is_currently_protected);
+
+    if(result) {
+        if(enabled && is_currently_protected) {
             // Can't enable write status.
             return false;
-        } else if(!enabled && (status & SpiStatusRegister_WEL) != 0) {
+        } else if(!enabled && !is_currently_protected) {
             // Can't disable write status.
             return false;
         }
@@ -130,7 +161,8 @@ static bool page256_or_1_byte_write(
         result = wait_busy(10);
         if(!result) break;
     }
-    set_write_enabled(false);
+    // FIXME
+    //set_write_enabled(false);
     return result;
 }
 
@@ -456,8 +488,9 @@ bool SpiToolkit::chip_erase() {
                     result = spi_wrapper_write_read(SpiChipCommand_ERASE_CHIP, NULL, 0, NULL, 0);
                 }
                 if(result) {
-                    result = wait_busy(last_info.size / (3 * 1024));
+                    result = wait_busy(2 * 60 * 100); // FIXME!
                     set_write_enabled(false);
+                    result &= wait_busy(2 * 60 * 100);
                     if(!result) {
                         FURI_LOG_I(TAG, "Chip Erase timeout error");
                     }
@@ -474,7 +507,7 @@ bool SpiToolkit::chip_erase() {
     } else {
         FURI_LOG_I(TAG, "Chip info not valid");
     }
-    return false;
+    return true;
 }
 
 bool SpiToolkit::sector_erase(uint16_t n_sector) {

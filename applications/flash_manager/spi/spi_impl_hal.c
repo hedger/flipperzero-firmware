@@ -27,7 +27,7 @@ static const LL_SPI_InitTypeDef flash_manager_spi_preset_external_safe = {
 #ifdef USE_SPI_LOG
     .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV16, // DIV256,
 #else
-    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV16,
+    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV8,
 #endif
     .BitOrder = LL_SPI_MSB_FIRST,
     .CRCCalculation = LL_SPI_CRCCALCULATION_DISABLE,
@@ -118,6 +118,12 @@ void spi_wrapper_release_bus() {
     furi_hal_spi_release(p_spi_bus);
 }
 
+void spi_wrapper_set_cs_state(bool state) {
+    //FURI_LOG_I(TAG, "Setting CS to %d", state);
+    hal_gpio_write(p_spi_bus->cs, state);
+}
+
+
 #ifdef USE_SPI_LOG
 void log_buffer_as_hex(uint8_t* inptr, const int size) {
     char *buf_str = (char*)malloc(3 * size), *buf_ptr = buf_str;
@@ -137,7 +143,7 @@ bool spi_wrapper_write_read(
     int write_len,
     uint8_t* read_data,
     int read_len) {
-    hal_gpio_write(p_spi_bus->cs, true);
+    //spi_wrapper_set_cs_state(true);
     bool result = false;
 
 #ifdef USE_SPI_LOG
@@ -151,7 +157,7 @@ bool spi_wrapper_write_read(
     free(tx_buffer);
 #endif
 
-    hal_gpio_write(p_spi_bus->cs, false);
+    spi_wrapper_set_cs_state(false);
     for(;;) {
         if(!furi_hal_spi_bus_tx(p_spi_bus, &opCode, 1, SPI_TIMEOUT)) break;
         if(write_data != NULL && write_len != 0 &&
@@ -170,7 +176,7 @@ bool spi_wrapper_write_read(
         result = true;
         break;
     }
-    hal_gpio_write(p_spi_bus->cs, true);
+    spi_wrapper_set_cs_state(true);
 
     return result;
 }
