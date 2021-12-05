@@ -14,7 +14,7 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
     cancelled = false;
 
     string_init(status_text);
-    write_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
+    write_buffer = std::make_unique<uint8_t[]>(DUMP_WRITE_BLOCK_BYTES);
 
     ContainerVM* container = app->view_controller;
 
@@ -35,10 +35,20 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
     line_2->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
     status_line->set_text("...", 64, 41, AlignCenter, AlignBottom, FontSecondary);
 
-    // TODO: error check, empty check
-    app->file_tools.open_dump_file_read(app->text_store.text, ChipType::SPI);
-    FURI_LOG_I(TAG, "file size to write: %d", app->file_tools.get_size());
+    size_t chip_size = app->worker->toolkit->get_info()->size;
 
+    app->file_tools.open_dump_file_read(app->text_store.text, ChipType::SPI);
+    size_t bin_file_size = app->file_tools.get_size();
+    // TODO: error check, empty check
+    FURI_LOG_I(TAG, "file size to write: %d", bin_file_size);
+
+    write_to_chip_size = bin_file_size;
+    if (bin_file_size > chip_size) {
+        // TODO: error?
+        FURI_LOG_W(TAG, "file size 0x%x exceeds flash size %x, clamping to flash", bin_file_size, chip_size);
+        write_to_chip_size = chip_size;
+    }
+    
     app->view_controller.switch_to<ContainerVM>();
 }
 
@@ -100,7 +110,7 @@ void FlashManagerSceneWriteDump::tick() {
         return;
     }
 
-    if(bytes_written >= flash->size) {
+    if(bytes_written >= write_to_chip_size) {
         finish_write();
     }
 
@@ -113,7 +123,7 @@ void FlashManagerSceneWriteDump::tick() {
     if(writer_task->completed()) {
         if(writer_task->success) {
             bytes_written += writer_task->size;
-            if(bytes_written < flash->size) {
+            if(bytes_written < write_to_chip_size) {
                 enqueue_next_block();
             }
         } else {
@@ -123,10 +133,10 @@ void FlashManagerSceneWriteDump::tick() {
             return;
         }
         header_line->update_text("Writing chip...");
-        progress = bytes_written * 100 / flash->size;
+        progress = bytes_written * 100 / write_to_chip_size;
     } else {
         progress = (bytes_written + (writer_task->progress * writer_task->size / 100)) * 100 /
-                   flash->size;
+                   write_to_chip_size;
     }
 
     string_printf(status_text, "%d%% done", progress);
@@ -136,7 +146,7 @@ void FlashManagerSceneWriteDump::tick() {
 bool FlashManagerSceneWriteDump::enqueue_next_block() {
     FURI_LOG_I(TAG, "enqueue_next_block: written %d", bytes_written);
     // TODO: fix tail
-    size_t block_size = DUMP_READ_BLOCK_BYTES;
+    size_t block_size = DUMP_WRITE_BLOCK_BYTES;
 
     app->file_tools.read_buffer(write_buffer.get(), block_size);
     writer_task = std::make_unique<WorkerTask>(

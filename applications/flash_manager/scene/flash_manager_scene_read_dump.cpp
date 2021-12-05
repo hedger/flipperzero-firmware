@@ -10,6 +10,7 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     this->app = app;
 
     bytes_read = 0;
+    verification_file_size = 0;
     read_completed = false;
     cancelled = false;
 
@@ -39,6 +40,10 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     // TODO: error check, empty check
     if(app->runVerification) {
         app->file_tools.open_dump_file_read(app->text_store.text, ChipType::SPI);
+        verification_file_size = app->file_tools.get_size();
+        if(!verification_file_size) {
+            // TODO: warn/err?
+        }
         verification_buffer = std::make_unique<uint8_t[]>(DUMP_READ_BLOCK_BYTES);
     } else {
         app->file_tools.open_dump_file_write(app->text_store.text, ChipType::SPI);
@@ -101,7 +106,7 @@ void FlashManagerSceneReadDump::tick() {
         enqueue_next_block();
     }
 
-    if(bytes_read >= flash->size) {
+    if(bytes_read >= get_job_size()) {
         finish_read();
     }
 
@@ -129,16 +134,16 @@ void FlashManagerSceneReadDump::tick() {
                 app->file_tools.write_buffer(reader_task->data, reader_task->size);
             }
             bytes_read += reader_task->size;
-            if(bytes_read < flash->size) {
+            if(bytes_read < get_job_size()) {
                 enqueue_next_block();
             }
         } else {
             // TODO
         }
-        progress = bytes_read * 100 / flash->size;
+        progress = bytes_read * 100 / get_job_size();
     } else {
         progress =
-            (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / flash->size;
+            (bytes_read + (reader_task->progress * reader_task->size / 100)) * 100 / get_job_size();
     }
 
     detail_line->update_text(string_get_cstr(detail_text));
@@ -157,6 +162,10 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
     // TODO: check result
     FURI_LOG_I(TAG, "enqueue_next_block: adding");
     return app->worker->enqueue_task(reader_task.get());
+}
+
+size_t FlashManagerSceneReadDump::get_job_size() const {
+    return verification_file_size ? verification_file_size : app->worker->toolkit->get_info()->size;
 }
 
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {

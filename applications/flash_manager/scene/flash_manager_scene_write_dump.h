@@ -7,7 +7,7 @@ class ButtonElement;
 class WorkerTask;
 
 class FlashManagerSceneWriteDump : public GenericScene<FlashManager> {
-    static const size_t DUMP_READ_BLOCK_BYTES = 4 * 1024;
+    static const size_t DUMP_WRITE_BLOCK_BYTES = 4 * 1024;
 
 public:
     void on_enter(FlashManager* app, bool need_restore) final;
@@ -33,7 +33,7 @@ private:
     bool write_completed;
     bool cancelled;
     string_t status_text;
-    size_t bytes_written;
+    size_t bytes_written, write_to_chip_size;
     std::unique_ptr<WorkerTask> writer_task;
     std::unique_ptr<uint8_t[]> write_buffer;
 };

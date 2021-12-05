@@ -29,7 +29,7 @@
 class FlashManagerWorker;
 
 class FlashManager {
-    static const int TICK_LEN_MS = 100;
+    static const int TICK_LEN_MS = 50;
 
 public:
     enum class EventType : uint8_t {

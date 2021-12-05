@@ -35,7 +35,7 @@ void SpiToolkit::disconnect() {
 
 static bool read_status(uint8_t* const status) {
     bool success = spi_wrapper_write_read(SpiChipCommand_READ_STATUS, NULL, 0, status, 1);
-    FURI_LOG_I(TAG, "Status reg = %02X", *status);
+    //FURI_LOG_I(TAG, "Status reg = %02X", *status);
     return success;
 }
 
@@ -47,26 +47,31 @@ static bool release_deep_sleep() {
     return false;
 }
 
-static bool wait_busy(uint32_t wait_in_10ticks) {
+static const int WAIT_STEP = 1; // in ms
+static const int MAX_WAIT_PAGE_WRITE = 15; // in ms
+static const int MAX_WAIT_PAGE_READ = 10; // in ms
+static const int MAX_WAIT_CHIP_ERASE = 2 * 60 * 1000;
+
+static bool wait_busy(int32_t max_wait_ms, int32_t wait_step = WAIT_STEP) {
     uint8_t status;
     bool result = false;
 
-    while(wait_in_10ticks != 0) {
+    while(max_wait_ms > 0) {
         result = read_status(&status);
         if(result && ((status & SpiStatusRegister_BUSY) == 0)) {
             break;
         }
-        osDelay(10);
-        --wait_in_10ticks;
+        osDelay(WAIT_STEP);
+        max_wait_ms -= WAIT_STEP;
     }
-    if (wait_in_10ticks == 0) {
-        FURI_LOG_I(TAG, "wait_busy() elapsed!");
+    if(max_wait_ms <= 0) {
+        FURI_LOG_W(TAG, "wait_busy() elapsed!");
     }
     return (result && ((status & SpiStatusRegister_BUSY) == 0));
 }
 
 static bool set_write_enabled(bool enabled) {
-    FURI_LOG_I(TAG, "Setting WE to %d", enabled);
+    //FURI_LOG_I(TAG, "Setting WE to %d", enabled);
 
     bool result = true;
     uint8_t status, cmd = enabled ? SpiChipCommand_WRITE_ENABLE : SpiChipCommand_WRITE_DISABLE;
@@ -90,19 +95,19 @@ static bool set_write_enabled(bool enabled) {
     //}
 
     if(result) {
-        FURI_LOG_I(TAG, "Updated status reg");
+        //FURI_LOG_I(TAG, "Updated status reg");
         result = read_status(&status);
     }
 
-    bool is_currently_protected = ((status & SpiStatusRegister_WEL) == 0);
+    bool is_currently_writeable = ((status & SpiStatusRegister_WEL) != 0);
 
-    FURI_LOG_I(TAG, "Requested protection: %d, effective protection: %d", enabled, is_currently_protected);
+    //FURI_LOG_I(TAG, "Requested WE: %d, effective writeable: %d", enabled, is_currently_writeable);
 
     if(result) {
-        if(enabled && is_currently_protected) {
+        if(enabled && !is_currently_writeable) {
             // Can't enable write status.
             return false;
-        } else if(!enabled && !is_currently_protected) {
+        } else if(!enabled && is_currently_writeable) {
             // Can't disable write status.
             return false;
         }
@@ -158,7 +163,7 @@ static bool page256_or_1_byte_write(
         result = spi_wrapper_write_read(
             SpiChipCommand_PAGE_PROGRAM, cmd_data, cmd_size + data_size, NULL, 0);
         if(!result) break;
-        result = wait_busy(10);
+        result = wait_busy(MAX_WAIT_PAGE_WRITE);
         if(!result) break;
     }
     // FIXME
@@ -194,7 +199,7 @@ static bool aai_write(struct SpiFlashInfo_t* info, uint32_t addr, size_t size, u
         result = spi_wrapper_write_read(
             SpiChipCommand_AAI_WORD_PROGRAM, cmd_data, cmd_size + 2, NULL, 0);
         if(!result) break;
-        result = wait_busy(20);
+        result = wait_busy(MAX_WAIT_PAGE_WRITE);
         if(!result) break;
         cmd_size = 0;
         size -= 2;
@@ -488,9 +493,9 @@ bool SpiToolkit::chip_erase() {
                     result = spi_wrapper_write_read(SpiChipCommand_ERASE_CHIP, NULL, 0, NULL, 0);
                 }
                 if(result) {
-                    result = wait_busy(2 * 60 * 100); // FIXME!
+                    result = wait_busy(MAX_WAIT_CHIP_ERASE, 200); // FIXME!
                     set_write_enabled(false);
-                    result &= wait_busy(2 * 60 * 100);
+                    result &= wait_busy(MAX_WAIT_CHIP_ERASE, 200);
                     if(!result) {
                         FURI_LOG_I(TAG, "Chip Erase timeout error");
                     }
@@ -530,7 +535,7 @@ bool SpiToolkit::write_block(
     furi_assert(p_data);
     furi_assert(data_len && (data_len <= SPI_MAX_BLOCK_SIZE));
 
-    FURI_LOG_I(TAG, "Writing %d bytes @ %x", data_len, offset);
+    //FURI_LOG_I(TAG, "Writing %d bytes @ %x", data_len, offset);
 
 #ifdef FLASHMGR_MOCK
     osDelay(100);
@@ -573,8 +578,8 @@ bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const si
     if(last_info.valid) {
         if((offset + data_len) <= last_info.size) {
             SpiLock lock;
-            if(release_deep_sleep() && wait_busy(10)) {
-                FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
+            if(release_deep_sleep() && wait_busy(MAX_WAIT_PAGE_READ)) {
+                //FURI_LOG_I(TAG, "Reading %d bytes @ %x", data_len, offset);
                 uint8_t cmd[4];
                 if(spi_wrapper_write_read(
                        SpiChipCommand_READ_DATA,
