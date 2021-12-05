@@ -27,7 +27,7 @@ static const LL_SPI_InitTypeDef flash_manager_spi_preset_external_safe = {
 #ifdef USE_SPI_LOG
     .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV16, // DIV256,
 #else
-    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV8,
+    .BaudRate = LL_SPI_BAUDRATEPRESCALER_DIV64,
 #endif
     .BitOrder = LL_SPI_MSB_FIRST,
     .CRCCalculation = LL_SPI_CRCCALCULATION_DISABLE,

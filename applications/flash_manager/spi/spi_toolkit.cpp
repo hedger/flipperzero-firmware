@@ -71,18 +71,20 @@ static bool wait_busy(int32_t max_wait_ms, int32_t wait_step = WAIT_STEP) {
 }
 
 static bool set_write_enabled(bool enabled) {
-    //FURI_LOG_I(TAG, "Setting WE to %d", enabled);
+    FURI_LOG_I(TAG, "Setting WE to %d", enabled);
 
     bool result = true;
-    uint8_t status, cmd = enabled ? SpiChipCommand_WRITE_ENABLE : SpiChipCommand_WRITE_DISABLE;
+    uint8_t original_status, status,
+        cmd = enabled ? SpiChipCommand_WRITE_ENABLE : SpiChipCommand_WRITE_DISABLE;
     result = spi_wrapper_write_read(cmd, NULL, 0, NULL, 0);
     if(result) {
-        result = read_status(&status);
+        original_status = result = read_status(&status);
     }
 
-    result = spi_wrapper_write_read(SpiChipCommand_VOLATILE_SR_WRITE_ENABLE, NULL, 0, NULL, 0);
-    if(result) {
-        result = read_status(&status);
+    if(enabled) {
+        result =
+            spi_wrapper_write_read(SpiChipCommand_VOLATILE_SR_WRITE_ENABLE, NULL, 0, NULL, 0) &&
+            read_status(&status);
     }
 
     // FIXME: respect 'enabled' mode
@@ -94,10 +96,10 @@ static bool set_write_enabled(bool enabled) {
     //    result &= spi_wrapper_write_read(SpiChipCommand_WRITE_STATUS_REG_1, &zero_status, 1, NULL, 0);
     //}
 
-    if(result) {
-        //FURI_LOG_I(TAG, "Updated status reg");
-        result = read_status(&status);
-    }
+    //if(result) {
+    //    //FURI_LOG_I(TAG, "Updated status reg");
+    //    result = read_status(&status);
+    //}
 
     bool is_currently_writeable = ((status & SpiStatusRegister_WEL) != 0);
 
@@ -106,9 +108,11 @@ static bool set_write_enabled(bool enabled) {
     if(result) {
         if(enabled && !is_currently_writeable) {
             // Can't enable write status.
+            FURI_LOG_W(TAG, "Failed to enable write: SR=%02X", status);
             return false;
         } else if(!enabled && is_currently_writeable) {
             // Can't disable write status.
+            FURI_LOG_W(TAG, "Failed to disable write: SR=%02X", status);
             return false;
         }
     }
