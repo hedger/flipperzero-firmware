@@ -80,7 +80,9 @@ void FlashManagerSceneWriteDump::finish_write() {
         button->set_type(ButtonElement::Type::Right, "Exit");
         button->set_callback(this, &FlashManagerSceneWriteDump::done_callback);
         cancel_btn->set_enabled(false);
-        run_verification_btn->set_enabled(true);
+        if(!cancelled) {
+            run_verification_btn->set_enabled(true);
+        }
     }
 }
 
@@ -109,15 +111,19 @@ void FlashManagerSceneWriteDump::tick() {
     uint32_t progress = 0;
 
     if(writer_task->completed()) {
-        header_line->update_text("Writing chip...");
         if(writer_task->success) {
-            // TODO: check result
             app->file_tools.read_buffer(writer_task->data, writer_task->size);
             bytes_written += writer_task->size;
             if(bytes_written < flash->size) {
                 enqueue_next_block();
             }
+        } else {
+            cancelled = true;
+            status_line->update_text("FAILED :(");
+            finish_write();
+            return;
         }
+        header_line->update_text("Writing chip...");
         progress = bytes_written * 100 / flash->size;
     } else {
         progress = (bytes_written + (writer_task->progress * writer_task->size / 100)) * 100 /
