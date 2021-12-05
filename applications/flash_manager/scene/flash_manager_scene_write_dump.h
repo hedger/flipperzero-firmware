@@ -19,8 +19,8 @@ private:
 
     void finish_write();
     void tick();
-    bool enqueue_next_block();
     void check_tasks_update_progress();
+    bool enqueue_next_block();
     bool check_task_state(std::unique_ptr<WorkerTask>& task);
 
     //void result_callback(void* context);

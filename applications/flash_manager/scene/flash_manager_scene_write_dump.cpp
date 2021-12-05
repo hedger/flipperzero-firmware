@@ -160,11 +160,6 @@ bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& t
         }
     }
     return false;
-    //FIXME
-    //else {
-    //    progress = (bytes_written + (task->progress * task->size / 100)) * 100 /
-    //               write_to_chip_size;
-    //}
 }
 
 bool FlashManagerSceneWriteDump::enqueue_next_block() {
