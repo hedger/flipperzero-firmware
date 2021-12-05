@@ -143,6 +143,7 @@ void FlashManagerSceneWriteDump::check_tasks_update_progress() {
     progress = bytes_written * 100 / write_to_chip_size;
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
+    app->notify_red_blink();
 }
 
 bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& task) {
@@ -162,8 +163,6 @@ bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& t
         }
     }
     return false;
-    
-    app->notify_red_blink();
 }
 
 bool FlashManagerSceneWriteDump::enqueue_next_block() {
