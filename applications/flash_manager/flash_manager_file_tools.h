@@ -27,12 +27,14 @@ public:
 
     std::string make_name(const std::string& full_name) const;
 
+    static const char* get_app_folder();
+
 private:
     // std::unique_ptr<IrdaFileSignal> parse_signal(const std::string& str) const;
     // std::unique_ptr<IrdaFileSignal> parse_signal_raw(const std::string& str) const;
     std::string make_full_name(const std::string& name, ChipType chip) const;
 
-    static inline const char* const dump_directory = "/any/flash";
+    static inline const char* const dump_directory = "/ext/flash";
     static inline const char* const dump_extension = ".bin";
 
     FileWorkerCpp file_worker;

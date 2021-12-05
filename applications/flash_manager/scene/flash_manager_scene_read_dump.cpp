@@ -91,6 +91,10 @@ void FlashManagerSceneReadDump::finish_read() {
         button->set_type(ButtonElement::Type::Right, "Exit");
         button->set_callback(this, &FlashManagerSceneReadDump::done_callback);
         cancel_button->set_enabled(false);
+
+        if(!cancelled) {
+            app->scene_controller.switch_to_scene(FlashManager::SceneType::ShowSuccess);
+        }
     }
 }
 
@@ -149,6 +153,12 @@ void FlashManagerSceneReadDump::tick() {
     detail_line->update_text(string_get_cstr(detail_text));
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
+
+    if(app->runVerification) {
+        app->notify_green_blink();
+    } else {
+        app->notify_yellow_blink();
+    }
 }
 
 bool FlashManagerSceneReadDump::enqueue_next_block() {

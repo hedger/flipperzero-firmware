@@ -49,23 +49,27 @@ void FlashManagerSceneChipID::start_chip_id() {
 }
 
 void FlashManagerSceneChipID::tick() {
-    if(chip_id_task && chip_id_task->completed()) {
-        FURI_LOG_I(
-            TAG,
-            "id task completed: succ %d, valid %d, id %d",
-            chip_id_task->success,
-            flash_info->valid,
-            flash_info->vendor_id);
+    if(chip_id_task) {
+        if(chip_id_task->completed()) {
+            FURI_LOG_I(
+                TAG,
+                "id task completed: succ %d, valid %d, id %d",
+                chip_id_task->success,
+                flash_info->valid,
+                flash_info->vendor_id);
 
-        if(chip_id_task->success && flash_info->valid) {
-            app->scene_controller.switch_to_scene(FlashManager::SceneType::ChipInfoScene);
+            if(chip_id_task->success && flash_info->valid) {
+                app->scene_controller.switch_to_scene(FlashManager::SceneType::ChipInfoScene);
+            } else {
+                status_line->update_text("NOTHING FOUND");
+                scan_btn->set_enabled(true);
+                back_btn->set_enabled(true);
+            }
+
+            chip_id_task.reset();
         } else {
-            status_line->update_text("NOTHING FOUND");
-            scan_btn->set_enabled(true);
-            back_btn->set_enabled(true);
+            app->notify_green_blink();
         }
-
-        chip_id_task.reset();
     }
 }
 

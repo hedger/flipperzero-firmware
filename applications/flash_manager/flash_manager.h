@@ -13,6 +13,7 @@
 #include <record-controller.hpp>
 #include <text-store.h>
 
+#include <view-modules/popup-vm.h>
 #include <view-modules/submenu-vm.h>
 #include <view-modules/text-input-vm.h>
 #include <view-modules/byte-input-vm.h>
@@ -49,7 +50,9 @@ public:
         ChipInfoScene, // InfoScene
         ReadImgFileNameInputScene, // SaveNameScene
         ReadImgProcessScene, // ReadScene
-        WriteImgProcessScene // WriteScene
+        WriteImgProcessScene, // WriteScene
+        ShowError,
+        ShowSuccess
     };
 
     class Event {
@@ -63,11 +66,13 @@ public:
 
     SceneController<GenericScene<FlashManager>, FlashManager> scene_controller;
     TextStore text_store;
-    ViewController<FlashManager, SubmenuVM, ByteInputVM, TextInputVM, ContainerVM> view_controller;
+    ViewController<FlashManager, SubmenuVM, PopupVM, ByteInputVM, TextInputVM, ContainerVM> view_controller;
 
     RecordController<NotificationApp> notification;
-    //RecordController<Storage> storage;
-    //RecordController<DialogsApp> dialogs;
+    RecordController<Storage> storage;
+    RecordController<DialogsApp> dialogs;
+
+    string_t error_str;
 
     std::unique_ptr<FlashManagerWorker> worker;
 
@@ -85,6 +90,17 @@ public:
 
     SpiFlashInfo_t* get_flash_info();
 
+    void notify_green_blink();
+    void notify_yellow_blink();
+    void notify_red_blink();
+    void notify_error();
+    void notify_success();
+    void notify_green_on();
+    void notify_green_off();
+    void notify_red_on();
+    void notify_red_off();
+    
+    bool make_app_folder();
 private:
     SpiFlashInfo_t flash_info;
 };

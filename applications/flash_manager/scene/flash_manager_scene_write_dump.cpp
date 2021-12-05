@@ -90,8 +90,10 @@ void FlashManagerSceneWriteDump::finish_write() {
         button->set_type(ButtonElement::Type::Right, "Exit");
         button->set_callback(this, &FlashManagerSceneWriteDump::done_callback);
         cancel_btn->set_enabled(false);
+
         if(!cancelled) {
             run_verification_btn->set_enabled(true);
+            app->notify_success();
         }
     }
 }
@@ -141,6 +143,8 @@ void FlashManagerSceneWriteDump::tick() {
 
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
+    
+    app->notify_red_blink();
 }
 
 bool FlashManagerSceneWriteDump::enqueue_next_block() {
