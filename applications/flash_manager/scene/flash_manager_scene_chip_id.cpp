@@ -61,7 +61,7 @@ void FlashManagerSceneChipID::tick() {
             if(chip_id_task->success && flash_info->valid) {
                 app->scene_controller.switch_to_scene(FlashManager::SceneType::ChipInfoScene);
             } else {
-                status_line->update_text("NOTHING FOUND");
+                status_line->update_text("NOT FOUND");
                 scan_btn->set_enabled(true);
                 back_btn->set_enabled(true);
             }

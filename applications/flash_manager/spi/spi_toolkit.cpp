@@ -74,11 +74,12 @@ static bool set_write_enabled(bool enabled) {
     //FURI_LOG_I(TAG, "Setting WE to %d", enabled);
 
     bool result = true;
-    uint8_t original_status, status,
+    uint8_t original_status = 0, status,
         cmd = enabled ? SpiChipCommand_WRITE_ENABLE : SpiChipCommand_WRITE_DISABLE;
     result = spi_wrapper_write_read(cmd, NULL, 0, NULL, 0);
     if(result) {
-        original_status = result = read_status(&status);
+        result = read_status(&status);
+        original_status = status;
     }
 
     if(enabled) {
@@ -108,11 +109,11 @@ static bool set_write_enabled(bool enabled) {
     if(result) {
         if(enabled && !is_currently_writeable) {
             // Can't enable write status.
-            FURI_LOG_W(TAG, "Failed to enable write: SR=%02X", status);
+            FURI_LOG_W(TAG, "Failed to enable write: orig SR=%02X, last SR=%02X", original_status, status);
             return false;
         } else if(!enabled && is_currently_writeable) {
             // Can't disable write status.
-            FURI_LOG_W(TAG, "Failed to disable write: SR=%02X", status);
+            FURI_LOG_W(TAG, "Failed to disable write: orig SR=%02X, last SR=%02X", original_status, status);
             return false;
         }
     }

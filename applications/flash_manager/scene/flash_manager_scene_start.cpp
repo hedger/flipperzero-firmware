@@ -17,7 +17,7 @@ void FlashManagerSceneStart::on_enter(FlashManager* app, bool need_restore) {
 
     //submenu->add_item("Byte Input", SubmenuByteInput, callback, app);
     //submenu->add_item("Dump browser", SubmenuFileBrowser, callback, app);
-    submenu->add_item("Detect SPI chip", SubmenuChipID, callback, app);
+    submenu->add_item("Detect SPI memory", SubmenuChipID, callback, app);
     //submenu->add_item("Read", SubmenuOpRead, callback, app);
     //submenu->add_item("Write", SubmenuOpWrite, callback, app);
 

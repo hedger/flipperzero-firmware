@@ -58,7 +58,7 @@ public:
     class Event {
     public:
         union {
-            int32_t menu_index;
+            uint32_t menu_index;
         } payload;
 
         EventType type;

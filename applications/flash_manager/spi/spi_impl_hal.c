@@ -12,7 +12,6 @@
 
 #define TAG "SPIImpl"
 
-#pragma region SPI CONFIG
 //static FuriHalSpiBusHandle* const p_spi_bus = &furi_hal_spi_bus_handle_external;
 
 //!!! #define USE_SPI_LOG
