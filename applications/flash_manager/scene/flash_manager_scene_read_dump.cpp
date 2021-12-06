@@ -160,6 +160,7 @@ bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& ta
                 // TODO: break
             }
         } else {
+            app->file_tools.seek(task->offset);
             app->file_tools.write_buffer(task->data, task->size);
         }
 

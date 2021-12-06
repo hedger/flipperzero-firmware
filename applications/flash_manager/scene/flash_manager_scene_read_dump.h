@@ -38,7 +38,7 @@ private:
     string_t detail_text, status_text;
     size_t bytes_read, bytes_queued, verification_file_size;
 
-    static const int TASK_DEPTH = 3;
+    static const int TASK_DEPTH = 1;
     std::unique_ptr<WorkerTask> reader_tasks[TASK_DEPTH];
     std::unique_ptr<uint8_t[]> read_buffers[TASK_DEPTH];
     //std::unique_ptr<WorkerTask> reader_task;
