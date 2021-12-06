@@ -50,8 +50,14 @@ bool furi_hal_i2c_tx(
     uint32_t time_left = timeout;
     bool ret = true;
 
-    while(LL_I2C_IsActiveFlag_BUSY(handle->bus->i2c))
-        ;
+    while(LL_I2C_IsActiveFlag_BUSY(handle->bus->i2c)) {
+        if(--time_left == 0) {
+            ret = false;
+            break;
+        }
+    }
+
+    time_left = timeout;
 
     LL_I2C_HandleTransfer(
         handle->bus->i2c,
