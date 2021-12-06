@@ -39,7 +39,7 @@
     debug_target_connection="GDB Server"
     gdb_server_allow_memory_access_during_execution="Yes"
     gdb_server_autostart_server="Yes"
-    gdb_server_command_line="E:/tools/openocd/bin/openocd.exe -f interface/stlink.cfg -c &quot;transport select hla_swd&quot; -f &quot;$(SolutionDir)/../debug/stm32wbx.cfg&quot; -c &quot;stm32wbx.cpu configure -rtos auto&quot; -c &quot;init&quot;"
+    gdb_server_command_line="openocd -f interface/stlink.cfg -c &quot;transport select hla_swd&quot; -f &quot;$(SolutionDir)/../debug/stm32wbx.cfg&quot; -c &quot;stm32wbx.cpu configure -rtos auto&quot; -c &quot;init&quot;"
     gdb_server_ignore_checksum_errors="No"
     gdb_server_port="3333"
     gdb_server_register_access="General and Individual"
