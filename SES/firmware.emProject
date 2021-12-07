@@ -2,17 +2,21 @@
 <solution Name="Flipper" target="8" version="2">
   <configuration
     Name="Debug"
-    c_preprocessor_definitions="DEBUG"
-    gcc_debugging_level="Level 3"
+    c_preprocessor_definitions="FURI_DEBUG;NDEBUG;"
+    gcc_cl_optimization_level="Debug"
+    _gcc_debugging_level="Level 3"
     gcc_optimization_level="None"
     hidden="Yes" />
   <configuration
     Name="Release"
     c_preprocessor_definitions="NDEBUG"
-    gcc_debugging_level="Level 2"
+    gcc_cl_optimization_level="Size"
+    gcc_debugging_level="None"
     gcc_omit_frame_pointer="Yes"
     gcc_optimization_level="Level 2 balanced"
-    hidden="Yes" />
+    link_keep_lto_files="Yes"
+    link_time_optimization="Yes" 
+    hidden="Yes"/>
   <configuration
     FLIPPER_PLATFORM="F6"
     Name="FlipperF6"
@@ -97,7 +101,6 @@
     gcc_cl_enable_debug_info="Yes"
     gcc_cl_extra_warnings="Yes"
     gcc_cl_function_sections="Yes"
-    gcc_cl_optimization_level="Debug"
     gcc_cl_warnings_as_errors="No"
     gcc_cplusplus_language_standard="gnu++17"
     gcc_entry_point="Reset_Handler"
@@ -142,15 +145,10 @@
       use_compiler_driver="No" />
     <configuration
       Name="Debug"
-      c_preprocessor_definitions="FURI_DEBUG;NDEBUG;APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER" />
+      c_preprocessor_definitions="APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER" />
     <configuration
       Name="Release"
-      c_preprocessor_definitions="APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER"
-      c_preprocessor_undefinitions="NDEBUG"
-      gcc_cl_optimization_level="Size"
-      gcc_optimization_level="Level 2 for size"
-      link_keep_lto_files="Yes"
-      link_time_optimization="Yes" />
+      c_preprocessor_definitions="APP_IRDA_MONITOR;APP_ARCHIVE;APP_BLINK;APP_SUBGHZ;APP_ABOUT;APP_LF_RFID;APP_NFC;APP_IRDA;APP_VIBRO_TEST;APP_USB_TEST;APP_UART_ECHO;APP_DISPLAY_TEST;APP_USB_MOUSE;APP_BAD_USB;APP_KEYPAD_TEST;APP_ACCESSOR;APP_GPIO;APP_MUSIC_PLAYER;APP_SNAKE_GAME;APP_IBUTTON;SRV_BT;SRV_DESKTOP;SRV_DOLPHIN;SRV_POWER_OBSERVER;SRV_POWER;SRV_RPC;SRV_LOADER;SRV_DIALOGS;SRV_GUI;SRV_INPUT;SRV_CLI;SRV_NOTIFICATION;SRV_STORAGE;PLUGIN_FLASH_MANAGER" />
     <folder
       Name="applications"
       filter="*.c;*.cpp;*.h;*.hpp;*.d;*.inc;*.s"
@@ -315,7 +313,7 @@
       armgnu_cl_fpu="fpv4-sp-d16"
       build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml"
       c_additional_options="-mcpu=cortex-m4;-Og;-g;-fdata-sections;-ffunction-sections;-fno-math-errno;-fstack-usage;-MMD;-MP;-Wall;-mfloat-abi=hard"
-      c_preprocessor_definitions="BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000;FLASH_ADDRESS=0x08000000;STM32WB55xx;USE_FULL_LL_DRIVER;FURI_DEBUG;NDEBUG;SLIM_BOOTLOADER"
+      c_preprocessor_definitions="BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000;FLASH_ADDRESS=0x08000000;STM32WB55xx;USE_FULL_LL_DRIVER;SLIM_BOOTLOADER"
       c_user_include_directories="../..;../../lib/drivers;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Include;../../lib/STM32CubeWB/Drivers/CMSIS/Include;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc;../../lib/u8g2;../../bootloader/targets/$(FlipperHwRev)/furi-hal;../../bootloader/targets/furi-hal-include"
       debug_threads_script=""
       external_assemble_command1="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -x assembler-with-cpp  -c $(AsmOptions) $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
@@ -328,8 +326,6 @@
       project_can_build_in_parallel="Yes"
       project_directory="bootloader"
       project_type="Executable" />
-    <configuration Name="Debug" />
-    <configuration Name="Release" />
     <file file_name="../../bootloader/src/main.c" />
     <folder Name="f6" path="../../bootloader/targets/f6" recurse="Yes">
       <configuration Name="FlipperF7" build_exclude_from_build="Yes" />
@@ -348,5 +344,6 @@
       <file file_name="../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Source/Templates/gcc/startup_stm32wb55xx_cm4.s" />
     </folder>
     <file file_name="../../lib/toolbox/version.c" />
+    <configuration Name="Release" gcc_optimization_level="Level 2 for size" />
   </project>
 </solution>
