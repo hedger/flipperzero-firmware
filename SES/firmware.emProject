@@ -31,12 +31,20 @@
     hidden="Yes"
     macros="FlipperHwRev=f7" />
   <configuration
-    Name="Mock SPI"
+    Name="Extra Flipper FW definitions"
     c_preprocessor_definitions="FLASHMGR_MOCK"
     hidden="Yes" />
   <configuration
     Name="Dbg: JLINK"
     debug_target_connection="J-Link"
+    debug_leave_target_running="Yes"
+    debug_memory_upload_page_size="4096"
+    debug_restrict_memory_access="No"
+    debug_start_from_entry_point_symbol="No"
+    debug_target_connection="GDB Server"
+    debug_terminal_log_file="debugger.log"
+    debug_threads_max="32"
+    speed="0"
     hidden="Yes" />
   <configuration
     Name="Dbg: OpenOCD over ST-LINK"
@@ -45,7 +53,6 @@
     debug_initial_breakpoint_set_option="Only With No Breakpoints Set"
     debug_leave_target_running="Yes"
     debug_memory_upload_page_size="4096"
-    debug_register_definition_file="$(SolutionDir)/STM32WBxx_CM4_Registers.xml"
     debug_restrict_memory_access="No"
     debug_start_from_entry_point_symbol="No"
     debug_target_connection="GDB Server"
@@ -63,9 +70,9 @@
     gdb_server_reset_command=""
     gdb_server_type="OpenOCD"
     gdb_server_write_timeout="20"
-    hidden="Yes"
     speed="0"
-    target_loader_erase_all="No" />
+    target_loader_erase_all="No"
+    hidden="Yes" />
   <configuration
     Name="Common"
     THREAD_SCRIPT="FreeRTOS CM4"
@@ -99,6 +106,7 @@
     c_asm_additional_options="-x assembler-with-cpp"
     c_only_additional_options="-std=gnu17"
     clang_gnu_version="None"
+    debug_register_definition_file="$(SolutionDir)/xtras/STM32WBxx_CM4_Registers.xml"
     debug_threads_script="$(StudioDir)/samples/FreeRTOSPlugin_CM4.js"
     external_assemble_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c $(AsmOptions) @$(SolutionDir)/version.inc $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -o &quot;$(RelTargetPath)&quot;"
     external_c_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c $(COptions) $(COnlyOptions) @$(SolutionDir)/version.inc -DBUILD_DATE=\&quot;$(DateDay)-$(DateMonth)-$(DateYear)\&quot; $(Defines) $(Includes) &quot;$(RelInputPath)&quot; -MD -MF &quot;$(RelDependencyPath)&quot; -fno-diagnostics-show-caret -o &quot;$(RelTargetPath)&quot;"
@@ -121,14 +129,14 @@
     gcc_optimization_level="None"
     gcc_wchar_size="16-Bit"
     link_include_standard_libraries="No"
-    linker_memory_map_file="$(SolutionDir)/STM32WB55RGVx_MemoryMap.xml"
+    linker_memory_map_file="$(SolutionDir)/xtras/STM32WB55RGVx_MemoryMap.xml"
     linker_output_format="None"
     linker_post_build_command="&quot;$(ToolChainDir)/arm-none-eabi-objcopy&quot; &quot;$(RelTargetPath)&quot; &quot;$(PostLinkOutputFilePath)&quot; -Obinary"
     linker_post_build_command_output_file="$(OutDir)/flipper-z-$(FlipperHwRev)-$(ProjectName)-local.bin"
     macros="DeviceHeaderFile=../../lib/STM32CubeWB/Drivers/CMSIS/Device/Include/stm32wbxx.h;DeviceLibraryIdentifier=M4lf;DeviceSystemFile=../../firmware/targets/$(FlipperHwRev)/Src/system_stm32wbxx.c;DeviceFamily=STM32WBxx;DeviceSubFamily=STM32WB55;Target=STM32WB55RGVx"
     pre_build_command="python ./version.py"
     pre_build_command_wd="$(SolutionDir)"
-    property_groups_file_path="$(SolutionDir)/flipper.property-groups.xml" />
+    property_groups_file_path="$(SolutionDir)/xtras/flipper.property-groups.xml" />
   <configuration
     Name="dbg"
     inherited_configurations="Internal;Debug;FlipperF7;Dbg: OpenOCD over ST-LINK" />
@@ -146,7 +154,6 @@
       c_preprocessor_definitions="__STM32WBxx_FAMILY;__STM32WB55_SUBFAMILY;ARM_MATH_CM4;STM32WB;USB_PMASIZE=0x400;STM32WB55xx;USE_FULL_LL_DRIVER;USE_HAL_DRIVER;HAVE_FREERTOS;PB_ENABLE_MALLOC;PB_WITHOUT_64BIT;_GNU_SOURCE;LFS_CONFIG=lfs_config.h;BOOT_ADDRESS=0x08000000;FW_ADDRESS=0x08008000;OS_OFFSET=0x00008000"
       c_user_include_directories="../../assets/compiled;../../core;../../applications;../../lib;../../lib/mlib;../../lib/u8g2;../../lib/littlefs;../../lib/ST25RFAL002;../../lib/ST25RFAL002/include;../../lib/ST25RFAL002/source/st25r3916;../../lib/nfc_protocols;../../lib/callback-connector;../../lib/app-template;../../lib/app_scene_template;../../lib/fnv1a-hash;../../lib/onewire;../../lib/cyfral;../../lib/common-api;../../lib/drivers;../../lib/file_reader;../../lib/irda/encoder_decoder;../../lib/irda/worker;../../lib/app-scened-template;../../lib/libusb_stm32/inc;../../lib/nanopb;../../lib/heatshrink;../../lib/flipper_file;../../;../../firmware/targets/furi-hal-include;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc;../../lib/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver/Inc/Legacy;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST;../../lib/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx/Include;../../lib/STM32CubeWB/Drivers/CMSIS/Include;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/include;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../../lib/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F;../../firmware/targets/$(FlipperHwRev)/ble-glue;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/ble/core/template;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/utilities;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl;../../lib/STM32CubeWB/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci;../../firmware/targets/$(FlipperHwRev)/furi-hal;../../firmware/targets/$(FlipperHwRev)/Inc;../../firmware/targets/$(FlipperHwRev)/fatfs"
       cpp_only_additional_options="-std=gnu++17;-fno-threadsafe-statics;-fno-use-cxa-atexit;-fno-exceptions;-fno-rtti"
-      debug_register_definition_file="$(SolutionDir)/STM32WBxx_CM4_Registers.xml"
       external_load_address="0x8008000"
       link_linker_script_file="../../firmware/targets/$(FlipperHwRev)/stm32wb55xx_flash_cm4_with_bootloader.ld"
       link_use_linker_script_file="Yes"
