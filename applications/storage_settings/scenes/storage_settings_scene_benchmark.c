@@ -1,16 +1,17 @@
 #include "../storage_settings.h"
 
-#define BENCH_DATA_SIZE 4096
+#define BENCH_DATA_SIZE 4096 * 16
 #define BENCH_COUNT 6
 #define BENCH_REPEATS 4
 #define BENCH_FILE "/ext/rwfiletest.bin"
 
-static void
-    storage_settings_scene_benchmark_dialog_callback(DialogExResult result, void* context) {
-    StorageSettings* app = context;
+#ifndef max
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
 
-    view_dispatcher_send_custom_event(app->view_dispatcher, result);
-}
+static uint16_t bench_size_default[BENCH_COUNT] = {1, 8, 32, 256, 512, 1024};
+static uint16_t bench_size_large[BENCH_COUNT] = {512, 1024, 2048, 4096, 8192, 16384};
 
 static bool storage_settings_scene_bench_write(
     Storage* api,
@@ -20,11 +21,12 @@ static bool storage_settings_scene_bench_write(
     File* file = storage_file_alloc(api);
     bool result = true;
     if(storage_file_open(file, BENCH_FILE, FSAM_WRITE, FSOM_CREATE_ALWAYS)) {
-        uint32_t ticks;
+        uint32_t ticks, bench_iterations;
+        bench_iterations = min(BENCH_DATA_SIZE / size, 512);
         ticks = osKernelGetTickCount();
 
         for(size_t repeat = 0; repeat < BENCH_REPEATS; repeat++) {
-            for(size_t i = 0; i < BENCH_DATA_SIZE / size; i++) {
+            for(size_t i = 0; i < bench_iterations; i++) {
                 if(storage_file_write(file, (data + i * size), size) != size) {
                     result = false;
                     break;
@@ -33,7 +35,7 @@ static bool storage_settings_scene_bench_write(
         }
 
         ticks = osKernelGetTickCount() - ticks;
-        *speed = BENCH_DATA_SIZE * osKernelGetTickFreq() * BENCH_REPEATS;
+        *speed = bench_iterations * size * osKernelGetTickFreq() * BENCH_REPEATS;
         *speed /= ticks;
         *speed /= 1024;
     }
@@ -49,11 +51,12 @@ static bool
     *speed = -1;
 
     if(storage_file_open(file, BENCH_FILE, FSAM_READ, FSOM_OPEN_EXISTING)) {
-        uint32_t ticks;
+        uint32_t ticks, bench_iterations;
+        bench_iterations = min(BENCH_DATA_SIZE / size, 512);
         ticks = osKernelGetTickCount();
 
         for(size_t repeat = 0; repeat < BENCH_REPEATS; repeat++) {
-            for(size_t i = 0; i < BENCH_DATA_SIZE / size; i++) {
+            for(size_t i = 0; i < bench_iterations; i++) {
                 if(storage_file_read(file, (data + i * size), size) != size) {
                     result = false;
                     break;
@@ -62,16 +65,22 @@ static bool
         }
 
         ticks = osKernelGetTickCount() - ticks;
-        *speed = BENCH_DATA_SIZE * osKernelGetTickFreq() * BENCH_REPEATS;
+        *speed = bench_iterations * size * osKernelGetTickFreq() * BENCH_REPEATS;
         *speed /= ticks;
         *speed /= 1024;
     }
     storage_file_close(file);
     storage_file_free(file);
     return result;
-}
+};
 
-static void storage_settings_scene_benchmark(StorageSettings* app) {
+static bool running = false;
+
+static void storage_settings_scene_benchmark(StorageSettings* app, uint16_t* bench_size) {
+    if(running) return;
+    running = true;
+
+    string_reset(app->text_string);
     DialogEx* dialog_ex = app->dialog_ex;
     uint8_t* bench_data;
     dialog_ex_set_header(dialog_ex, "Preparing data...", 64, 32, AlignCenter, AlignCenter);
@@ -81,7 +90,6 @@ static void storage_settings_scene_benchmark(StorageSettings* app) {
         bench_data[i] = (uint8_t)i;
     }
 
-    uint16_t bench_size[BENCH_COUNT] = {1, 8, 32, 256, 512, 1024};
     uint32_t bench_w_speed[BENCH_COUNT] = {0, 0, 0, 0, 0, 0};
     uint32_t bench_r_speed[BENCH_COUNT] = {0, 0, 0, 0, 0, 0};
 
@@ -107,7 +115,18 @@ static void storage_settings_scene_benchmark(StorageSettings* app) {
     }
 
     free(bench_data);
+    running = false;
 }
+
+static void
+    storage_settings_scene_benchmark_dialog_callback(DialogExResult result, void* context) {
+    StorageSettings* app = context;
+
+    view_dispatcher_send_custom_event(app->view_dispatcher, result);
+    if(result == DialogExResultRight) {
+        storage_settings_scene_benchmark(app, bench_size_large);
+    }
+};
 
 void storage_settings_scene_benchmark_on_enter(void* context) {
     StorageSettings* app = context;
@@ -128,7 +147,8 @@ void storage_settings_scene_benchmark_on_enter(void* context) {
             AlignCenter);
         dialog_ex_set_left_button_text(dialog_ex, "Back");
     } else {
-        storage_settings_scene_benchmark(app);
+        dialog_ex_set_right_button_text(dialog_ex, "...");
+        storage_settings_scene_benchmark(app, bench_size_default); //bench_size_large);
         notification_message(app->notification, &sequence_blink_green_100);
     }
 }
