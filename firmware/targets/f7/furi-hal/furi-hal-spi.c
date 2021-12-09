@@ -70,14 +70,20 @@ void furi_hal_spi_release(FuriHalSpiBusHandle* handle) {
 }
 
 static void furi_hal_spi_bus_end_txrx(FuriHalSpiBusHandle* handle, uint32_t timeout) {
-    while(LL_SPI_GetTxFIFOLevel(handle->bus->spi) != LL_SPI_TX_FIFO_EMPTY);
-    while(LL_SPI_IsActiveFlag_BSY(handle->bus->spi));
+    while(LL_SPI_GetTxFIFOLevel(handle->bus->spi) != LL_SPI_TX_FIFO_EMPTY)
+        ;
+    while(LL_SPI_IsActiveFlag_BSY(handle->bus->spi))
+        ;
     while(LL_SPI_GetRxFIFOLevel(handle->bus->spi) != LL_SPI_RX_FIFO_EMPTY) {
         LL_SPI_ReceiveData8(handle->bus->spi);
     }
 }
 
-bool furi_hal_spi_bus_rx(FuriHalSpiBusHandle* handle, uint8_t* buffer, size_t size, uint32_t timeout) {
+bool furi_hal_spi_bus_rx(
+    FuriHalSpiBusHandle* handle,
+    uint8_t* buffer,
+    size_t size,
+    uint32_t timeout) {
     furi_assert(handle);
     furi_assert(handle->bus->current_handle == handle);
     furi_assert(buffer);
@@ -86,7 +92,11 @@ bool furi_hal_spi_bus_rx(FuriHalSpiBusHandle* handle, uint8_t* buffer, size_t si
     return furi_hal_spi_bus_trx(handle, buffer, buffer, size, timeout);
 }
 
-bool furi_hal_spi_bus_tx(FuriHalSpiBusHandle* handle, uint8_t* buffer, size_t size, uint32_t timeout) {
+bool furi_hal_spi_bus_tx(
+    FuriHalSpiBusHandle* handle,
+    uint8_t* buffer,
+    size_t size,
+    uint32_t timeout) {
     furi_assert(handle);
     furi_assert(handle->bus->current_handle == handle);
     furi_assert(buffer);
@@ -94,7 +104,7 @@ bool furi_hal_spi_bus_tx(FuriHalSpiBusHandle* handle, uint8_t* buffer, size_t si
     bool ret = true;
 
     while(size > 0) {
-        if (LL_SPI_IsActiveFlag_TXE(handle->bus->spi)) {
+        if(LL_SPI_IsActiveFlag_TXE(handle->bus->spi)) {
             LL_SPI_TransmitData8(handle->bus->spi, *buffer);
             buffer++;
             size--;
@@ -107,11 +117,16 @@ bool furi_hal_spi_bus_tx(FuriHalSpiBusHandle* handle, uint8_t* buffer, size_t si
     return ret;
 }
 
-bool furi_hal_spi_bus_trx(FuriHalSpiBusHandle* handle, uint8_t* tx_buffer, uint8_t* rx_buffer, size_t size, uint32_t timeout) {
+bool furi_hal_spi_bus_trx(
+    FuriHalSpiBusHandle* handle,
+    uint8_t* tx_buffer,
+    uint8_t* rx_buffer,
+    size_t size,
+    uint32_t timeout) {
     furi_assert(handle);
     furi_assert(handle->bus->current_handle == handle);
-    furi_assert(tx_buffer);
-    furi_assert(rx_buffer);
+    //furi_assert(tx_buffer);
+    //furi_assert(rx_buffer);
     furi_assert(size > 0);
 
     bool ret = true;
@@ -120,13 +135,17 @@ bool furi_hal_spi_bus_trx(FuriHalSpiBusHandle* handle, uint8_t* tx_buffer, uint8
 
     while(size > 0) {
         if(tx_size > 0 && LL_SPI_IsActiveFlag_TXE(handle->bus->spi) && tx_allowed) {
-            LL_SPI_TransmitData8(handle->bus->spi, *tx_buffer);
-            tx_buffer++;
+            if(tx_buffer) {
+                LL_SPI_TransmitData8(handle->bus->spi, *tx_buffer);
+                tx_buffer++;
+            } else {
+                LL_SPI_TransmitData8(handle->bus->spi, 0);
+            }
             tx_size--;
             tx_allowed = false;
         }
-        
-        if(LL_SPI_IsActiveFlag_RXNE(handle->bus->spi)) {
+
+        if(rx_buffer && LL_SPI_IsActiveFlag_RXNE(handle->bus->spi)) {
             *rx_buffer = LL_SPI_ReceiveData8(handle->bus->spi);
             rx_buffer++;
             size--;
