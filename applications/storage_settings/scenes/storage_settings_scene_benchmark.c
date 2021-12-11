@@ -22,7 +22,7 @@ static bool storage_settings_scene_bench_write(
     bool result = true;
     if(storage_file_open(file, BENCH_FILE, FSAM_WRITE, FSOM_CREATE_ALWAYS)) {
         uint32_t ticks, bench_iterations;
-        bench_iterations = min(BENCH_DATA_SIZE / size, 512);
+        bench_iterations = max(min(BENCH_DATA_SIZE / size, 512), 16);
         ticks = osKernelGetTickCount();
 
         for(size_t repeat = 0; repeat < BENCH_REPEATS; repeat++) {
@@ -52,7 +52,7 @@ static bool
 
     if(storage_file_open(file, BENCH_FILE, FSAM_READ, FSOM_OPEN_EXISTING)) {
         uint32_t ticks, bench_iterations;
-        bench_iterations = min(BENCH_DATA_SIZE / size, 512);
+        bench_iterations = max(min(BENCH_DATA_SIZE / size, 512), 16);
         ticks = osKernelGetTickCount();
 
         for(size_t repeat = 0; repeat < BENCH_REPEATS; repeat++) {

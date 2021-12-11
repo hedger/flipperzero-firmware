@@ -537,7 +537,6 @@ BSP_SD_WriteBlocksByOne(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlock
     uint32_t offset = 0;
     uint32_t addr;
     uint8_t retr = BSP_SD_ERROR;
-    uint8_t* ptr = NULL;
     SD_CmdAnswer_typedef response;
     uint16_t BlockSize = 512;
 
@@ -547,11 +546,6 @@ BSP_SD_WriteBlocksByOne(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlock
     SD_IO_CSState(1);
     SD_IO_WriteByte(SD_DUMMY_BYTE);
     if(response.r1 != SD_R1_NO_ERROR) {
-        goto error;
-    }
-
-    ptr = furi_alloc(sizeof(uint8_t) * BlockSize);
-    if(ptr == NULL) {
         goto error;
     }
 
@@ -575,7 +569,7 @@ BSP_SD_WriteBlocksByOne(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlock
         SD_IO_WriteByte(SD_TOKEN_START_DATA_SINGLE_BLOCK_WRITE);
 
         /* Write the block data to SD */
-        SD_IO_WriteReadData((uint8_t*)pData + offset, ptr, BlockSize);
+        SD_IO_WriteReadData((uint8_t*)pData + offset, NULL, BlockSize);
 
         /* Set next write address */
         offset += BlockSize;
@@ -597,7 +591,6 @@ BSP_SD_WriteBlocksByOne(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlock
     retr = BSP_SD_OK;
 
 error:
-    if(ptr != NULL) free(ptr);
     /* Send dummy byte: 8 Clock pulses of delay */
     SD_IO_CSState(1);
     SD_IO_WriteByte(SD_DUMMY_BYTE);
