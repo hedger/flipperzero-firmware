@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "elf-lib/elf.h"
+#include "symcache.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,6 +13,8 @@ typedef bool (*ELFResolver)(const char* name, Elf32_Addr* address);
 bool elf_resolve_from_table(const char* name, Elf32_Addr* address);
 
 bool elf_resolve_printf_only(const char* name, Elf32_Addr* address);
+
+bool elf_resolve_from_cache(const char* name, Elf32_Addr* address);
 
 #ifdef __cplusplus
 }
