@@ -5,7 +5,7 @@
 #include <string.h>
 #include <flipper_file/flipper_file.h>
 
-#include "tkvdb/tkvdb.h"
+#include <tkvdb.h>
 
 #define TAG "ElfSym"
 
@@ -24,7 +24,7 @@ bool fw_sym_cache_init() {
     };
 
     storage = furi_record_open("storage");
-    db = tkvdb_open(storage, TKV_SYM_PATH, NULL);
+    db = tkvdb_open(TKV_SYM_PATH, NULL);
     if(!db) {
         fw_sym_cache_free();
         return false;
@@ -72,10 +72,8 @@ uint32_t fw_sym_cache_resolve(const char* symname) {
 
     transaction->begin(transaction); /* start new transaction */
     TKVDB_RES opres = transaction->get(transaction, &key, &ovalue); /* get key-value pair */
-    FURI_LOG_I(TAG, "query res: %d", opres);
-
     if(opres != 0) {
-        FURI_LOG_W(TAG, "query FAILED!");
+        FURI_LOG_W(TAG, "query FAILED! res = %d", opres);
         ret_address = 0xFFFFFFFF;
     } else {
         furi_assert(ovalue.size == sizeof(uint32_t));
@@ -84,11 +82,7 @@ uint32_t fw_sym_cache_resolve(const char* symname) {
 
     transaction->rollback(transaction); /* dismiss */
 
-    FURI_LOG_I(
-        TAG,
-        "done: ovalue.size=%d, ret_address = %x\n",
-        ovalue.size,
-        ret_address);
+    FURI_LOG_I(TAG, "done: ovalue.size=%d, ret_address = %x", ovalue.size, ret_address);
 
     return ret_address;
 }

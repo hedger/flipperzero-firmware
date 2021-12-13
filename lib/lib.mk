@@ -124,3 +124,7 @@ C_SOURCES		+= $(wildcard $(LIB_DIR)/heatshrink/*.c)
 # Toolbox
 CFLAGS			+= -I$(LIB_DIR)/flipper_file
 C_SOURCES		+= $(wildcard $(LIB_DIR)/flipper_file/*.c)
+
+# TKV DB
+CFLAGS			+= -DTKV_IO_FURI -I$(LIB_DIR)/tkvdb
+C_SOURCES 		+= $(LIB_DIR)/tkvdb/tkvdb.c
