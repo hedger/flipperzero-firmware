@@ -5,13 +5,15 @@
 #include <string.h>
 #include <flipper_file/flipper_file.h>
 
+#include "tkvdb/tkvdb.h"
+
 #define TAG "ElfSym"
 
 #define READ_BUF_LEN 4096
 #define SYM_PATH "/ext/elf/fwdef.cfg"
 
 static Storage* storage = NULL;
-static FlipperFile* flipper_file = NULL;
+static File* sym_cache = NULL;
 
 bool fw_sym_cache_init() {
     if(fw_sym_cache_ready()) {
@@ -19,8 +21,8 @@ bool fw_sym_cache_init() {
     };
 
     storage = furi_record_open("storage");
-    flipper_file = flipper_file_alloc(storage);
-    if(!flipper_file_open_existing(flipper_file, SYM_PATH)) {
+    sym_cache = storage_file_alloc(storage);
+    if(!storage_file_open(sym_cache, SYM_PATH, FSAM_READ, FSOM_OPEN_EXISTING)) {
         fw_sym_cache_free();
         return false;
     }
@@ -33,15 +35,15 @@ void fw_sym_cache_free() {
     if(!fw_sym_cache_ready()) {
         return;
     }
-    flipper_file_close(flipper_file);
-    flipper_file_free(flipper_file);
-    flipper_file = NULL;
+    storage_file_close(sym_cache);
+    storage_file_free(sym_cache);
+    sym_cache = NULL;
     furi_record_close("storage");
     storage = NULL;
 }
 
 bool fw_sym_cache_ready() {
-    return (storage && flipper_file);
+    return (storage && sym_cache);
 }
 
 void* fw_sym_cache_resolve(const char* symname) {
@@ -50,10 +52,10 @@ void* fw_sym_cache_resolve(const char* symname) {
     }
 
     uint32_t ret_address = 0;
-    if(!flipper_file_read_uint32(flipper_file, symname, &ret_address, 1)) {
-        FURI_LOG_E(TAG, "Missing Symbol %s", symname);
-    }
+    //if(!flipper_file_read_uint32(flipper_file, symname, &ret_address, 1)) {
+    //    FURI_LOG_E(TAG, "Missing Symbol %s", symname);
+    //}
 
-    flipper_file_rewind(flipper_file);
+    //flipper_file_rewind(flipper_file);
     return (void*)ret_address;
 }
