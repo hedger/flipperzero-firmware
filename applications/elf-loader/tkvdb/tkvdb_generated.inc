@@ -40,23 +40,23 @@
 #define TKVDB_PARAMS_ALIGN_VAL
 
 #include "impl/memnode.h"
-#include "impl/node.c"
-#include "impl/put.c"
-#include "impl/get.c"
-#include "impl/cursor.c"
-#include "impl/tr.c"
-#include "impl/del.c"
+#include "impl/node.c_inc"
+#include "impl/put.c_inc"
+#include "impl/get.c_inc"
+#include "impl/cursor.c_inc"
+#include "impl/tr.c_inc"
+#include "impl/del.c_inc"
 #include "impl/subnode.h"
 
 #define TKVDB_TRIGGER
 #undef TKVDB_IMPL_PUT
 #define TKVDB_IMPL_PUT tkvdb_put_alignvalx
-#include "impl/put.c"
+#include "impl/put.c_inc"
 #undef TKVDB_IMPL_DEL
 #undef TKVDB_IMPL_DO_DEL
 #define TKVDB_IMPL_DEL tkvdb_del_alignvalx
 #define TKVDB_IMPL_DO_DEL tkvdb_do_del_alignvalx
-#include "impl/del.c"
+#include "impl/del.c_inc"
 #undef TKVDB_TRIGGER
 
 #undef TKVDB_IMPL_PUT
@@ -134,23 +134,23 @@
 #define TKVDB_IMPL_DEL tkvdb_del_generic
 #define TKVDB_IMPL_SUBNODE tkvdb_subnode_generic
 #include "impl/memnode.h"
-#include "impl/node.c"
-#include "impl/put.c"
-#include "impl/get.c"
-#include "impl/cursor.c"
-#include "impl/tr.c"
-#include "impl/del.c"
+#include "impl/node.c_inc"
+#include "impl/put.c_inc"
+#include "impl/get.c_inc"
+#include "impl/cursor.c_inc"
+#include "impl/tr.c_inc"
+#include "impl/del.c_inc"
 #include "impl/subnode.h"
 
 #define TKVDB_TRIGGER
 #undef TKVDB_IMPL_PUT
 #define TKVDB_IMPL_PUT tkvdb_put_genericx
-#include "impl/put.c"
+#include "impl/put.c_inc"
 #undef TKVDB_IMPL_DEL
 #undef TKVDB_IMPL_DO_DEL
 #define TKVDB_IMPL_DEL tkvdb_del_genericx
 #define TKVDB_IMPL_DO_DEL tkvdb_do_del_genericx
-#include "impl/del.c"
+#include "impl/del.c_inc"
 #undef TKVDB_TRIGGER
 
 #undef TKVDB_IMPL_PUT
@@ -231,23 +231,23 @@
 #define TKVDB_PARAMS_NODBFILE
 
 #include "impl/memnode.h"
-#include "impl/node.c"
-#include "impl/put.c"
-#include "impl/get.c"
-#include "impl/cursor.c"
-#include "impl/tr.c"
-#include "impl/del.c"
+#include "impl/node.c_inc"
+#include "impl/put.c_inc"
+#include "impl/get.c_inc"
+#include "impl/cursor.c_inc"
+#include "impl/tr.c_inc"
+#include "impl/del.c_inc"
 #include "impl/subnode.h"
 
 #define TKVDB_TRIGGER
 #undef TKVDB_IMPL_PUT
 #define TKVDB_IMPL_PUT tkvdb_put_alignval_nodbx
-#include "impl/put.c"
+#include "impl/put.c_inc"
 #undef TKVDB_IMPL_DEL
 #undef TKVDB_IMPL_DO_DEL
 #define TKVDB_IMPL_DEL tkvdb_del_alignval_nodbx
 #define TKVDB_IMPL_DO_DEL tkvdb_do_del_alignval_nodbx
-#include "impl/del.c"
+#include "impl/del.c_inc"
 #undef TKVDB_TRIGGER
 
 #undef TKVDB_IMPL_PUT
@@ -331,23 +331,23 @@
 #define TKVDB_PARAMS_NODBFILE
 
 #include "impl/memnode.h"
-#include "impl/node.c"
-#include "impl/put.c"
-#include "impl/get.c"
-#include "impl/cursor.c"
-#include "impl/tr.c"
-#include "impl/del.c"
+#include "impl/node.c_inc"
+#include "impl/put.c_inc"
+#include "impl/get.c_inc"
+#include "impl/cursor.c_inc"
+#include "impl/tr.c_inc"
+#include "impl/del.c_inc"
 #include "impl/subnode.h"
 
 #define TKVDB_TRIGGER
 #undef TKVDB_IMPL_PUT
 #define TKVDB_IMPL_PUT tkvdb_put_generic_nodbx
-#include "impl/put.c"
+#include "impl/put.c_inc"
 #undef TKVDB_IMPL_DEL
 #undef TKVDB_IMPL_DO_DEL
 #define TKVDB_IMPL_DEL tkvdb_del_generic_nodbx
 #define TKVDB_IMPL_DO_DEL tkvdb_do_del_generic_nodbx
-#include "impl/del.c"
+#include "impl/del.c_inc"
 #undef TKVDB_TRIGGER
 
 #undef TKVDB_IMPL_PUT

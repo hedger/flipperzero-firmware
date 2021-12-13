@@ -1,6 +1,7 @@
 #pragma once
-#include <stdbool.h>
 
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,7 +11,7 @@ extern "C" {
 bool fw_sym_cache_init();
 void fw_sym_cache_free();
 bool fw_sym_cache_ready();
-void* fw_sym_cache_resolve(const char* symname);
+uint32_t fw_sym_cache_resolve(const char* symname);
 
 
 #ifdef __cplusplus

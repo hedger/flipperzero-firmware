@@ -59,7 +59,16 @@ typedef enum TKVDB_PARAM
 	TKVDB_PARAM_CURSOR_KEY_LIMIT,
 
 	/* flags passed to open() function */
-	TKVDB_PARAM_DBFILE_OPEN_FLAGS
+	TKVDB_PARAM_DBFILE_OPEN_FLAGS,
+
+    /* */
+    TKVDB_PARAM_DB_MODE,
+
+    /* */
+    TKVDB_PARAM_WRITE_BUF_LIMIT,
+
+    /* */
+    TKVDB_PARAM_WRITE_BUF_DYNALLOC,
 } TKVDB_PARAM;
 
 typedef struct tkvdb_datum
@@ -176,8 +185,9 @@ void tkvdb_param_set(tkvdb_params *params, TKVDB_PARAM p, int64_t val);
 /* free */
 void tkvdb_params_free(tkvdb_params *params);
 
+typedef struct Storage;
 /* database */
-tkvdb    *tkvdb_open(const char *path, tkvdb_params *params);
+tkvdb    *tkvdb_open(Storage* storage, const char *path, tkvdb_params *params);
 TKVDB_RES tkvdb_close(tkvdb *db);
 /* fsync() db file */
 TKVDB_RES tkvdb_sync(tkvdb *db);
@@ -192,8 +202,8 @@ tkvdb_cursor *tkvdb_cursor_create(tkvdb_tr *tr);
 TKVDB_RES tkvdb_vacuum(tkvdb_tr *tr, tkvdb_tr *vac, tkvdb_tr *tres,
 	tkvdb_cursor *c);
 /* get database file information */
-TKVDB_RES tkvdb_dbinfo(tkvdb *db, uint64_t *root_off,
-	uint64_t *gap_begin, uint64_t *gap_end);
+TKVDB_RES tkvdb_dbinfo(tkvdb *db, uint32_t *root_off,
+	uint32_t *gap_begin, uint32_t *gap_end);
 
 
 /* triggers */

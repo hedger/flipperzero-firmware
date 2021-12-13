@@ -216,7 +216,7 @@ const FlipperApplication FLIPPER_PLUGINS[] = {
 #endif
 
 #ifdef APP_ELF_LOADER
-    {.app = elf_loader_app, .name = "Elf Loader", .stack_size = 4096, .icon = &A_Plugins_14},
+    {.app = elf_loader_app, .name = "Elf Loader", .stack_size = 8096, .icon = &A_Plugins_14},
 #endif
 };
 
