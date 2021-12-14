@@ -6,7 +6,32 @@
 
 using namespace ELFIO;
 
+Elf64_Addr get_ptr_from_ptr(const section* section, Elf64_Addr va) {
+    // internally read 32 bits
+    if ((va < section->get_address()) || (va > section->get_address() + section->get_size())) {
+        std::cerr << "va " << va << "lies outside section " << section->get_name() << std::endl;
+        return 0;
+    }
+
+    Elf64_Addr va_section_offs = va - section->get_address();
+    return *(Elf32_Addr*)(section->get_data() + va_section_offs);
+}
+
+std::string get_cstr_from_ptr(const section* section, Elf64_Addr va) {
+    if ((va < section->get_address()) || (va > section->get_address() + section->get_size())) {
+        std::cerr << "va " << va << "lies outside section " << section->get_name() << std::endl;
+        return "";
+    }
+
+    Elf64_Addr va_section_offs = va - section->get_address();
+    const char* cstr_ptr = section->get_data();
+    //std::cout << " offs = " << va_section_offs;
+    return std::string(cstr_ptr + va_section_offs);
+}
+
 bool process_elf(const char* fwname, sym_cb callback) {
+    auto& out = std::cout;
+
 	elfio reader;
 
 	if (!reader.load(fwname)) {
@@ -14,8 +39,25 @@ bool process_elf(const char* fwname, sym_cb callback) {
 		return false;
 	}
 
-	auto& out = std::cout;
     Elf_Half n = reader.sections.size();
+
+    section* p_rodata = nullptr;
+    out << "Looking for .rodata... ";
+    for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
+        section* sec = reader.sections[i];
+        if ( ".rodata" == sec->get_name()) {
+            out << " is #" << i << std::endl;
+            p_rodata = sec;
+            break;
+        }
+    }
+    if (p_rodata == nullptr) {
+        std::cerr << ".rodata not found!" << std::endl;
+        return false;
+    }
+    // out << get_cstr_from_ptr(p_rodata, 0x080B79F8);
+    // return false;
+
     for ( Elf_Half i = 0; i < n; ++i ) { // For all sections
         section* sec = reader.sections[i];
         if ( SHT_SYMTAB == sec->get_type() ||
@@ -49,7 +91,17 @@ bool process_elf(const char* fwname, sym_cb callback) {
                     symbols.get_symbol( i, name, value, size, bind, type,
                                         section, other );
 
-                    out << "sym " << name << "type " << (uint32_t)type << " @ " << value << std::endl;
+                    if (name == "version") {
+                        out << "Found VERSION symbol" << std::endl;
+                        std::string git_commit = get_cstr_from_ptr(p_rodata, get_ptr_from_ptr(p_rodata, value));
+                        // Elf64_Addr version_ptr = get_ptr_from_ptr(p_rodata, value);
+                        // out << "struct ptr = " << std::hex << version_ptr << std::endl;
+                        // out << "git_hash " << git_commit;
+                        uint32_t version_id_from_hash = strtol(git_commit.c_str(), NULL, 16);
+                        // out << " version id=" << version_id_from_hash;
+                        callback("os_FLIPPER_BUILD", version_id_from_hash, 1);
+                    }
+                    // out << "sym " << name << "type " << (uint32_t)type << " @ " << value << std::endl;
                     callback(name.c_str(), static_cast<uint32_t>(value), type);
                     // symbol_table( out, i, name, value, size, bind, type,
                     //               section, reader.get_class() );

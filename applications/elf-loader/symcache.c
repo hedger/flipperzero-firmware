@@ -1,4 +1,5 @@
 #include "symcache.h"
+#include "toolbox/version.h"
 
 #include <file_helper.h>
 #include <storage/storage.h>
@@ -10,6 +11,9 @@
 #define TAG "ElfSym"
 
 #define READ_BUF_LEN 4096
+
+#define CACHE_ID_STRING "os_FLIPPER_BUILD"
+
 #define SYM_PATH "/ext/elf/fwdef.cfg"
 #define TKV_SYM_PATH "/ext/elf/fwdef.tkv"
 
@@ -33,6 +37,18 @@ bool fw_sym_cache_init() {
     transaction = tkvdb_tr_create(db, NULL);
     transaction->begin(transaction); /* start new transaction */
     transaction_queries = 0;
+
+    FURI_LOG_I(TAG, "Symbol cache DB initialized");
+    uint32_t version_id_from_db = fw_sym_cache_resolve(CACHE_ID_STRING);
+    
+    uint32_t version_id_from_os = strtol(version_get_githash(NULL), NULL, 16);
+    FURI_LOG_I(TAG, "Cache built for %X, running %X", version_id_from_db, version_id_from_os);
+
+    if (version_id_from_db != version_id_from_os) {
+        FURI_LOG_W(TAG, "Symbol cache version mismatch!");
+        fw_sym_cache_free();
+        return false;
+    }
 
     return true;
 }

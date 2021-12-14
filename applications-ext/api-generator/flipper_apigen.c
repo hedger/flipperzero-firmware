@@ -18,7 +18,7 @@ static tkvdb_tr *output_transaction;
 static tkvdb_datum output_key, output_value;
 
 void process_sym(const char* symname, uint32_t addr, uint8_t type) {
-	printf("sym cb: '%s' (%d) @ %x...", symname, type, addr);
+	printf("(%d) @ %8x '%s'", type, addr, symname);
 	if ((type != 1 /*STB_GLOBAL*/) && (type != 2 /*STB_WEAK*/)) {
 		printf(" skipped\n");
 		return;
@@ -49,8 +49,12 @@ int main() {
 
 
 	transaction->begin(transaction);             /* start */
-	process_elf("flipper-z-f7-firmware-local.elf", process_sym);
+	if (!process_elf("flipper-z-f7-firmware-local.elf", process_sym)) {
+		return EXIT_FAILURE;
+		// disregard everything
+	}
 	transaction->commit(transaction);            /* commit */
+	//return EXIT_SUCCESS;
 
 
 	/* READ TEST */

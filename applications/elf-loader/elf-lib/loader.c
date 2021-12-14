@@ -446,7 +446,7 @@ static int loader_jump_to(ELFExec_t* e) {
         entry_t* entry = (entry_t*)(e->text.data + e->entry);
         FURI_LOG_I(
             TAG,
-            "Jumping to ELF EIP: %p, .text @ %p, entry offs: %x ",
+            "Jumping to ELF EP: %p, .text @ %p, entry offs: %x",
             entry,
             e->text.data,
             e->entry);
