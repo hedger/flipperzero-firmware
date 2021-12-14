@@ -350,7 +350,9 @@ static int load_symbols(ELFExec_t* e) {
             FURI_LOG_E(TAG, "Error reading section");
             return -1;
         }
-        if(sectHdr.sh_name) read_section_name(e, sectHdr.sh_name, name, sizeof(name));
+        if(sectHdr.sh_name) {
+            read_section_name(e, sectHdr.sh_name, name, sizeof(name));
+        }
         FURI_LOG_D(TAG, "Examining section %d %s", n, name);
         founded |= place_info(e, &sectHdr, name, n);
         if(IS_FLAGS_SET(founded, FoundAll)) return FoundAll;
@@ -442,6 +444,12 @@ static int loader_jump_to(ELFExec_t* e) {
 #if 1
     if(e->entry) {
         entry_t* entry = (entry_t*)(e->text.data + e->entry);
+        FURI_LOG_I(
+            TAG,
+            "Jumping to ELF EIP: %p, .text @ %p, entry offs: %x ",
+            entry,
+            e->text.data,
+            e->entry);
         arch_jump_to(entry);
         return 0;
     } else {

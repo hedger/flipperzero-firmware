@@ -80,16 +80,10 @@ bool elf_resolve_printf_only(const char* name, Elf32_Addr* address) {
 }
 
 bool elf_resolve_from_cache(const char* symname, Elf32_Addr* address) {
-    if (!fw_sym_cache_init()) { // TODO: keep it open
-        FURI_LOG_I(TAG, "Failed to init symbol cache");
-        return false;
-    }
-
     FURI_LOG_I(TAG, "Resolving '%s'", symname);
     *address = (uint32_t)fw_sym_cache_resolve(symname);
     FURI_LOG_I(TAG, "   '%s' -> %x", symname, *address);
     
-    fw_sym_cache_free();
     
     return *address ? true : false;
 }

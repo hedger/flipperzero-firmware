@@ -11,6 +11,11 @@
 
 int32_t elf_loader_app(void* p) {
     ELFResolver resolver = elf_resolve_from_cache;
+    if (!fw_sym_cache_init()) { // TODO: message box
+        FURI_LOG_I(TAG, "Failed to init symbol cache");
+        return -1;
+    }
+
     //ELFResolver resolver = elf_resolve_from_table;
     Storage* storage = furi_record_open("storage");
     DialogsApp* dialogs = furi_record_open("dialogs");
@@ -26,6 +31,7 @@ int32_t elf_loader_app(void* p) {
         FURI_LOG_I(TAG, "ELF Loader returned: %i", ret);
     }
 
+    fw_sym_cache_free();
     string_clear(file_path);
     free(app_name);
     // furi_log_set_level(FURI_LOG_LEVEL);
