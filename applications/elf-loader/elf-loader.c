@@ -10,15 +10,17 @@
 #define TAG "elf_loader_app"
 
 int32_t elf_loader_app(void* p) {
+    Storage* storage = furi_record_open("storage");
+    DialogsApp* dialogs = furi_record_open("dialogs");
+
     ELFResolver resolver = elf_resolve_from_cache;
     if (!fw_sym_cache_init()) { // TODO: message box
         FURI_LOG_I(TAG, "Failed to init symbol cache");
+        dialog_message_show_storage_error(dialogs, "Can not load\nsym cache");
         return -1;
     }
 
     //ELFResolver resolver = elf_resolve_from_table;
-    Storage* storage = furi_record_open("storage");
-    DialogsApp* dialogs = furi_record_open("dialogs");
     const uint8_t app_name_size = 128;
     char* app_name = furi_alloc(app_name_size + 1);
     // furi_log_set_level(5);

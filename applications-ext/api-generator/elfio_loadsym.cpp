@@ -6,6 +6,8 @@
 
 using namespace ELFIO;
 
+static const char* BUILD_ID_STRING = "os_FLIPPER_BUILD";
+
 Elf64_Addr get_ptr_from_ptr(const section* section, Elf64_Addr va) {
     // internally read 32 bits
     if ((va < section->get_address()) || (va > section->get_address() + section->get_size())) {
@@ -97,9 +99,10 @@ bool process_elf(const char* fwname, sym_cb callback) {
                         // Elf64_Addr version_ptr = get_ptr_from_ptr(p_rodata, value);
                         // out << "struct ptr = " << std::hex << version_ptr << std::endl;
                         // out << "git_hash " << git_commit;
-                        uint32_t version_id_from_hash = strtol(git_commit.c_str(), NULL, 16);
+                        const char* git_commit_cstr = git_commit.c_str();
+                        uint32_t version_id_from_hash = strtoul(git_commit_cstr, NULL, 16);
                         // out << " version id=" << version_id_from_hash;
-                        callback("os_FLIPPER_BUILD", version_id_from_hash, 1);
+                        callback(BUILD_ID_STRING, version_id_from_hash, 1);
                     }
                     // out << "sym " << name << "type " << (uint32_t)type << " @ " << value << std::endl;
                     callback(name.c_str(), static_cast<uint32_t>(value), type);
