@@ -93,6 +93,7 @@
 #include "stdio.h"
 #include <furi-hal.h>
 
+#define TAG "ADASD"
 /** @addtogroup BSP
   * @{
   */
@@ -161,7 +162,7 @@ typedef enum {
 #define SD_TOKEN_START_DATA_SINGLE_BLOCK_WRITE \
     0xFE /* Data token start byte, Start Single Block Write */
 #define SD_TOKEN_START_DATA_MULTIPLE_BLOCK_WRITE \
-    0xFD /* Data token start byte, Start Multiple Block Write */
+    0xFC /* Data token start byte, Start Multiple Block Write */
 #define SD_TOKEN_STOP_DATA_MULTIPLE_BLOCK_WRITE \
     0xFD /* Data toke stop byte, Stop Multiple Block Write */
 
@@ -378,21 +379,13 @@ uint8_t BSP_SD_GetCardInfo(SD_CardInfo* pCardInfo) {
     return status;
 }
 
-/**
-  * @brief  Reads block(s) from a specified address in the SD card, in polling mode. 
-  * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  ReadAddr: Address from where data is to be read. The address is counted 
-  *                   in blocks of 512bytes
-  * @param  NumOfBlocks: Number of SD blocks to read
-  * @param  Timeout: This parameter is used for compatibility with BSP implementation
-  * @retval SD status
-  */
-uint8_t
-BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+
+static uint8_t
+BSP_SD_ReadBlocksByOne(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    //FURI_LOG_I(, "Read ReadSingleBlock");
     uint32_t offset = 0;
     uint32_t addr;
     uint8_t retr = BSP_SD_ERROR;
-    uint8_t* ptr = NULL;
     SD_CmdAnswer_typedef response;
     uint16_t BlockSize = 512;
 
@@ -404,12 +397,6 @@ BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint
     if(response.r1 != SD_R1_NO_ERROR) {
         goto error;
     }
-
-    ptr = furi_alloc(sizeof(uint8_t) * BlockSize);
-    if(ptr == NULL) {
-        goto error;
-    }
-    memset(ptr, SD_DUMMY_BYTE, sizeof(uint8_t) * BlockSize);
 
     /* Initialize the address */
     addr = (ReadAddr * ((flag_SDHC == 1) ? 1 : BlockSize));
@@ -426,7 +413,7 @@ BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint
         /* Now look for the data token to signify the start of the data */
         if(SD_WaitData(SD_TOKEN_START_DATA_SINGLE_BLOCK_READ) == BSP_SD_OK) {
             /* Read the SD block data : read NumByteToRead data */
-            SD_IO_WriteReadData(ptr, (uint8_t*)pData + offset, BlockSize);
+            SD_IO_WriteReadData(NULL, (uint8_t*)pData + offset, BlockSize);
 
             /* Set next read address*/
             offset += BlockSize;
@@ -450,27 +437,26 @@ error:
     /* Send dummy byte: 8 Clock pulses of delay */
     SD_IO_CSState(1);
     SD_IO_WriteByte(SD_DUMMY_BYTE);
-    if(ptr != NULL) free(ptr);
 
     /* Return the reponse */
     return retr;
 }
 
 /**
-  * @brief  Writes block(s) to a specified address in the SD card, in polling mode. 
+  * @brief  Reads block(s) from a specified address in the SD card, in polling mode. 
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  WriteAddr: Address from where data is to be written. The address is counted 
+  * @param  ReadAddr: Address from where data is to be read. The address is counted 
   *                   in blocks of 512bytes
-  * @param  NumOfBlocks: Number of SD blocks to write
+  * @param  NumOfBlocks: Number of SD blocks to read
   * @param  Timeout: This parameter is used for compatibility with BSP implementation
   * @retval SD status
   */
-uint8_t
-BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+static uint8_t
+BSP_SD_ReadBlocksMultiple(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    //FURI_LOG_I(TAG, "Read %x pages", NumOfBlocks);
     uint32_t offset = 0;
     uint32_t addr;
     uint8_t retr = BSP_SD_ERROR;
-    uint8_t* ptr = NULL;
     SD_CmdAnswer_typedef response;
     uint16_t BlockSize = 512;
 
@@ -483,8 +469,83 @@ BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, ui
         goto error;
     }
 
-    ptr = furi_alloc(sizeof(uint8_t) * BlockSize);
-    if(ptr == NULL) {
+    /* Initialize the address */
+    addr = (ReadAddr * ((flag_SDHC == 1) ? 1 : BlockSize));
+
+    /* Data transfer */
+    response = SD_SendCmd(SD_CMD_READ_MULT_BLOCK, addr, 0xFF, SD_ANSWER_R1_EXPECTED);
+    if(response.r1 != SD_R1_NO_ERROR) {
+        goto error;
+    }
+    while(NumOfBlocks--) {
+        /* Now look for the data token to signify the start of the data */
+        if (SD_WaitData(SD_TOKEN_START_DATA_MULTIPLE_BLOCK_READ) == BSP_SD_OK) {
+            /* Read the SD block data : read NumByteToRead data */
+            SD_IO_WriteReadData(NULL, (uint8_t*)pData + offset, BlockSize);
+
+            /* Set next read address*/
+            offset += BlockSize;
+            addr = ((flag_SDHC == 1) ? (addr + 1) : (addr + BlockSize));
+
+            /* get CRC bytes (not really needed by us, but required by SD) */
+            SD_IO_WriteByte(SD_DUMMY_BYTE);
+            SD_IO_WriteByte(SD_DUMMY_BYTE);
+        } else {
+            goto error;
+        }
+
+    }
+    response = SD_SendCmd(SD_CMD_STOP_TRANSMISSION, addr, 0xFF, SD_ANSWER_R1B_EXPECTED);
+    if(response.r1 != SD_R1_NO_ERROR) {
+        goto error;
+    }
+
+    retr = BSP_SD_OK;
+
+error:
+    /* Send dummy byte: 8 Clock pulses of delay */
+    SD_IO_CSState(1);
+    SD_IO_WriteByte(SD_DUMMY_BYTE);
+
+    /* Return the reponse */
+    return retr;
+}
+
+#define READ_BLOCK_COUNT_THRESHOLD_USE_MULTI 2
+
+/**
+  * @brief  Reads block(s) from a specified address in the SD card, in polling mode. 
+  * @param  pData: Pointer to the buffer that will contain the data to transmit
+  * @param  ReadAddr: Address from where data is to be read. The address is counted 
+  *                   in blocks of 512bytes
+  * @param  NumOfBlocks: Number of SD blocks to read
+  * @param  Timeout: This parameter is used for compatibility with BSP implementation
+  * @retval SD status
+  */
+uint8_t
+BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    if (NumOfBlocks <= READ_BLOCK_COUNT_THRESHOLD_USE_MULTI) {
+        return BSP_SD_ReadBlocksByOne(pData, ReadAddr, NumOfBlocks, Timeout);
+    } else {
+        return BSP_SD_ReadBlocksMultiple(pData, ReadAddr, NumOfBlocks, Timeout);
+    }
+}
+
+static uint8_t
+BSP_SD_WriteBlocksByOne(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    //FURI_LOG_I(TAG, "Write %x pages", NumOfBlocks);
+    uint32_t offset = 0;
+    uint32_t addr;
+    uint8_t retr = BSP_SD_ERROR;
+    SD_CmdAnswer_typedef response;
+    uint16_t BlockSize = 512;
+
+    /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
+     Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
+    response = SD_SendCmd(SD_CMD_SET_BLOCKLEN, BlockSize, 0xFF, SD_ANSWER_R1_EXPECTED);
+    SD_IO_CSState(1);
+    SD_IO_WriteByte(SD_DUMMY_BYTE);
+    if(response.r1 != SD_R1_NO_ERROR) {
         goto error;
     }
 
@@ -508,7 +569,7 @@ BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, ui
         SD_IO_WriteByte(SD_TOKEN_START_DATA_SINGLE_BLOCK_WRITE);
 
         /* Write the block data to SD */
-        SD_IO_WriteReadData((uint8_t*)pData + offset, ptr, BlockSize);
+        SD_IO_WriteReadData((uint8_t*)pData + offset, NULL, BlockSize);
 
         /* Set next write address */
         offset += BlockSize;
@@ -530,13 +591,123 @@ BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, ui
     retr = BSP_SD_OK;
 
 error:
-    if(ptr != NULL) free(ptr);
     /* Send dummy byte: 8 Clock pulses of delay */
     SD_IO_CSState(1);
     SD_IO_WriteByte(SD_DUMMY_BYTE);
 
     /* Return the reponse */
+    //FURI_LOG_I(TAG, "BSP_SD_WriteBlocksByOne: 0x%X", retr);
     return retr;
+}
+
+
+static uint8_t
+BSP_SD_WriteBlocksMultiple(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    //FURI_LOG_I(TAG, "Write %x pages", NumOfBlocks);
+    uint32_t offset = 0;
+    uint32_t addr;
+    uint8_t retr = BSP_SD_ERROR;
+    //uint8_t* ptr = NULL;
+    SD_CmdAnswer_typedef response;
+    uint16_t BlockSize = 512;
+
+    /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
+     Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
+    response = SD_SendCmd(SD_CMD_SET_BLOCKLEN, BlockSize, 0xFF, SD_ANSWER_R1_EXPECTED);
+    SD_IO_CSState(1);
+    SD_IO_WriteByte(SD_DUMMY_BYTE);
+    if(response.r1 != SD_R1_NO_ERROR) {
+        FURI_LOG_E(TAG, "BSP_SD_WriteBlocksMultiple: SD_CMD_SET_BLOCKLEN: response.r1 != SD_R1_NO_ERROR, code: 0x%02X", response.r1);
+        goto error;
+    }
+
+    ///* Pre-erase length */
+    //response = SD_SendCmd(SD_CMD_SET_BLOCK_COUNT, NumOfBlocks, 0xFF, SD_ANSWER_R1_EXPECTED);
+    //if(response.r1 != SD_R1_NO_ERROR) {
+    //    goto error;
+    //}
+
+    /* Initialize the address */
+    addr = (WriteAddr * ((flag_SDHC == 1) ? 1 : BlockSize));
+
+    /* Data transfer */
+    response = SD_SendCmd(SD_CMD_WRITE_MULT_BLOCK, addr, 0xFF, SD_ANSWER_R1_EXPECTED);
+    if(response.r1 != SD_R1_NO_ERROR) {
+        FURI_LOG_E(TAG, "BSP_SD_WriteBlocksMultiple: SD_CMD_WRITE_MULT_BLOCK: response.r1 != SD_R1_NO_ERROR, code: 0x%02X", response.r1);
+        goto error;
+    }
+
+    static uint8_t tmpbuf[512];
+
+    while(NumOfBlocks--) {
+        SD_IO_WriteByte(SD_DUMMY_BYTE);
+        SD_IO_WriteByte(SD_DUMMY_BYTE);
+
+        /* Send the data token to signify the start of the data */
+        SD_IO_WriteByte(SD_TOKEN_START_DATA_MULTIPLE_BLOCK_WRITE);
+
+        SD_IO_WriteReadData((uint8_t*)pData + offset, tmpbuf, BlockSize);
+
+        /* Set next read address*/
+        offset += BlockSize;
+        addr = ((flag_SDHC == 1) ? (addr + 1) : (addr + BlockSize));
+
+        /* get CRC bytes (not really needed by us, but required by SD) */
+        SD_IO_WriteByte(SD_DUMMY_BYTE);
+        SD_IO_WriteByte(SD_DUMMY_BYTE);
+
+        /* Read data response */
+        if(SD_GetDataResponse() != SD_DATA_OK) {
+            /* Set response value to failure */
+            goto error;
+        }
+
+        SD_WaitData(SD_DUMMY_BYTE);
+
+        //SD_IO_CSState(1);
+        //SD_IO_WriteByte(SD_DUMMY_BYTE);
+    }
+
+    SD_IO_WriteByte(SD_TOKEN_STOP_DATA_MULTIPLE_BLOCK_WRITE);
+    SD_IO_WriteByte(SD_DUMMY_BYTE);
+
+    SD_WaitData(SD_DUMMY_BYTE);
+
+    //if(SD_GetDataResponse() != SD_DATA_OK) {
+    //    /* Set response value to failure */
+    //    goto error;
+    //}
+
+    retr = BSP_SD_OK;
+
+error:
+    /* Send dummy byte: 8 Clock pulses of delay */
+    SD_IO_CSState(1);
+    SD_IO_WriteByte(SD_DUMMY_BYTE);
+
+    //FURI_LOG_I(TAG, "BSP_SD_WriteBlocksMultiple: 0x%X", retr);
+    /* Return the reponse */
+    return retr;
+}
+
+
+#define WRITE_BLOCK_COUNT_THRESHOLD_USE_MULTI 0
+/**
+  * @brief  Writes block(s) to a specified address in the SD card, in polling mode. 
+  * @param  pData: Pointer to the buffer that will contain the data to transmit
+  * @param  WriteAddr: Address from where data is to be written. The address is counted 
+  *                   in blocks of 512bytes
+  * @param  NumOfBlocks: Number of SD blocks to write
+  * @param  Timeout: This parameter is used for compatibility with BSP implementation
+  * @retval SD status
+  */
+uint8_t
+BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    if (NumOfBlocks <= WRITE_BLOCK_COUNT_THRESHOLD_USE_MULTI) {
+        return BSP_SD_WriteBlocksByOne(pData, WriteAddr, NumOfBlocks, Timeout);
+    } else {
+        return BSP_SD_WriteBlocksMultiple(pData, WriteAddr, NumOfBlocks, Timeout);
+    }
 }
 
 /**
@@ -598,6 +769,8 @@ uint8_t BSP_SD_GetCardState(void) {
     /* Find SD status according to card state */
     if((retr.r1 == SD_R1_NO_ERROR) && (retr.r2 == SD_R2_NO_ERROR)) {
         return BSP_SD_OK;
+    } else {
+        FURI_LOG_E(TAG, "BSP_SD_GetCardState: state=0x%02X/0x%02X", retr.r1, retr.r2);
     }
 
     return BSP_SD_ERROR;
