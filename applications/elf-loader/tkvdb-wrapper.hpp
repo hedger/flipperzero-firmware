@@ -9,13 +9,13 @@ template <typename T> struct TkvObject {
         datum.size = sizeof(T);
     }
 
-    inline void set(const T& _val) {
+    inline void set(T& _val) {
         datum.size = sizeof(T);
-        datum.data = _val;
+        datum.data = &_val;
     }
 };
 
-template<> struct TkvObject<char*> {
+template <> struct TkvObject<char*> {
     tkvdb_datum datum;
 
     TkvObject() {
@@ -38,11 +38,16 @@ private:
     uint16_t transaction_query_count;
     TkvObject<tK> key;
     TkvObject<tV> value;
-    bool readonly;
+    bool readonly, dirty;
 
     void check_transaction_count() {
         if(transaction_query_count++ > max_queries_in_transaction) {
-            transaction->rollback(transaction);
+            if (dirty) {
+                FURI_LOG_I("cpptkv", "autocommitting on count check");
+                commit();
+            } else {
+                transaction->rollback(transaction);
+            }
             transaction->begin(transaction);
             transaction_query_count = 0;
         }
@@ -53,9 +58,10 @@ public:
         : db_filename(filename)
         , db(nullptr)
         , transaction(nullptr)
-        , max_queries_in_transaction(15)
+        , max_queries_in_transaction(13) // magic!
         , transaction_query_count(0)
-        , readonly(_readonly) {
+        , readonly(_readonly)
+        , dirty(false) {
     }
 
     ~TkvDatabase() {
@@ -65,9 +71,9 @@ public:
     bool open() {
         tkvdb_params* open_params = nullptr;
         if(!readonly) {
-            tkvdb_params* hotdb_params = tkvdb_params_create();
-            tkvdb_param_set(hotdb_params, TKVDB_PARAM_DBFILE_OPEN_FLAGS, FSAM_READ | FSAM_WRITE);
-            tkvdb_param_set(hotdb_params, TKVDB_PARAM_DBFILE_OPEN_MODE, FSOM_OPEN_ALWAYS);
+            open_params = tkvdb_params_create();
+            tkvdb_param_set(open_params, TKVDB_PARAM_DBFILE_OPEN_FLAGS, FSAM_READ | FSAM_WRITE);
+            tkvdb_param_set(open_params, TKVDB_PARAM_DBFILE_OPEN_MODE, FSOM_OPEN_ALWAYS);
         }
         db = tkvdb_open(db_filename, open_params);
         if(!readonly) {
@@ -85,6 +91,10 @@ public:
 
     void close() {
         if(transaction) {
+            if(dirty) {
+                FURI_LOG_I("cpptkv", "autocommitting on close");
+                commit();
+            }
             transaction->rollback(transaction);
             transaction->free(transaction);
             transaction = nullptr;
@@ -97,6 +107,8 @@ public:
     }
 
     bool commit() {
+        FURI_LOG_I("cpptkv", "COMMIT()");
+        dirty = false;
         return (transaction->commit(transaction) == TKVDB_OK);
     }
 
@@ -119,10 +131,12 @@ public:
         return true;
     }
 
-    bool put(const tK& _key, const tV* _value) {
+    bool put(const tK& _key, tV& _value) {
+        FURI_LOG_I("cpptkv", "put() %d", value);
         check_transaction_count();
         key.set(_key);
         value.set(_value);
+        dirty = true;
         return (transaction->put(transaction, &key.datum, &value.datum) == TKVDB_OK);
     }
 };
