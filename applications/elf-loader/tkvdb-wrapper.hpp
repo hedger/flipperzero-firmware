@@ -22,13 +22,12 @@ template <> struct TkvObject<char*> {
     }
 
     inline void set(char* _val) {
-        //char yoba[] = "alloyoba";
-        //datum.data = &yoba[0]; //_val;
         datum.data = _val;
         datum.size = strlen(_val);
     }
 };
 
+#define TKV_LOG_TAG "CppTkv"
 template <typename tK, typename tV> class TkvDatabase {
 private:
     const char* db_filename;
@@ -43,7 +42,7 @@ private:
     void check_transaction_count() {
         if(transaction_query_count++ > max_queries_in_transaction) {
             if(dirty) {
-                FURI_LOG_I("cpptkv", "autocommitting on count check");
+                FURI_LOG_D(TKV_LOG_TAG, "autocommitting on count check");
                 commit();
             } else {
                 transaction->rollback(transaction);
@@ -92,7 +91,7 @@ public:
     void close() {
         if(transaction) {
             if(dirty) {
-                FURI_LOG_I("cpptkv", "autocommitting on close");
+                FURI_LOG_I(TKV_LOG_TAG, "autocommitting on close");
                 commit();
             }
             transaction->rollback(transaction);
@@ -107,7 +106,7 @@ public:
     }
 
     bool commit() {
-        FURI_LOG_I("cpptkv", "COMMIT()");
+        FURI_LOG_I(TKV_LOG_TAG, "COMMIT()");
         dirty = false;
         return (transaction->commit(transaction) == TKVDB_OK);
     }
@@ -131,7 +130,7 @@ public:
     }
 
     bool put(const tK& _key, tV& _value) {
-        FURI_LOG_I("cpptkv", "put() %d", value);
+        FURI_LOG_D(TKV_LOG_TAG, "put() %d", value);
         check_transaction_count();
         key.set(_key);
         value.set(_value);
@@ -139,3 +138,5 @@ public:
         return (transaction->put(transaction, &key.datum, &value.datum) == TKVDB_OK);
     }
 };
+
+#undef TKV_LOG_TAG

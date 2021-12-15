@@ -56,9 +56,9 @@ bool fw_sym_cache_init() {
         }
 
         if(reset_hot_db) {
-            FURI_LOG_I(TAG, "Dropping hot db");
+            FURI_LOG_W(TAG, "Dropping hot db");
             if(!hot_database->drop_contents()) {
-                FURI_LOG_I(TAG, "Failed to drop db!");
+                FURI_LOG_W(TAG, "Failed to drop db!");
                 break;
             }
 
@@ -93,16 +93,16 @@ bool fw_sym_cache_ready() {
 uint32_t fw_sym_cache_resolve(char* symname) {
     uint32_t ret;
     if(!hot_database->get(symname, &ret)) {
-        FURI_LOG_I(TAG, "cache MISS");
+        FURI_LOG_D(TAG, "cache MISS");
         if(!database->get(symname, &ret)) {
-            FURI_LOG_I(TAG, "main db MISS");
+            FURI_LOG_W(TAG, "main db MISS for '%s'", symname);
             return SYM_NOT_FOUND_VA;
         } else {
             FURI_LOG_I(TAG, "putting '%s' in cache", symname);
             hot_database->put(symname, ret);
         }
     } else {
-        FURI_LOG_I(TAG, "cache HIT!");
+        FURI_LOG_D(TAG, "cache HIT!");
     }
 
     return ret;

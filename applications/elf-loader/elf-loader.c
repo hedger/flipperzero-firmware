@@ -15,8 +15,8 @@ int32_t elf_loader_app(void* p) {
 
     ELFResolver resolver = elf_resolve_from_cache;
     if (!fw_sym_cache_init()) { // TODO: message box
-        FURI_LOG_I(TAG, "Failed to init symbol cache");
-        dialog_message_show_storage_error(dialogs, "Can not load\nsym cache");
+        FURI_LOG_W(TAG, "Failed to init symbol cache");
+        dialog_message_show_storage_error(dialogs, "Cannot load\nsymbol cache");
         return -1;
     }
 
