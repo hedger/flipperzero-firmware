@@ -31,10 +31,10 @@ int32_t elf_loader_app(void* p) {
         FURI_LOG_I(TAG, "ELF Loader start for '%s'", string_get_cstr(file_path));
         int ret = loader_exec_elf(string_get_cstr(file_path), resolver, storage);
         FURI_LOG_I(TAG, "ELF Loader returned: %i", ret);
+        string_clear(file_path);
     }
 
     fw_sym_cache_free();
-    string_clear(file_path);
     free(app_name);
     // furi_log_set_level(FURI_LOG_LEVEL);
     furi_record_close("dialogs");
