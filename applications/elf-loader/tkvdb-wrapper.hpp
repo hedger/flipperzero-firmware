@@ -42,7 +42,7 @@ private:
 
     void check_transaction_count() {
         if(transaction_query_count++ > max_queries_in_transaction) {
-            if (dirty) {
+            if(dirty) {
                 FURI_LOG_I("cpptkv", "autocommitting on count check");
                 commit();
             } else {
@@ -114,10 +114,9 @@ public:
 
     bool drop_contents() {
         close();
-        storage_common_remove(furi_record_open("storage"), db_filename);
+        storage_common_remove(static_cast<Storage*>(furi_record_open("storage")), db_filename);
         furi_record_close("storage");
-        open();
-        return true; // FIXME
+        return open();
     }
 
     bool get(const tK& _key, tV* _value) {
