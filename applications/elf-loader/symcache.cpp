@@ -14,7 +14,7 @@
 TkvDatabase<char*, uint32_t>*database, *hot_database;
 
 bool fw_sym_cache_init() {
-    if(database) {
+    if(database || hot_database) {
         fw_sym_cache_free();
     }
 
@@ -46,18 +46,18 @@ bool fw_sym_cache_init() {
         if(!hot_database->get(CACHE_ID_STRING, &version_id_from_db)) {
             FURI_LOG_W(TAG, "Failed to get version from HOT database!");
             reset_hot_db = true;
-        } else if (version_id_from_os != version_id_from_db) {
+        } else if(version_id_from_os != version_id_from_db) {
             FURI_LOG_W(
                 TAG,
-                "HOT Symbol cache version mismatch (db: %x, os: %x), dropping",
+                "HOT Symbol cache version mismatch (db: %x, os: %x)",
                 version_id_from_db,
                 version_id_from_os);
             reset_hot_db = true;
         }
 
-        if (reset_hot_db) {
+        if(reset_hot_db) {
             FURI_LOG_I(TAG, "Dropping hot db");
-            if (!hot_database->drop_contents()) {
+            if(!hot_database->drop_contents()) {
                 FURI_LOG_I(TAG, "Failed to drop db!");
                 break;
             }
@@ -87,7 +87,7 @@ void fw_sym_cache_free() {
 }
 
 bool fw_sym_cache_ready() {
-    return true;
+    return (database != nullptr) && (hot_database != nullptr);
 }
 
 uint32_t fw_sym_cache_resolve(char* symname) {
