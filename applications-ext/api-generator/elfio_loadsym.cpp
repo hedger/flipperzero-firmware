@@ -81,10 +81,6 @@ bool process_elf(const char* fwname, sym_cb callback) {
                     // bind " << (int)bind << " type " << (int)type << " section " <<
                     // section << " other " << (int)other << std::endl;
 
-                    if(((type != STT_OBJECT) && (type != STT_FUNC)) || (bind != STB_GLOBAL)) {
-                        continue;
-                    }
-
                     if(name == "version") {
                         out << "Found VERSION symbol" << std::endl;
                         std::string git_commit =
@@ -98,6 +94,11 @@ bool process_elf(const char* fwname, sym_cb callback) {
                         callback(
                             BUILD_ID_STRING, version_id_from_hash, STB_GLOBAL, STT_OBJECT, other);
                     }
+
+                    if(((type != STT_OBJECT) && (type != STT_FUNC)) || (bind != STB_GLOBAL)) {
+                        continue;
+                    }
+
                     callback(name.c_str(), static_cast<uint32_t>(value), bind, type, other);
                 }
 
