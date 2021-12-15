@@ -118,7 +118,7 @@ public:
         return open();
     }
 
-    bool get(const tK& _key, tV* _value) {
+    bool get(tK& _key, tV* _value) {
         check_transaction_count();
         key.set(_key);
         if(transaction->get(transaction, &key.datum, &value.datum) != TKVDB_OK) {
@@ -129,7 +129,7 @@ public:
         return true;
     }
 
-    bool put(const tK& _key, tV& _value) {
+    bool put(tK& _key, tV& _value) {
         FURI_LOG_D(TKV_LOG_TAG, "put() %d", value);
         check_transaction_count();
         key.set(_key);

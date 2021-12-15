@@ -1,8 +1,10 @@
 #include "elfio_loadsym.h"
 
 #include <elfio/elfio.hpp>
-#include <iostream>
 #include <elfio/elfio_dump.hpp>
+
+#include <iostream>
+#include <set>
 
 using namespace ELFIO;
 
@@ -35,6 +37,7 @@ bool process_elf(const char* fwname, sym_cb callback) {
     auto& out = std::cout;
 
     elfio reader;
+    std::set<uint32_t> gnu_sym_hashes;
 
     if(!reader.load(fwname)) {
         std::cerr << "Failed to open firmware " << fwname << std::endl;
@@ -99,9 +102,19 @@ bool process_elf(const char* fwname, sym_cb callback) {
                         continue;
                     }
 
+                    uint32_t sym_hash =
+                        elf_gnu_hash(reinterpret_cast<const unsigned char*>(name.c_str()));
+
+                    if (gnu_sym_hashes.find(sym_hash) != gnu_sym_hashes.cend()) {
+                        std::cerr << "HASH COLLISION DETECTED FOR SYMBOL " << name << " = " << sym_hash << std::endl;
+                    }
+                    gnu_sym_hashes.insert(sym_hash);
+                    //out << name << " = " << sym_hash << std::endl;
+
                     callback(name.c_str(), static_cast<uint32_t>(value), bind, type, other);
                 }
 
+                out << "total symbols processed: " << gnu_sym_hashes.size() << std::endl;
                 out << std::endl;
             }
         }
