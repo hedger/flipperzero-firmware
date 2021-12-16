@@ -3,15 +3,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class SymbolProcessor {
+public:
+    virtual ~SymbolProcessor() {};
+    virtual bool init_database(const char* fname) = 0;
+    virtual bool process_symbol(
+        const char* symname,
+        uint32_t address,
+        uint8_t bind,
+        uint8_t type,
+        uint8_t other) = 0;
+};
 
-typedef void (*sym_cb)(const char* symname, uint32_t address, uint8_t bind, uint8_t type, uint8_t other);
-
-bool process_elf(const char* fwname, sym_cb callback);
-
-
-#ifdef __cplusplus
-}
-#endif
+bool process_elf(const char* elfname, SymbolProcessor* processor);
