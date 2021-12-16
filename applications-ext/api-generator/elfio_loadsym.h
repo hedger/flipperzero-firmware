@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <string>
+#include <cstdint>
 
 class SymbolProcessor {
 public:
@@ -15,4 +15,4 @@ public:
         uint8_t other) = 0;
 };
 
-bool process_elf(const char* elfname, SymbolProcessor* processor);
+bool process_elf(std::string objname, SymbolProcessor* processor);

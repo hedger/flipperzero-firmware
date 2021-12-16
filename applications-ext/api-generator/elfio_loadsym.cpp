@@ -33,31 +33,31 @@ std::string get_cstr_from_ptr(const section* section, Elf64_Addr va) {
     return std::string(cstr_ptr + va_section_offs);
 }
 
-bool process_elf(const char* fwname, SymbolProcessor* processor) {
+bool process_elf(std::string objname, SymbolProcessor* processor) {
     auto& out = std::cout;
 
     elfio reader;
     std::set<uint32_t> gnu_sym_hashes;
 
-    if(!reader.load(fwname)) {
-        std::cerr << "Failed to open firmware " << fwname << std::endl;
+    if(!reader.load(objname)) {
+        std::cerr << "Failed to open ELF file " << objname << std::endl;
         return false;
     }
 
     Elf_Half n = reader.sections.size();
 
     section* p_rodata = nullptr;
-    out << "Looking for .rodata... ";
+    //out << "Looking for .rodata... ";
     for(Elf_Half i = 0; i < n; ++i) { // For all sections
         section* sec = reader.sections[i];
         if(".rodata" == sec->get_name()) {
-            out << " is #" << i << std::endl;
+            //out << " is #" << i << std::endl;
             p_rodata = sec;
             break;
         }
     }
     if(p_rodata == nullptr) {
-        std::cerr << ".rodata not found!" << std::endl;
+        //std::cerr << ".rodata not found!" << std::endl;
         // return false;
     }
     // out << get_cstr_from_ptr(p_rodata, 0x080B79F8);
@@ -86,7 +86,7 @@ bool process_elf(const char* fwname, SymbolProcessor* processor) {
                 // bind " << (int)bind << " type " << (int)type << " section " <<
                 // section << " other " << (int)other << std::endl;
 
-                if(name == "version") {
+                if((name == "version") && (p_rodata != nullptr)) {
                     std::string git_commit =
                         get_cstr_from_ptr(p_rodata, get_ptr_from_ptr(p_rodata, value));
                     // Elf64_Addr version_ptr = get_ptr_from_ptr(p_rodata, value);

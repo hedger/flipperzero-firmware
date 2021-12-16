@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "elfio_loadsym.h"
+#include "symbol_filter.h"
 
 #define FLIPPER_FW_SYM_DEFINITION_FILE "fwdef.tkv"
 
@@ -39,6 +40,7 @@ public:
             NULL); /* optional, only if you need to keep data on disk */
         transaction = tkvdb_tr_create(db, NULL); /* pass NULL instead of db for RAM-only db */
         transaction->begin(transaction); /* start */
+        return true;
     }
 
     virtual ~TkvDbProcessor() override {
@@ -128,7 +130,34 @@ public:
     }
 };
 
+class ExcludingMapSymbolProcessor : public MapSymbolProcessor {
+protected:
+    SymbolExclusionFilter* filter;
+
+public:
+    ExcludingMapSymbolProcessor(SymbolExclusionFilter* _filter)
+        : filter(_filter) {
+    }
+
+    virtual bool process_symbol(
+        const char* symname,
+        uint32_t address,
+        uint8_t bind,
+        uint8_t type,
+        uint8_t other) override {
+        if (filter->should_skip(symname)) {
+            std::cout << "skipping '" << symname << "' due to ignore list" << std::endl;
+            return true;
+        }
+        return MapSymbolProcessor::process_symbol(symname, address, bind, type, other);
+    }
+};
+
 int main() {
+    SymbolExclusionFilter f;
+    f.gather_sources("../../../applications", {"dialogs/", "storage/", "gui/"});
+    f.gather_symbols("../../../sesproject/firmware/build/Debug");
+    //return 1;
     // printf("key= %x", elf_gnu_hash("os_FLIPPER_BUILD"));
     // return 0;
     // process_elf("flipper-z-f7-firmware-local.elf", dump_sym);
@@ -138,7 +167,7 @@ int main() {
     TKVDB_RES opres;
 
     {
-        MapSymbolProcessor processor;
+        ExcludingMapSymbolProcessor processor(&f);
         processor.init_database(FLIPPER_FW_SYM_DEFINITION_FILE);
         if(!process_elf("flipper-z-f7-firmware-local.elf", &processor)) {
             return EXIT_FAILURE;
