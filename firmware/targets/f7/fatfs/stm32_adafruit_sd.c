@@ -92,6 +92,7 @@
 #include "string.h"
 #include "stdio.h"
 #include <furi-hal.h>
+#include "sectorcache.h"
 
 #define TAG "ADASD"
 /** @addtogroup BSP
@@ -388,6 +389,14 @@ BSP_SD_ReadBlocksByOne(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks,
     uint8_t retr = BSP_SD_ERROR;
     SD_CmdAnswer_typedef response;
     uint16_t BlockSize = 512;
+    uint8_t* cached_data;
+
+    bool single_sector_read = (NumOfBlocks == 1);
+    if (single_sector_read && (cached_data = sector_cache_get(ReadAddr))) {
+        //FURI_LOG_I(TAG, "SD Cache HIT for sector %x", ReadAddr);
+        memcpy(pData, cached_data, BlockSize);
+        return BSP_SD_OK;
+    }
 
     /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
      Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
@@ -429,6 +438,11 @@ BSP_SD_ReadBlocksByOne(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks,
         /* End the command data read cycle */
         SD_IO_CSState(1);
         SD_IO_WriteByte(SD_DUMMY_BYTE);
+    }
+
+    if (single_sector_read) {
+        sector_cache_put(ReadAddr, pData);
+        //FURI_LOG_I(TAG, "SD Cache Update for sector %x", ReadAddr);
     }
 
     retr = BSP_SD_OK;
@@ -524,6 +538,7 @@ error:
   */
 uint8_t
 BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    //FURI_LOG_I(TAG, "BSP_SD_ReadBlocks: addr=%x, blocks=%d", ReadAddr, NumOfBlocks);
     if (NumOfBlocks <= READ_BLOCK_COUNT_THRESHOLD_USE_MULTI) {
         return BSP_SD_ReadBlocksByOne(pData, ReadAddr, NumOfBlocks, Timeout);
     } else {
@@ -703,6 +718,7 @@ error:
   */
 uint8_t
 BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout) {
+    sector_cache_invalidate_range(WriteAddr, WriteAddr + NumOfBlocks);
     if (NumOfBlocks <= WRITE_BLOCK_COUNT_THRESHOLD_USE_MULTI) {
         return BSP_SD_WriteBlocksByOne(pData, WriteAddr, NumOfBlocks, Timeout);
     } else {
