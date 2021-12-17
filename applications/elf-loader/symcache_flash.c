@@ -6,13 +6,8 @@
 
 #define CACHE_ID_STRING "os_FLIPPER_BUILD"
 
-#define TKV_SYM_PATH "/ext/elf/fwdef.tkv"
-
 #define SYM_NOT_FOUND_VA 0xFFFFFFFF
 #define CACHE_FILE_MAGIC 3250633246
-
-#define PAGE_SIZE 512
-#define ENTRIES_PER_PAGE PAGE_SIZE / sizeof(sym_entry_t)
 
 typedef struct sym_entry {
     uint32_t address;
