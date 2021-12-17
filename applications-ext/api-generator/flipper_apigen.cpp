@@ -132,6 +132,7 @@ public:
 
 class ExcludingMapSymbolProcessor : public MapSymbolProcessor {
 protected:
+    int32_t n_skipped = 0, n_saved = 0;
     SymbolExclusionFilter* filter;
 
 public:
@@ -146,10 +147,18 @@ public:
         uint8_t type,
         uint8_t other) override {
         if (filter->should_skip(symname)) {
-            std::cout << "skipping '" << symname << "' due to ignore list" << std::endl;
+            //std::cout << "skipping '" << symname << "' due to ignore list" << std::endl;
+            n_skipped++;
+            std::cout << symname << " - SKIPPED " <<  std::endl;
             return true;
         }
+        std::cout << symname << " - SAVED " <<  std::endl;
+        n_saved++;
         return MapSymbolProcessor::process_symbol(symname, address, bind, type, other);
+    }
+
+    virtual ~ExcludingMapSymbolProcessor() override {
+        std::cout << std::dec << "saved " << n_saved << ", skipped " << n_skipped << std::endl;
     }
 };
 
