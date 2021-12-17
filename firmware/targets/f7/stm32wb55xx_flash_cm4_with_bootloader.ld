@@ -55,7 +55,11 @@ _Min_Stack_Size = 0x1000; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)                 : ORIGIN = 0x08008000, LENGTH = 992K
+BOOTLOADER (rx)            : ORIGIN = 0x08000000, LENGTH = 32K
+FLASH (rx)                 : ORIGIN = 0x08008000, LENGTH = 751K
+SYMBOLS (r)                : ORIGIN = 0x080C3C00, LENGTH = 25K
+/* radio stack stm32wb5x_BLE_Stack_full_fw.bin is @ 0x080CA000 */
+RADIO_FUS (x)              : ORIGIN = 0x080CA000, LENGTH = 216K
 RAM1 (xrw)                 : ORIGIN = 0x20000008, LENGTH = 0x2FFF8
 RAM_SHARED (xrw)           : ORIGIN = 0x20030000, LENGTH = 10K
 }
@@ -174,6 +178,12 @@ SECTIONS
     __free_flash_start__ = .;
     . = ORIGIN(FLASH) + LENGTH(FLASH);
   } >FLASH
+
+  .sym_data(NOLOAD):
+  {
+    __sym_data_start__ = .;
+    . = ORIGIN(SYMBOLS) + LENGTH(SYMBOLS);
+  } >SYMBOLS
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
