@@ -22,8 +22,7 @@ FlashManagerWorker::FlashManagerWorker()
     , task_executor(std::make_unique<TaskExecutor>(toolkit.get())) {
     FURI_LOG_I(TAG, "ctor()");
 
-    init_mutex(&tasks_mutex, &tasks, sizeof(tasks));
-    tasks_semaphore = osSemaphoreNew(1, 0, nullptr);
+    task_queue = osMessageQueueNew(8, sizeof(WorkerTask*), nullptr);
 
     FURI_LOG_I(TAG, "spawning thread()");
     thread = furi_thread_alloc();
@@ -41,17 +40,15 @@ void FlashManagerWorker::start() {
 void FlashManagerWorker::stop() {
     FURI_LOG_I(TAG, "worker stop flag set");
     worker_running = false;
-    osSemaphoreRelease(tasks_semaphore);
 
     furi_thread_join(thread);
     FURI_LOG_I(TAG, "join() done");
 }
 
 FlashManagerWorker::~FlashManagerWorker() {
+    osMessageQueueDelete(task_queue);
     furi_assert(thread);
     furi_thread_free(thread);
-    delete_mutex(&tasks_mutex);
-    osSemaphoreDelete(tasks_semaphore);
     FURI_LOG_I(TAG, "dtor() done");
 }
 
@@ -69,16 +66,14 @@ bool FlashManagerWorker::enqueue_task(WorkerTask* task) {
         task->size,
         task->data);
 
-    with_value_mutex_cpp(&tasks_mutex, [&](void*) { tasks.push(task); });
+    return osMessageQueuePut(task_queue, &task, 0, 300) == osOK;
 
-    osSemaphoreRelease(tasks_semaphore);
-
-    FURI_LOG_I(TAG, "task posted");
-    return true;
+    //FURI_LOG_I(TAG, "task posted");
+    //return true;
 }
 
 bool FlashManagerWorker::is_busy() const {
-    return !tasks.empty();
+    return osMessageQueueGetCount(task_queue) != 0;
 }
 
 /** Worker thread
@@ -90,41 +85,29 @@ static int32_t flash_manager_worker_thread(void* context) {
     FlashManagerWorker* instance = static_cast<FlashManagerWorker*>(context);
     // SpiToolkit *pToolkit = instance->toolkit.get();
 
-    auto& tasks = instance->tasks;
+    WorkerTask* p_task = nullptr;
 
     while(instance->worker_running) {
-        if(tasks.empty()) {
-            FURI_LOG_I(TAG, "awaiting tasks");
+        osStatus_t task_status = osMessageQueueGet(instance->task_queue, &p_task, nullptr, 100);
 
-            osSemaphoreAcquire(instance->tasks_semaphore, osWaitForever);
-            FURI_LOG_I(TAG, "worker is released");
-
-            if(tasks.empty()) {
-                FURI_LOG_I(TAG, "worker is released with no tasks!");
-                if(instance->worker_running) {
-                    FURI_LOG_E(TAG, "THIS IS A BUG");
-                }
-                continue;
-            }
-            osDelay(100);
+        if(task_status == osErrorTimeout) {
+            continue;
         }
 
-        WorkerTask* pTask = nullptr;
+        if(task_status != osOK) {
+            FURI_LOG_I(TAG, "worker queue dequeue result: %d", task_status);
+            break;
+        }
 
-        with_value_mutex_cpp(&instance->tasks_mutex, [&](void*) {
-            pTask = tasks.front();
-            tasks.pop();
-        });
-
-        instance->task_executor->run(pTask);
+        instance->task_executor->run(p_task);
 
         // instance->active_task = nullptr;
         FURI_LOG_I(
             TAG,
             "task done: op=%d @ %02X, res=%d",
-            pTask->operation,
-            pTask->offset,
-            pTask->success);
+            p_task->operation,
+            p_task->offset,
+            p_task->success);
     }
 
     FURI_LOG_I(TAG, "worker is done");

@@ -2,7 +2,6 @@
 #include <furi-hal.h>
 #include <furi.h>
 #include <memory>
-#include <queue>
 
 class SpiToolkit;
 class TaskExecutor;
@@ -47,7 +46,6 @@ public:
     void start();
     void stop();
 
-    // void enqueue_task(WorkerOperation operation, size_t offset, void *data, size_t size);
     bool enqueue_task(WorkerTask* task);
 
     inline bool is_busy() const;
@@ -55,13 +53,8 @@ public:
     std::unique_ptr<SpiToolkit> toolkit;
     std::unique_ptr<TaskExecutor> task_executor;
 
-    // WorkerTask* active_task;
-
-    std::queue<WorkerTask*> tasks;
-    ValueMutex tasks_mutex;
-    osSemaphoreId_t tasks_semaphore;
+    osMessageQueueId_t task_queue;
 
     volatile bool worker_running;
-    // volatile WorkerOperation current_operation;
     FuriThread* thread;
 };
