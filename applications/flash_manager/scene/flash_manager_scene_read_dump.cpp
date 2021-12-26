@@ -144,7 +144,7 @@ void FlashManagerSceneReadDump::check_tasks_update_progress() {
 
 bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& task) {
     if(!(bool)task) {
-        return enqueue_next_block();
+        return enqueue_next_block(0);
     }
 
     if(task->completed()) {
@@ -152,10 +152,10 @@ bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& ta
             app->file_tools.seek(task->offset);
             app->file_tools.read_buffer(verification_buffer.get(), task->size);
             if(!memcmp(verification_buffer.get(), task->data, task->size)) {
-                FURI_LOG_I(TAG, "verify: block @%x OK", task->offset);
+                FURI_LOG_D(TAG, "verify: block @%x OK", task->offset);
                 string_printf(detail_text, "Block %x+%x OK", task->offset, task->size);
             } else {
-                FURI_LOG_I(TAG, "verify: block @%x MISMATCHED");
+                FURI_LOG_W(TAG, "verify: block @%x MISMATCHED");
                 string_printf(detail_text, "Block %x+%x FAILED!", task->offset, task->size);
                 // TODO: break
             }
@@ -165,8 +165,7 @@ bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& ta
         }
 
         if(task->success) {
-            bytes_read += task->size;
-            return enqueue_next_block();
+            return enqueue_next_block(task->size);
         } else {
             cancelled = true;
             status_line->update_text("FAILED :(");
@@ -177,12 +176,18 @@ bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& ta
     return false;
 }
 
-bool FlashManagerSceneReadDump::enqueue_next_block() {
+bool FlashManagerSceneReadDump::enqueue_next_block(size_t prev_block_size) {
+    if (bytes_read < get_job_size()) {
+        bytes_read += prev_block_size;
+    } else {
+        FURI_LOG_W(TAG, "ADDING EXTRA BYTES READ: %x", prev_block_size);
+    }
+
     if(bytes_queued >= get_job_size()) {
         return false;
     }
 
-    FURI_LOG_I(TAG, "enqueue_next_block: read %d, queued %d", bytes_read, bytes_queued);
+    FURI_LOG_D(TAG, "enqueue_next_block: read %d, queued %d", bytes_read, bytes_queued);
     // TODO: fix tail
     size_t block_size = DUMP_READ_BLOCK_BYTES;
 
@@ -209,7 +214,7 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
 
     target_task = std::make_unique<WorkerTask>(
         WorkerOperation::BlockRead, bytes_queued, target_buffer.get(), block_size);
-    FURI_LOG_I(
+    FURI_LOG_D(
         TAG,
         "enqueue_next_block(): put block from file @ %x + %x to queue task %d to flash @ %x",
         bytes_queued,
@@ -219,7 +224,7 @@ bool FlashManagerSceneReadDump::enqueue_next_block() {
 
     bytes_queued += block_size;
     // TODO: check result
-    FURI_LOG_I(TAG, "enqueue_next_block: adding");
+    FURI_LOG_I(TAG, "enqueue_next_block: adding, next %x", bytes_queued);
     return app->worker->enqueue_task(target_task.get());
 }
 
@@ -231,7 +236,7 @@ size_t FlashManagerSceneReadDump::get_job_size() const {
 void FlashManagerSceneReadDump::on_exit(FlashManager* app) {
     app->file_tools.close();
     if(cancelled && !app->runVerification) {
-        FURI_LOG_I(TAG, "removing unfinished dump '%s'", app->text_store.text);
+        FURI_LOG_W(TAG, "removing unfinished dump '%s'", app->text_store.text);
         app->file_tools.remove_dump_file(app->text_store.text, ChipType::SPI);
     }
 

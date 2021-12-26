@@ -10,8 +10,8 @@ TaskExecutor::TaskExecutor(SpiToolkit* _toolkit)
 }
 
 void TaskExecutor::run(WorkerTask* pTask) {
-    FURI_LOG_I(TAG, "running operation %d", pTask->operation);
-    FURI_LOG_I(
+    FURI_LOG_D(TAG, "running operation %d", pTask->operation);
+    FURI_LOG_T(
         TAG,
         "op: task=%x, code=%d, offs=%x, size=%x, data=%x",
         pTask,

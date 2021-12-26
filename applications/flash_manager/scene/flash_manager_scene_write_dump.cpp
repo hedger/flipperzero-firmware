@@ -148,13 +148,12 @@ void FlashManagerSceneWriteDump::check_tasks_update_progress() {
 
 bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& task) {
     if(!(bool)task) {
-        return enqueue_next_block();
+        return enqueue_next_block(0);
     }
 
     if(task->completed()) {
         if(task->success) {
-            bytes_written += task->size;
-            return enqueue_next_block();
+            return enqueue_next_block(task->size);
         } else {
             cancelled = true;
             status_line->update_text("FAILED :(");
@@ -165,11 +164,17 @@ bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& t
     return false;
 }
 
-bool FlashManagerSceneWriteDump::enqueue_next_block() {
+bool FlashManagerSceneWriteDump::enqueue_next_block(size_t prev_block_size) {
+    if (bytes_written < write_to_chip_size) {
+        bytes_written += prev_block_size;
+    } else {
+        FURI_LOG_W(TAG, "ADDING EXTRA BYTES WRITTEN: %x", prev_block_size);
+    }
+
     if(bytes_queued >= write_to_chip_size) {
         return false;
     }
-    FURI_LOG_I(TAG, "enqueue_next_block: written %d, queued %d", bytes_written, bytes_queued);
+    FURI_LOG_D(TAG, "enqueue_next_block: written %d, queued %d", bytes_written, bytes_queued);
     // TODO: fix tail
     size_t block_size = DUMP_WRITE_BLOCK_BYTES;
 
@@ -200,7 +205,7 @@ bool FlashManagerSceneWriteDump::enqueue_next_block() {
     app->file_tools.read_buffer(target_buffer.get(), block_size);
     target_task = std::make_unique<WorkerTask>(
         WorkerOperation::BlockWrite, bytes_queued, target_buffer.get(), block_size);
-    FURI_LOG_I(
+    FURI_LOG_D(
         TAG,
         "enqueue_next_block(): put block from file @ %x + %x to queue task %d to flash @ %x",
         bytes_queued,
@@ -211,7 +216,7 @@ bool FlashManagerSceneWriteDump::enqueue_next_block() {
     bytes_queued += block_size;
 
     // TODO: check result
-    FURI_LOG_I(TAG, "enqueue_next_block: adding");
+    FURI_LOG_I(TAG, "enqueue_next_block: adding, next %x", bytes_queued);
     return app->worker->enqueue_task(target_task.get());
 }
 

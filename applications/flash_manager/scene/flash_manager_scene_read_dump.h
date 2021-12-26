@@ -21,7 +21,7 @@ private:
     void tick();
 
     void check_tasks_update_progress();
-    bool enqueue_next_block();
+    bool enqueue_next_block(size_t prev_block_size);
     bool check_task_state(std::unique_ptr<WorkerTask>& task);
 
     size_t get_job_size() const;
@@ -38,7 +38,7 @@ private:
     string_t detail_text, status_text;
     size_t bytes_read, bytes_queued, verification_file_size;
 
-    static const int TASK_DEPTH = 1;
+    static const int TASK_DEPTH = 3;
     std::unique_ptr<WorkerTask> reader_tasks[TASK_DEPTH];
     std::unique_ptr<uint8_t[]> read_buffers[TASK_DEPTH];
     //std::unique_ptr<WorkerTask> reader_task;

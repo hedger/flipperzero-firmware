@@ -20,11 +20,11 @@ WorkerTask::WorkerTask(WorkerOperation _operation, size_t _offset, uint8_t* _dat
 FlashManagerWorker::FlashManagerWorker()
     : toolkit(std::make_unique<SpiToolkit>())
     , task_executor(std::make_unique<TaskExecutor>(toolkit.get())) {
-    FURI_LOG_I(TAG, "ctor()");
+    FURI_LOG_T(TAG, "ctor()");
 
     task_queue = osMessageQueueNew(8, sizeof(WorkerTask*), nullptr);
 
-    FURI_LOG_I(TAG, "spawning thread()");
+    FURI_LOG_D(TAG, "spawning thread()");
     thread = furi_thread_alloc();
     furi_thread_set_name(thread, "FlashManagerWorker");
     furi_thread_set_stack_size(thread, 1024);
@@ -38,26 +38,26 @@ void FlashManagerWorker::start() {
 }
 
 void FlashManagerWorker::stop() {
-    FURI_LOG_I(TAG, "worker stop flag set");
+    FURI_LOG_D(TAG, "worker stop flag set");
     worker_running = false;
 
     furi_thread_join(thread);
-    FURI_LOG_I(TAG, "join() done");
+    FURI_LOG_D(TAG, "join() done");
 }
 
 FlashManagerWorker::~FlashManagerWorker() {
-    osMessageQueueDelete(task_queue);
     furi_assert(thread);
     furi_thread_free(thread);
-    FURI_LOG_I(TAG, "dtor() done");
+    osMessageQueueDelete(task_queue);
+    FURI_LOG_D(TAG, "dtor() done");
 }
 
 bool FlashManagerWorker::enqueue_task(WorkerTask* task) {
-    FURI_LOG_I(TAG, "posting task");
+    FURI_LOG_T(TAG, "posting task");
     furi_assert(task);
     furi_assert(task->operation > WorkerOperation::None);
 
-    FURI_LOG_I(
+    FURI_LOG_D(
         TAG,
         "op: task=%x, code=%d, offs=%x, size=%x, data=%x",
         task,
@@ -95,14 +95,14 @@ static int32_t flash_manager_worker_thread(void* context) {
         }
 
         if(task_status != osOK) {
-            FURI_LOG_I(TAG, "worker queue dequeue result: %d", task_status);
+            FURI_LOG_W(TAG, "worker queue dequeue result: %d", task_status);
             break;
         }
 
         instance->task_executor->run(p_task);
 
         // instance->active_task = nullptr;
-        FURI_LOG_I(
+        FURI_LOG_D(
             TAG,
             "task done: op=%d @ %02X, res=%d",
             p_task->operation,

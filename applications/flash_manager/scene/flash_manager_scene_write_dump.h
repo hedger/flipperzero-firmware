@@ -20,7 +20,7 @@ private:
     void finish_write();
     void tick();
     void check_tasks_update_progress();
-    bool enqueue_next_block();
+    bool enqueue_next_block(size_t prev_block_size);
     bool check_task_state(std::unique_ptr<WorkerTask>& task);
 
     //void result_callback(void* context);

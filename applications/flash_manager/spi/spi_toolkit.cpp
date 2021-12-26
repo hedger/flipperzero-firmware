@@ -456,7 +456,7 @@ bool SpiToolkit::detect_flash() {
                 FURI_LOG_I(TAG, "SFDP OK");
                 last_info.valid = true;
             } else if(chip != nullptr) {
-                FURI_LOG_I(TAG, "SFDP Failed, use table info");
+                FURI_LOG_W(TAG, "SFDP Failed, use table info");
                 last_info.name = chip->name;
                 last_info.size = chip->size;
                 last_info.write_mode = chip->write_mode;
@@ -464,7 +464,7 @@ bool SpiToolkit::detect_flash() {
                 last_info.erase_gran_cmd = chip->erase_gran_cmd;
                 last_info.valid = true;
             } else {
-                FURI_LOG_I(TAG, "Can't define chip type");
+                FURI_LOG_W(TAG, "Can't detect chip type");
             }
             break;
         }
@@ -506,16 +506,16 @@ bool SpiToolkit::chip_erase() {
                     }
                     return result;
                 }
-                FURI_LOG_I(TAG, "Can't start Chip Erase");
+                FURI_LOG_W(TAG, "Can't start Chip Erase");
             } else {
-                FURI_LOG_I(TAG, "Can't change Write Enable");
+                FURI_LOG_W(TAG, "Can't change Write Enable");
             }
         } else {
-            FURI_LOG_I(TAG, "Chip status: BUSY");
+            FURI_LOG_W(TAG, "Chip status: BUSY");
         }
         set_write_enabled(false);
     } else {
-        FURI_LOG_I(TAG, "Chip info not valid");
+        FURI_LOG_W(TAG, "Chip info not valid");
     }
     return true;
 }
@@ -558,13 +558,13 @@ bool SpiToolkit::write_block(
             } else if(last_info.write_mode & CHIP_WM_AAI) {
                 result = aai_write(&last_info, offset, data_len, (uint8_t*)p_data);
             } else if(last_info.write_mode & CHIP_WM_DUAL_BUFFER) {
-                FURI_LOG_I(TAG, "Dual-buffer mode not implemented");
+                FURI_LOG_E(TAG, "Dual-buffer mode not implemented");
             }
         } else {
-            FURI_LOG_I(TAG, "Flash address is out of bound.");
+            FURI_LOG_W(TAG, "Flash address is out of bound.");
         }
     } else {
-        FURI_LOG_I(TAG, "Chip info not valid");
+        FURI_LOG_W(TAG, "Chip info not valid");
     }
     return result;
 }
@@ -593,15 +593,15 @@ bool SpiToolkit::read_block(const size_t offset, uint8_t* const p_data, const si
                        p_data,
                        data_len))
                     return true;
-                FURI_LOG_I(TAG, "Read data failed");
+                FURI_LOG_W(TAG, "Read data failed");
             } else {
-                FURI_LOG_I(TAG, "Chip status: BUSY");
+                FURI_LOG_W(TAG, "Chip status: BUSY");
             }
         } else {
-            FURI_LOG_I(TAG, "Flash address is out of bound.");
+            FURI_LOG_W(TAG, "Flash address is out of bound.");
         }
     } else {
-        FURI_LOG_I(TAG, "Chip info not valid");
+        FURI_LOG_W(TAG, "Chip info not valid");
     }
     return false;
 }
