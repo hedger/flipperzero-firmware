@@ -86,7 +86,9 @@ bool FlashManagerSceneReadDump::on_event(FlashManager* app, FlashManager::Event*
     return consumed;
 }
 
-void FlashManagerSceneReadDump::finish_read() {
+void FlashManagerSceneReadDump::finish_read(bool cancel) {
+    cancelled = cancel;
+
     if(!read_completed) {
         read_completed = true;
 
@@ -111,7 +113,7 @@ void FlashManagerSceneReadDump::tick() {
     furi_assert(flash && flash->valid);
 
     if(bytes_read >= get_job_size()) {
-        finish_read();
+        finish_read(false);
     }
 
     if(read_completed) {
@@ -157,7 +159,8 @@ bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& ta
             } else {
                 FURI_LOG_W(TAG, "verify: block @%x MISMATCHED");
                 string_printf(detail_text, "Block %x+%x FAILED!", task->offset, task->size);
-                // TODO: break
+
+                finish_read(true);
             }
         } else {
             app->file_tools.seek(task->offset);
@@ -167,9 +170,8 @@ bool FlashManagerSceneReadDump::check_task_state(std::unique_ptr<WorkerTask>& ta
         if(task->success) {
             return enqueue_next_block(task->size);
         } else {
-            cancelled = true;
             status_line->update_text("FAILED :(");
-            finish_read();
+            finish_read(true);
             return false;
         }
     }

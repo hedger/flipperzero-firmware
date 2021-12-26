@@ -17,9 +17,10 @@ private:
 
     static void next_callback(void* context);
     static void write_callback(void* context);
+    static void verify_callback(void* context);
     static void retry_callback(void* context);
 
-    ButtonElement *retry_btn, *next_btn;
+    ButtonElement *retry_btn, *next_btn, *verify_btn;
     StringElement *header_line, *chip_id_line, *chip_extra_line;
 
     string_t chip_id, chip_extra;

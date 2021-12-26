@@ -41,6 +41,7 @@ public:
         Retry,
         OpReadChip,
         OpWriteChip,
+        OpVerifyChip,
         Cancel
     };
 

@@ -17,7 +17,7 @@ public:
 private:
     FlashManager* app;
 
-    void finish_read();
+    void finish_read(bool cancelled);
     void tick();
 
     void check_tasks_update_progress();

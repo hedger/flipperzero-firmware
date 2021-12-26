@@ -42,10 +42,16 @@ void FlashManagerSceneChipInfo::on_enter(FlashManager* app, bool need_restore) {
     // TODO: move "Write" action to "readed-menu" scene
     const char* next_op = "Next";
     ButtonElementCallback next_cb = FlashManagerSceneChipInfo::next_callback;
+    verify_btn = nullptr;
 
     if(app->run_in_app_mode) {
         next_op = "Write";
         next_cb = &FlashManagerSceneChipInfo::write_callback;
+
+        verify_btn = container->add<ButtonElement>();
+        verify_btn->set_type(ButtonElement::Type::Center, "Verify");
+        verify_btn->set_callback(this, &FlashManagerSceneChipInfo::verify_callback);
+        verify_btn->set_enabled(true);
     }
 
     next_btn = container->add<ButtonElement>();
@@ -98,6 +104,10 @@ bool FlashManagerSceneChipInfo::on_event(FlashManager* app, FlashManager::Event*
     case FlashManager::EventType::OpWriteChip:
         app->scene_controller.switch_to_scene(FlashManager::SceneType::WriteImgProcessScene);
         break;
+    case FlashManager::EventType::OpVerifyChip:
+        app->runVerification = true;
+        app->scene_controller.switch_to_scene(FlashManager::SceneType::ReadImgProcessScene);
+        break;
     default:
         break;
     }
@@ -118,6 +128,11 @@ void FlashManagerSceneChipInfo::next_callback(void* context) {
 
 void FlashManagerSceneChipInfo::write_callback(void* context) {
     FlashManager::Event event{.type = FlashManager::EventType::OpWriteChip};
+    reinterpret_cast<FlashManagerSceneChipInfo*>(context)->app->view_controller.send_event(&event);
+}
+
+void FlashManagerSceneChipInfo::verify_callback(void* context) {
+    FlashManager::Event event{.type = FlashManager::EventType::OpVerifyChip};
     reinterpret_cast<FlashManagerSceneChipInfo*>(context)->app->view_controller.send_event(&event);
 }
 
