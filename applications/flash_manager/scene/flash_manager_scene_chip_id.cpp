@@ -68,7 +68,7 @@ void FlashManagerSceneChipID::tick() {
 
             chip_id_task.reset();
         } else {
-            app->notify_green_blink();
+            app->notify(FlashManager::NotificationMode::GreenBlink);
         }
     }
 }

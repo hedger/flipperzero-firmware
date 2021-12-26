@@ -11,7 +11,7 @@ void FlashManagerSceneShowError::on_enter(FlashManager* app, bool need_restore) 
     popup->enable_timeout();
 
     app->view_controller.switch_to<PopupVM>();
-    app->notify_error();
+    app->notify(FlashManager::NotificationMode::Error);
 }
 
 bool FlashManagerSceneShowError::on_event(FlashManager* app, FlashManager::Event* event) {

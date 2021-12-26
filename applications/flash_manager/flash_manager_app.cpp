@@ -14,8 +14,7 @@ FlashManager::FlashManager()
     , text_store{128}
     , notification{"notification"}
     , storage{"storage"}
-    , dialogs{"dialogs"}
-{
+    , dialogs{"dialogs"} {
     string_init(error_str);
 }
 
@@ -42,8 +41,10 @@ int32_t FlashManager::run(const char* args) {
         run_in_app_mode = true;
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneChipID());
         scene_controller.add_scene(SceneType::ChipInfoScene, new FlashManagerSceneChipInfo());
-        scene_controller.add_scene(SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
-        scene_controller.add_scene(SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
+        scene_controller.add_scene(
+            SceneType::WriteImgProcessScene, new FlashManagerSceneWriteDump());
+        scene_controller.add_scene(
+            SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
         scene_controller.add_scene(SceneType::ShowError, new FlashManagerSceneShowError());
         scene_controller.add_scene(SceneType::ShowSuccess, new FlashManagerSceneShowSuccess());
         scene_controller.process(TICK_LEN_MS, SceneType::Start);
@@ -51,8 +52,10 @@ int32_t FlashManager::run(const char* args) {
         scene_controller.add_scene(SceneType::Start, new FlashManagerSceneStart());
         scene_controller.add_scene(SceneType::ChipIDScene, new FlashManagerSceneChipID());
         scene_controller.add_scene(SceneType::ChipInfoScene, new FlashManagerSceneChipInfo());
-        scene_controller.add_scene(SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
-        scene_controller.add_scene(SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
+        scene_controller.add_scene(
+            SceneType::ReadImgFileNameInputScene, new FlashManagerSceneReadDumpInputFilename());
+        scene_controller.add_scene(
+            SceneType::ReadImgProcessScene, new FlashManagerSceneReadDump());
         scene_controller.add_scene(SceneType::ShowError, new FlashManagerSceneShowError());
         scene_controller.add_scene(SceneType::ShowSuccess, new FlashManagerSceneShowSuccess());
         scene_controller.process(TICK_LEN_MS);
@@ -66,40 +69,45 @@ SpiFlashInfo_t* FlashManager::get_flash_info() {
     return &flash_info;
 }
 
-void FlashManager::notify_green_blink() {
-    notification_message(notification, &sequence_blink_green_10);
-}
+void FlashManager::notify(NotificationMode mode) {
+    const NotificationSequence* sequence = nullptr;
+    switch(mode) {
+    case NotificationMode::GreenBlink:
+        sequence = &sequence_blink_green_10;
+        break;
+    case NotificationMode::YellowBlink:
+        sequence = &sequence_blink_yellow_10;
+        break;
+    case NotificationMode::RedBlink:
+        sequence = &sequence_blink_red_10;
+        break;
+    case NotificationMode::Error:
+        sequence = &sequence_error;
+        break;
+    case NotificationMode::Success:
+        sequence = &sequence_success;
+        break;
+    case NotificationMode::GreenOn:
+        sequence = &sequence_set_green_255;
+        break;
+    case NotificationMode::GreenOff:
+        sequence = &sequence_reset_green;
+        break;
+    case NotificationMode::RedOn:
+        sequence = &sequence_set_red_255;
+        break;
+    case NotificationMode::RedOff:
+        sequence = &sequence_reset_red;
+        break;
+    default:
+        break;
+    }
 
-void FlashManager::notify_yellow_blink() {
-    notification_message(notification, &sequence_blink_yellow_10);
-}
+    if(sequence == nullptr) {
+        return;
+    }
 
-void FlashManager::notify_red_blink() {
-    notification_message(notification, &sequence_blink_red_10);
-}
-
-void FlashManager::notify_error() {
-    notification_message(notification, &sequence_error);
-}
-
-void FlashManager::notify_success() {
-    notification_message(notification, &sequence_success);
-}
-
-void FlashManager::notify_green_on() {
-    notification_message_block(notification, &sequence_set_green_255);
-}
-
-void FlashManager::notify_green_off() {
-    notification_message(notification, &sequence_reset_green);
-}
-
-void FlashManager::notify_red_on() {
-    notification_message_block(notification, &sequence_set_red_255);
-}
-
-void FlashManager::notify_red_off() {
-    notification_message(notification, &sequence_reset_red);
+    notification_message(notification, sequence);
 }
 
 bool FlashManager::make_app_folder() {

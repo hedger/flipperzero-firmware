@@ -100,7 +100,7 @@ void FlashManagerSceneWriteDump::finish_write() {
 
         if(!cancelled) {
             run_verification_btn->set_enabled(true);
-            app->notify_success();
+            app->notify(FlashManager::NotificationMode::Success);
         }
     }
 }
@@ -143,7 +143,7 @@ void FlashManagerSceneWriteDump::check_tasks_update_progress() {
     progress = bytes_written * 100 / write_to_chip_size;
     string_printf(status_text, "%d%% done", progress);
     status_line->update_text(string_get_cstr(status_text));
-    app->notify_red_blink();
+    app->notify(FlashManager::NotificationMode::RedBlink);
 }
 
 bool FlashManagerSceneWriteDump::check_task_state(std::unique_ptr<WorkerTask>& task) {

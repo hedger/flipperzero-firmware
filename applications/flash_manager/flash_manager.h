@@ -55,6 +55,19 @@ public:
         ShowSuccess
     };
 
+    enum class NotificationMode {
+        None,
+        GreenBlink,
+        YellowBlink,
+        RedBlink,
+        Error,
+        Success,
+        GreenOn,
+        GreenOff,
+        RedOn,
+        RedOff
+    };
+
     class Event {
     public:
         union {
@@ -90,15 +103,7 @@ public:
 
     SpiFlashInfo_t* get_flash_info();
 
-    void notify_green_blink();
-    void notify_yellow_blink();
-    void notify_red_blink();
-    void notify_error();
-    void notify_success();
-    void notify_green_on();
-    void notify_green_off();
-    void notify_red_on();
-    void notify_red_off();
+    void notify(NotificationMode mode);
     
     bool make_app_folder();
 private:

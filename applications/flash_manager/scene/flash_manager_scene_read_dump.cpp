@@ -136,9 +136,9 @@ void FlashManagerSceneReadDump::check_tasks_update_progress() {
     status_line->update_text(string_get_cstr(status_text));
 
     if(app->runVerification) {
-        app->notify_green_blink();
+        app->notify(FlashManager::NotificationMode::GreenBlink);
     } else {
-        app->notify_yellow_blink();
+        app->notify(FlashManager::NotificationMode::YellowBlink);
     }
 }
 
