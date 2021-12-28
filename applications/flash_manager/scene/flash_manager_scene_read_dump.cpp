@@ -3,6 +3,7 @@
 #include "../../lfrfid/view/elements/button-element.h"
 #include "../../lfrfid/view/elements/icon-element.h"
 #include "../../lfrfid/view/elements/string-element.h"
+#include "../control/progress_bar.h"
 
 #include "../flash_manager_worker.h"
 
@@ -31,6 +32,11 @@ void FlashManagerSceneReadDump::on_enter(FlashManager* app, bool need_restore) {
     auto line_1 = container->add<StringElement>();
     detail_line = container->add<StringElement>();
     status_line = container->add<StringElement>();
+
+    status_line->set_enabled(false);
+
+    progress = container->add<ProgressBarElement>();
+    progress->setup(15, 34, 104, 16, FontSecondary);
 
     string_printf(status_text, "Please be patient.");
 
@@ -124,17 +130,18 @@ void FlashManagerSceneReadDump::tick() {
 }
 
 void FlashManagerSceneReadDump::check_tasks_update_progress() {
-    uint32_t progress = 0;
+    uint32_t progress_pct = 0;
 
     for(int i = 0; i < TASK_DEPTH; ++i) {
         check_task_state(reader_tasks[i]);
     }
 
     //header_line->update_text("Writing chip...");
-    progress = bytes_read * 100 / get_job_size();
+    progress_pct = bytes_read * 100 / get_job_size();
 
     detail_line->update_text(string_get_cstr(detail_text));
-    string_printf(status_text, "%d%% done", progress);
+    string_printf(status_text, "%d%% done", progress_pct);
+    progress->update_progress(progress_pct);
     status_line->update_text(string_get_cstr(status_text));
 
     if(app->runVerification) {

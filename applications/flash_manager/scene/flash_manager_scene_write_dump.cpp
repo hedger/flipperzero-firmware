@@ -3,6 +3,7 @@
 #include "../../lfrfid/view/elements/button-element.h"
 #include "../../lfrfid/view/elements/icon-element.h"
 #include "../../lfrfid/view/elements/string-element.h"
+#include "../control/progress_bar.h"
 
 #include "../flash_manager_worker.h"
 
@@ -33,6 +34,10 @@ void FlashManagerSceneWriteDump::on_enter(FlashManager* app, bool need_restore) 
     header_line = container->add<StringElement>();
     auto line_2 = container->add<StringElement>();
     status_line = container->add<StringElement>();
+    status_line->set_enabled(false);
+
+    progress = container->add<ProgressBarElement>();
+    progress->setup(15, 34, 104, 16, FontSecondary);
 
     header_line->set_text("Erasing chip...", 64, 17, AlignCenter, AlignBottom, FontSecondary);
     line_2->set_text("Please be patient.", 64, 29, AlignCenter, AlignBottom, FontSecondary);
@@ -131,7 +136,7 @@ void FlashManagerSceneWriteDump::tick() {
 }
 
 void FlashManagerSceneWriteDump::check_tasks_update_progress() {
-    uint32_t progress = 0;
+    uint32_t progress_pct = 0;
     bool wip = false;
     for(int i = 0; i < TASK_DEPTH; ++i) {
         wip |= check_task_state(writer_tasks[i]);
@@ -140,9 +145,10 @@ void FlashManagerSceneWriteDump::check_tasks_update_progress() {
         return;
     }
     header_line->update_text("Writing chip...");
-    progress = bytes_written * 100 / write_to_chip_size;
-    string_printf(status_text, "%d%% done", progress);
+    progress_pct = bytes_written * 100 / write_to_chip_size;
+    string_printf(status_text, "%d%% done", progress_pct);
     status_line->update_text(string_get_cstr(status_text));
+    progress->update_progress(progress_pct);
     app->notify(FlashManager::NotificationMode::RedBlink);
 }
 

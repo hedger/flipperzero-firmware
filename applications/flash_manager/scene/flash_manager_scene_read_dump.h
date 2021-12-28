@@ -5,6 +5,7 @@
 class ButtonElement;
 class StringElement;
 class WorkerTask;
+class ProgressBarElement;
 
 class FlashManagerSceneReadDump : public GenericScene<FlashManager> {
     static const size_t DUMP_READ_BLOCK_BYTES = 8 * 1024;
@@ -31,6 +32,7 @@ private:
     static void done_callback(void* context);
 
     StringElement *detail_line, *status_line;
+    ProgressBarElement* progress;
     ButtonElement* cancel_button;
 
     bool read_completed;

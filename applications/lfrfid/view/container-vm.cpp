@@ -5,31 +5,14 @@
 #include "elements/button-element.h"
 #include <list>
 
-class ContainerVMData {
-public:
-    ContainerVMData(){};
-
-    ~ContainerVMData() {
-        for(auto& it : elements) delete it;
-    };
-
-    std::list<GenericElement*> elements;
-
-    template <typename T> T add(const T element, View* view) {
-        elements.push_back(element);
-        element->set_parent_view(view);
-        return element;
-    }
-
-    void clean() {
-        for(auto& it : elements) delete it;
-        elements.clear();
-    }
+ContainerVMData::~ContainerVMData() {
+    for(auto& it : elements) delete it;
 };
 
-struct ContainerVMModel {
-    ContainerVMData* data;
-};
+void ContainerVMData::clean() {
+    for(auto& it : elements) delete it;
+    elements.clear();
+}
 
 ContainerVM::ContainerVM() {
     view = view_alloc();
@@ -64,17 +47,6 @@ void ContainerVM::clean() {
         model->data->clean();
         return true;
     });
-}
-
-template <typename T> T* ContainerVM::add() {
-    T* element = new T();
-
-    with_view_model_cpp(view, ContainerVMModel, model, {
-        model->data->add(element, view);
-        return true;
-    });
-
-    return element;
 }
 
 void ContainerVM::view_draw_callback(Canvas* canvas, void* model) {
@@ -117,7 +89,3 @@ bool ContainerVM::view_input_callback(InputEvent* event, void* context) {
 
     return consumed;
 }
-
-template StringElement* ContainerVM::add<StringElement>();
-template IconElement* ContainerVM::add<IconElement>();
-template ButtonElement* ContainerVM::add<ButtonElement>();

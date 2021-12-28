@@ -5,6 +5,7 @@
 class StringElement;
 class ButtonElement;
 class WorkerTask;
+class ProgressBarElement;
 
 class FlashManagerSceneWriteDump : public GenericScene<FlashManager> {
     static const size_t DUMP_WRITE_BLOCK_BYTES = 4 * 1024;
@@ -30,6 +31,7 @@ private:
 
     StringElement* header_line;
     StringElement* status_line;
+    ProgressBarElement* progress;
     ButtonElement *cancel_btn, *run_verification_btn;
 
     bool write_completed;
