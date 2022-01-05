@@ -1,7 +1,7 @@
 #include "progress_bar.h"
 #include <gui/elements.h>
-#include "../../lfrfid/view/container-vm.h"
-#include <app-scened-template/text-store.h>
+#include "../../lfrfid/view/container_vm.h"
+#include <app-scened-template/text_store.h>
 
 ProgressBarElement::ProgressBarElement() {
     progress_txt = new TextStore(5);

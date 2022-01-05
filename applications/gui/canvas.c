@@ -3,11 +3,8 @@
 #include "icon_animation_i.h"
 
 #include <furi.h>
-#include <furi-hal.h>
+#include <furi_hal.h>
 #include <u8g2_glue.h>
-
-#include "furi-hal-power.h"
-#include "furi-hal-compress.h"
 
 const CanvasFontParameters canvas_font_params[FontTotalNumber] = {
     [FontPrimary] = {.leading_default = 12, .leading_min = 11, .height = 8, .descender = 2},

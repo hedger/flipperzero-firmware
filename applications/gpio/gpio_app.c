@@ -1,7 +1,7 @@
 #include "gpio_app_i.h"
 
 #include <furi.h>
-#include <furi-hal.h>
+#include <furi_hal.h>
 
 #include "gpio/views/gpio_usb_uart.h"
 

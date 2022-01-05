@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../lfrfid/view/elements/generic-element.h"
+#include "../../lfrfid/view/elements/generic_element.h"
 
 class TextStore;
 

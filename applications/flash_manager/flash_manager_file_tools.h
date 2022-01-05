@@ -2,7 +2,7 @@
 
 #include "chip_type.h"
 
-#include <file-worker-cpp.h>
+#include <file_worker_cpp.h>
 #include <memory>
 #include <string>
 #include <cstdint>

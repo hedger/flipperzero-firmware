@@ -1,17 +1,15 @@
 #include "flash_manager_cli.h"
 
-#include <furi-hal-delay.h>
+#include <furi_hal_delay.h>
 #include <irda.h>
-#include <app-template.h>
+#include <app_template.h>
 #include <cli/cli.h>
 #include <cmsis_os2.h>
 #include <irda_worker.h>
 #include <furi.h>
-#include <furi-hal-irda.h>
 #include <sstream>
 #include <string>
 #include <m-string.h>
-#include <irda_transmit.h>
 #include <sys/types.h>
 
 static void flash_manager_cli_i2c_find(Cli* cli, string_t args, void* context) {

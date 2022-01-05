@@ -1,12 +1,10 @@
 #include <furi.h>
-#include <furi-hal.h>
+#include <furi_hal.h>
 
 #include <gui/view.h>
 #include <gui/view_dispatcher.h>
 #include <gui/modules/submenu.h>
 #include <gui/gui.h>
-
-#include "furi-hal-usb.h"
 
 typedef struct {
     Gui* gui;

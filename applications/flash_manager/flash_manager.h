@@ -3,25 +3,25 @@
 #include "flash_manager_file_tools.h"
 
 #include <furi.h>
-#include <furi-hal.h>
+#include <furi_hal.h>
 
 #include <memory>
 
-#include <generic-scene.hpp>
-#include <scene-controller.hpp>
-#include <view-controller.hpp>
-#include <record-controller.hpp>
-#include <text-store.h>
+#include <generic_scene.hpp>
+#include <scene_controller.hpp>
+#include <view_controller.hpp>
+#include <record_controller.hpp>
+#include <text_store.h>
 
-#include <view-modules/popup-vm.h>
-#include <view-modules/submenu-vm.h>
-#include <view-modules/text-input-vm.h>
-#include <view-modules/byte-input-vm.h>
-#include "../lfrfid/view/container-vm.h"
+#include <view_modules/popup_vm.h>
+#include <view_modules/submenu_vm.h>
+#include <view_modules/text_input_vm.h>
+#include <view_modules/byte_input_vm.h>
+#include "../lfrfid/view/container_vm.h"
 
 #include <storage/storage.h>
 #include <dialogs/dialogs.h>
-#include <notification/notification-messages.h>
+#include <notification/notification_messages.h>
 
 #include "spi/spi_toolkit.h"
 

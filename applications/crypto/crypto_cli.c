@@ -1,10 +1,8 @@
-#include <furi-hal.h>
+#include <furi_hal.h>
 #include <furi.h>
 
 #include <lib/toolbox/args.h>
 #include <cli/cli.h>
-
-#include "furi-hal-crypto.h"
 
 void crypto_cli_print_usage() {
     printf("Usage:\r\n");

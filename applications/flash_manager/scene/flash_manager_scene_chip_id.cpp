@@ -1,8 +1,8 @@
 #include "flash_manager_scene_chip_id.h"
 
-#include "../../lfrfid/view/elements/button-element.h"
-#include "../../lfrfid/view/elements/icon-element.h"
-#include "../../lfrfid/view/elements/string-element.h"
+#include "../../lfrfid/view/elements/button_element.h"
+#include "../../lfrfid/view/elements/icon_element.h"
+#include "../../lfrfid/view/elements/string_element.h"
 
 #include "../flash_manager_worker.h"
 #include "../spi/spi_chips.h"

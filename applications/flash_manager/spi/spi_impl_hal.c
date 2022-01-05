@@ -3,10 +3,10 @@
 #ifndef FLASMMGR_SPI_BITBANG
 
 #include <furi.h>
-#include <furi-hal.h>
+#include <furi_hal.h>
 
-#include <furi-hal-spi.h>
-#include <furi-hal-spi-config.h>
+#include <furi_hal_spi.h>
+#include <furi_hal_spi_config.h>
 
 #define SPI_TIMEOUT 500
 

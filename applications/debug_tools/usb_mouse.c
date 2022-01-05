@@ -1,10 +1,7 @@
 #include <furi.h>
-#include <furi-hal.h>
+#include <furi_hal.h>
 #include <gui/gui.h>
 #include <input/input.h>
-
-#include "furi-hal-usb.h"
-#include "furi-hal-usb-hid.h"
 
 #define MOUSE_MOVE_SHORT 5
 #define MOUSE_MOVE_LONG 20

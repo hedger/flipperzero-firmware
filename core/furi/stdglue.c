@@ -5,10 +5,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include <furi-hal.h>
+#include <furi_hal.h>
 #include <m-dict.h>
-
-#include "furi-hal-console.h"
 
 DICT_DEF2(
     FuriStdglueCallbackDict,
