@@ -3,8 +3,6 @@
 #include <furi.h>
 #include <furi_hal.h>
 
-#include "gpio/views/gpio_usb_uart.h"
-
 static bool gpio_app_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
     GpioApp* app = context;

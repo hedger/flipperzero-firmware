@@ -29,7 +29,7 @@ static void flash_manager_cli_i2c_find(Cli* cli, string_t args, void* context) {
     furi_hal_i2c_release(p_bus);
 }
 
-extern "C" void flash_manager_cli_init() {
+extern "C" void flash_manager_on_system_start() {
     Cli* cli = (Cli*)furi_record_open("cli");
     cli_add_command(
         cli, "flash_i2c_find", CliCommandFlagDefault, flash_manager_cli_i2c_find, NULL);

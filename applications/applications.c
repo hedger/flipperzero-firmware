@@ -60,7 +60,7 @@ extern void storage_on_system_start();
 extern void subghz_on_system_start();
 extern void power_on_system_start();
 extern void unit_tests_on_system_start();
-extern void flash_manager_cli_init();
+extern void flash_manager_on_system_start();
 
 // Settings
 extern int32_t notification_settings_app(void* p);
@@ -204,7 +204,7 @@ const FlipperOnStartHook FLIPPER_ON_SYSTEM_START[] = {
 #endif
 
 #ifdef PLUGIN_FLASH_MANAGER
-    flash_manager_cli_init,
+    flash_manager_on_system_start,
 #endif
 
 #ifdef APP_UNIT_TESTS

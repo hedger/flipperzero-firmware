@@ -70,55 +70,55 @@ const char* furi_hal_version_get_model_name();
  *
  * @return     OTP Version
  */
-FuriHalVersionOtpVersion furi_hal_version_get_otp_version();
+const FuriHalVersionOtpVersion furi_hal_version_get_otp_version();
 
 /** Get hardware version
  *
  * @return     Hardware Version
  */
-uint8_t furi_hal_version_get_hw_version();
+const uint8_t furi_hal_version_get_hw_version();
 
 /** Get hardware target
  *
  * @return     Hardware Target
  */
-uint8_t furi_hal_version_get_hw_target();
+const uint8_t furi_hal_version_get_hw_target();
 
 /** Get hardware body
  *
  * @return     Hardware Body
  */
-uint8_t furi_hal_version_get_hw_body();
+const uint8_t furi_hal_version_get_hw_body();
 
 /** Get hardware body color
  *
  * @return     Hardware Color
  */
-FuriHalVersionColor furi_hal_version_get_hw_color();
+const FuriHalVersionColor furi_hal_version_get_hw_color();
 
 /** Get hardware connect
  *
  * @return     Hardware Interconnect
  */
-uint8_t furi_hal_version_get_hw_connect();
+const uint8_t furi_hal_version_get_hw_connect();
 
 /** Get hardware region
  *
  * @return     Hardware Region
  */
-FuriHalVersionRegion furi_hal_version_get_hw_region();
+const FuriHalVersionRegion furi_hal_version_get_hw_region();
 
 /** Get hardware display id
  *
  * @return     Display id
  */
-FuriHalVersionDisplay furi_hal_version_get_hw_display();
+const FuriHalVersionDisplay furi_hal_version_get_hw_display();
 
 /** Get hardware timestamp
  *
  * @return     Hardware Manufacture timestamp
  */
-uint32_t furi_hal_version_get_hw_timestamp();
+const uint32_t furi_hal_version_get_hw_timestamp();
 
 /** Get pointer to target name
  *
